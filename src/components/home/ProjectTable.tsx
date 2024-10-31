@@ -2,16 +2,22 @@
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
 import {Badge} from "@/components/ui/badge";
 import {cn} from "@/lib/utils";
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
+import {DropdownMenu} from "@/components/ui/dropdown-menu";
 import {Button} from "@/components/ui/button";
-import {ChevronDown, ChevronUp, Edit2} from "lucide-react";
-import {motion} from "framer-motion";
-import {useMemo, useRef, useState} from "react";
+import {ChevronDown, ChevronUp, Edit2, Search} from "lucide-react";
+import {AnimatePresence, motion} from "framer-motion";
+import {useEffect, useMemo, useRef, useState} from "react";
 import {useVirtualizer} from "@tanstack/react-virtual";
+import {useDebounce} from "use-debounce";
+import {Input} from "@/components/ui/input";
+import Link from "next/link";
+
+
+const searchProjects = ['Fostimon', 'Fluoxetine', 'Finasteride', 'Fluconazole']
 
 export interface Project {
     id: string
-    name: string
+    project_name: string
     priority: 'Low' | 'Normal' | 'High' | 'Critical'
     status: 'Planned' | 'In Progress' | 'Completed' | 'On Hold'
 }
@@ -25,9 +31,9 @@ export type SortConfig = {
 export default function ProjectTable() {
 
     const projects: Project[] = useMemo(() =>
-            Array.from({length: 20}, (_, i) => ({
+            Array.from({length: 15}, (_, i) => ({
                 id: `project-${i}`,
-                name: `Project ${i + 1}`,
+                project_name: `Project ${i + 1}`,
                 priority: ['Low', 'Normal', 'High', 'Critical'][Math.floor(Math.random() * 4)] as Project['priority'],
                 status: ['Planned', 'In Progress', 'Completed', 'On Hold'][Math.floor(Math.random() * 4)] as Project['status'],
             }))
@@ -35,6 +41,23 @@ export default function ProjectTable() {
 
     const [sortConfig, setSortConfig] = useState<SortConfig>({key: null, direction: 'asc'})
     const parentRef = useRef<HTMLDivElement>(null)
+    const [searchQuery, setSearchQuery] = useState('')
+    const [debouncedQuery] = useDebounce(searchQuery, 300)
+    const [searchResults, setSearchResults] = useState<string[]>([])
+    const [showResults, setShowResults] = useState(false)
+
+    useEffect(() => {
+        if (debouncedQuery) {
+            const results = searchProjects.filter(term =>
+                term.toLowerCase().includes(debouncedQuery.toLowerCase())
+            )
+            setSearchResults(results)
+            setShowResults(true)
+        } else {
+            setSearchResults([])
+            setShowResults(false)
+        }
+    }, [debouncedQuery])
 
     const sortedProjects = useMemo(() => {
         if (!sortConfig.key) return projects
@@ -71,16 +94,18 @@ export default function ProjectTable() {
     }
 
     const getStatusColor = (status: Project['status']) => {
-        switch (status) {
-            case 'Planned':
-                return 'text-slate-500'
-            case 'In Progress':
-                return 'text-blue-500'
-            case 'Completed':
-                return 'text-emerald-500'
-            case 'On Hold':
-                return 'text-amber-500'
-        }
+        console.log(status)
+        return 'text-slate-500'
+        // switch (status) {
+        //     case 'Planned':
+        //         return 'text-slate-500'
+        //     case 'In Progress':
+        //         return 'text-blue-500'
+        //     case 'Completed':
+        //         return 'text-emerald-500'
+        //     case 'On Hold':
+        //         return 'text-amber-500'
+        // }
     }
 
 
@@ -98,11 +123,11 @@ export default function ProjectTable() {
         return (
             <TableHead
                 style={{width}}
-                className="group cursor-pointer transition-colors hover:bg-muted/50"
+                className="group cursor-pointer transition-colors hover:bg-muted/50 "
                 onClick={() => handleSort(column)}
             >
                 <div className="flex items-center gap-2">
-                    <span>{column.charAt(0).toUpperCase() + column.slice(1)}</span>
+                    <span className="text-2xl">{column.charAt(0).toUpperCase() + column.slice(1)}</span>
                     <div className="flex flex-col opacity-0 group-hover:opacity-100 transition-opacity">
                         <ChevronUp
                             className={cn(
@@ -123,77 +148,120 @@ export default function ProjectTable() {
     }
 
     return (
-        <motion.div
-            initial={{y: 40, opacity: 0}}
-            animate={{y: 0, opacity: 1}}
-            transition={{delay: 0.4}}
-            ref={parentRef}
-            className="border rounded-lg overflow-hidden h-[calc(100vh-20rem)]"
-            style={{
-                overflowY: 'auto',
-                overflowX: 'hidden'
-            }}
-        >
-            <div className="min-w-[800px]">
-                <Table>
-                    <TableHeader className="sticky top-0 bg-background z-10">
-                        <TableRow className="hover:bg-transparent">
-                            <SortableHeader column="name" width="30%"/>
-                            <SortableHeader column="priority" width="30%"/>
-                            <SortableHeader column="status" width="30%"/>
-                            <TableHead style={{width: '10%'}}>Actions</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody style={{
-                        height: `${rowVirtualizer.getTotalSize()}px`,
-                        width: '100%',
-                        position: 'relative',
-                    }}>
-                        {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-                            const project = sortedProjects[virtualRow.index]
-                            return (
-                                <TableRow
-                                    key={project.id}
-                                    className="absolute w-full hover:bg-muted/50 transition-colors"
-                                    style={{
-                                        height: `${virtualRow.size}px`,
-                                        transform: `translateY(${virtualRow.start}px)`,
-                                    }}
-                                >
-                                    <TableCell
-                                        className="py-4 w-[60rem]">{project.name}</TableCell>
-                                    <TableCell style={{width: '30%'}} className="py-4">
-                                        <Badge variant="secondary"
-                                               className={cn('font-medium', getPriorityColor(project.priority))}>
-                                            {project.priority}
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell style={{width: '30%'}} className="py-4">
-                            <span className={cn('font-medium', getStatusColor(project.status))}>
-                              {project.status}
-                            </span>
-                                    </TableCell>
-                                    <TableCell style={{width: '10%'}} className="py-4">
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" size="icon"
-                                                        className="hover:scale-105 transition-transform">
-                                                    <Edit2 className="w-4 h-4"/>
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end">
-                                                <DropdownMenuItem>Edit Project</DropdownMenuItem>
-                                                <DropdownMenuItem>Change Priority</DropdownMenuItem>
-                                                <DropdownMenuItem>Update Status</DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
-                                    </TableCell>
+
+        <>
+            <motion.header
+                initial={{y: -20, opacity: 0}}
+                animate={{y: 0, opacity: 1}}
+                transition={{delay: 0.2}}
+                className="p-4 flex w-full justify-center relative"
+            >
+                <div className="relative bg-[#F0F2F5] border-none rounded-2xl w-full max-w-2xl">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 text-muted-foreground"/>
+                    <Input
+                        placeholder="Search Project"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="pl-12 pr-4 py-6 text-xl w-full h-[46px] focus:outline-none focus:ring-0 focus:border-blue-500"
+                    />
+                    <AnimatePresence>
+                        {showResults && searchResults.length > 0 && (
+                            <motion.div
+                                initial={{opacity: 0, y: -10}}
+                                animate={{opacity: 1, y: 0}}
+                                exit={{opacity: 0, y: -10}}
+                                className="absolute w-full bg-background border rounded-md shadow-lg z-50"
+                            >
+                                {searchResults.map((result) => (
+                                    <motion.div
+                                        key={result}
+                                        initial={{opacity: 0}}
+                                        animate={{opacity: 1}}
+                                        exit={{opacity: 0}}
+                                        className="px-4 py-2 transition-all duration-250 hover:bg-gray-300 cursor-pointer bg-[#98A7A3]"
+                                        onClick={() => {
+                                            setSearchQuery(result)
+                                            setShowResults(false)
+                                        }}
+                                    >
+                                        <span className="font-normal">{result.slice(0, searchQuery.length)}</span>
+                                        <span
+                                            className="text-white font-normal">{result.slice(searchQuery.length)}</span>
+                                    </motion.div>
+                                ))}
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
+            </motion.header>
+
+            <main className="flex-1 p-8 overflow-hidden">
+
+                <motion.div
+                    initial={{y: 40, opacity: 0}}
+                    animate={{y: 0, opacity: 1}}
+                    transition={{delay: 0.4}}
+                    ref={parentRef}
+                    className="border-2 border-gray-200 dark:border-gray-700 rounded-2xl overflow-auto h-[calc(100vh-20rem)] shadow-inner bg-white dark:bg-gray-800"
+                >
+                    <div className="min-w-[900px]">
+                        <Table>
+                            <TableHeader className="sticky top-0 bg-gray-50 dark:bg-gray-900 z-10">
+                                <TableRow className="hover:bg-transparent">
+                                    <SortableHeader column={`${'project Name' as "project_name"}`} width="25%"/>
+                                    <SortableHeader column="priority" width="35%"/>
+                                    <SortableHeader column="status" width="25%"/>
+                                    <TableHead style={{width: '10%'}}
+                                               className="text-lg font-semibold">Actions</TableHead>
                                 </TableRow>
-                            )
-                        })}
-                    </TableBody>
-                </Table>
-            </div>
-        </motion.div>
+                            </TableHeader>
+                            <TableBody style={{
+                                height: `${rowVirtualizer.getTotalSize()}px`,
+                                width: '100%',
+                                position: 'relative',
+                            }}>
+                                {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+                                    const project = sortedProjects[virtualRow.index]
+                                    return (
+                                        <TableRow
+                                            key={project.id}
+                                            className="absolute w-full flex items-center text-center justify-around hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                                            style={{
+                                                height: `${virtualRow.size}px`,
+                                                transform: `translateY(${virtualRow.start}px)`,
+                                            }}
+                                        >
+                                            <TableCell
+                                                className="text-lg">{project.project_name}</TableCell>
+                                            <TableCell style={{width: '30%'}} className="py-6">
+                                                <Badge variant="secondary"
+                                                       className={cn('text-base font-medium px-4 py-2', getPriorityColor(project.priority))}>
+                                                    {project.priority}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell style={{width: '30%'}} className="py-6">
+                                        <span className={cn('text-lg font-bold', getStatusColor(project.status))}>
+                                          {project.status}
+                                        </span>
+                                            </TableCell>
+                                            <TableCell style={{width: '10%'}} className="py-6">
+                                                <DropdownMenu>
+                                                    <Link href={`/project/${project.id}`}>
+                                                        <Button variant="ghost" size="icon"
+                                                                className="hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full w-12 h-12">
+                                                            <Edit2 className="w-6 h-6"/>
+                                                        </Button>
+                                                    </Link>
+                                                </DropdownMenu>
+                                            </TableCell>
+                                        </TableRow>
+                                    )
+                                })}
+                            </TableBody>
+                        </Table>
+                    </div>
+                </motion.div>
+            </main>
+        </>
     )
 }

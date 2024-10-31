@@ -17,7 +17,7 @@ export default function IndustriesMenu(): ReactNode {
         <>
 
             <ListItemButton onClick={() => setIsIndustriesOpen(!isIndustriesOpen)}
-                            className="flex items-center text-black border rounded-2xl mx-2 my-2 hover:bg-gray-200">
+                            className="flex items-center text-black border rounded-2xl my-2 hover:bg-gray-200">
                 <ListItemIcon>
                     <AssignmentIcon className="mr-3"/>
                 </ListItemIcon>

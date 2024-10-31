@@ -1,11 +1,13 @@
 import React, {ReactNode} from "react";
 import {FormControl, FormField, FormItem, FormMessage} from "@/components/ui/form";
 import {InputAdornment, TextField} from "@mui/material";
-import {FormProps} from "@/components/login/form.interface";
 import LockIcon from "@mui/icons-material/Lock";
+import {UseFormReturn} from "react-hook-form";
 
 
-export default function PasswordInput({form}: FormProps): ReactNode {
+export default function PasswordInput({form}: {
+    form: UseFormReturn<{ email: string; password: string; }>;
+}): ReactNode {
     return (
         <FormField
             control={form.control}

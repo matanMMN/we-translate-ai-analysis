@@ -1,5 +1,4 @@
-
-export enum ClientTextMessage{
+export enum ClientTextMessage {
     TEXT_INPUT_PLACEHOLDER_TEXT = "write_here",
     TRANSLATION_TEXT = "translation",
     TEXT_TEXT = "text",
@@ -57,43 +56,145 @@ export function createLanguageText(textsObject: { [key: string]: string }): { [k
 }
 
 
-class Language{
+class Language {
     staticTexts = {
-        [ClientTextMessage.TEXT_INPUT_PLACEHOLDER_TEXT]: createLanguageText({[ClientLanguages.HEBREW]: "הקלד כאן...", [ClientLanguages.ENGLISH]:"הקלד כאן..."}),
-        [ClientTextMessage.TRANSLATION_TEXT]: createLanguageText({[ClientLanguages.HEBREW]: "תרגום", [ClientLanguages.ENGLISH]:"Translation"}),
-        [ClientTextMessage.TEXT_TEXT]: createLanguageText({[ClientLanguages.HEBREW]: "טקסט", [ClientLanguages.ENGLISH]:"Text"}),
-        [ClientTextMessage.SETTINGS_TEXT]: createLanguageText({[ClientLanguages.HEBREW]: "הגדרות", [ClientLanguages.ENGLISH]:"Settings"}),
-        [ClientTextMessage.GENERATE_BUTTON_TEXT]: createLanguageText({[ClientLanguages.HEBREW]: "תרגם הכל", [ClientLanguages.ENGLISH]:"Translate All"}),
-        [ClientTextMessage.TRANSLATE_BUTTON_TEXT]: createLanguageText({[ClientLanguages.HEBREW]: "תרגם", [ClientLanguages.ENGLISH]:"Translate"}),
-        [ClientTextMessage.REFERENCE_FILE_LABEL_TEXT]: createLanguageText({[ClientLanguages.HEBREW]: ":קובץ ייחוס", [ClientLanguages.ENGLISH]:"Reference File:"}),
-        [ClientTextMessage.NO_SELECTED_FILE_TEXT]: createLanguageText({[ClientLanguages.HEBREW]: "קובץ לא נבחר", [ClientLanguages.ENGLISH]:"No file selected"}),
-        [ClientTextMessage.HEBREW_LANGUAGE_TEXT]: createLanguageText({[ClientLanguages.HEBREW]: "עברית", [ClientLanguages.ENGLISH]:"Hebrew"}),
-        [ClientTextMessage.ENGLISH_LANGUAGE_TEXT]: createLanguageText({[ClientLanguages.HEBREW]: "אנגלית", [ClientLanguages.ENGLISH]:"English"}),
-        [ClientTextMessage.ARABIC_LANGUAGE_TEXT]: createLanguageText({[ClientLanguages.HEBREW]: "ערבית", [ClientLanguages.ENGLISH]:"Arabic"}),
-        [ClientTextMessage.LANGUAGE_TEXT]: createLanguageText({[ClientLanguages.HEBREW]: "שפה", [ClientLanguages.ENGLISH]:"language"}),
-        [ClientTextMessage.WEBSITE_HEADER_TEXT]: createLanguageText({[ClientLanguages.HEBREW]: "תרגום עלוני תרופות", [ClientLanguages.ENGLISH]:"Drug Leaflets Translation"}),
-        [ClientTextMessage.SUPPORTED_FILE_TEXT]: createLanguageText({[ClientLanguages.HEBREW]: "DOC, PDF "+ " סוגי קבצים הנתמכים", [ClientLanguages.ENGLISH]:"Supported file types: Docs, PDF"}),
-        [ClientTextMessage.FILE_NOT_FOUND_TEXT]: createLanguageText({[ClientLanguages.HEBREW]: "קובץ לא נמצא", [ClientLanguages.ENGLISH]:"File not found"}),
-        [ClientTextMessage.DRAG_AND_DROP_FILE_TEXT]: createLanguageText({[ClientLanguages.HEBREW]: "גרור קובץ ושחרר" , [ClientLanguages.ENGLISH]:"Drag And drop your files"}),
-        [ClientTextMessage.BROWSE_FILE_TEXT]: createLanguageText({[ClientLanguages.HEBREW]: "בחר קובץ", [ClientLanguages.ENGLISH]:"Browse file"}),
-        [ClientTextMessage.OR_TEXT]: createLanguageText({[ClientLanguages.HEBREW]: "או", [ClientLanguages.ENGLISH]:"OR"}),
-        [ClientTextMessage.SUCCESS_REFERENCE_UPLOAD_TEXT]: createLanguageText({[ClientLanguages.HEBREW]: "קובץ ייחוס הועלה בהצלחה!", [ClientLanguages.ENGLISH]:"reference file uploaded successfuly!"}),
-        [ClientTextMessage.FAIL_REFERENCE_UPLOAD_TEXT]: createLanguageText({[ClientLanguages.HEBREW]: "העלאת קובץ יחוס נכשלה", [ClientLanguages.ENGLISH]:"failed to upload reference file"}),
-        [ClientTextMessage.P_TEXT]: createLanguageText({[ClientLanguages.HEBREW]: "פ", [ClientLanguages.ENGLISH]:"P"}),
-        [ClientTextMessage.INVALID_INPUT_TEXT]: createLanguageText({[ClientLanguages.HEBREW]: "טקסט שגוי", [ClientLanguages.ENGLISH]:"invalid input"}),
-        [ClientTextMessage.PART_TEXT]: createLanguageText({[ClientLanguages.HEBREW]: "חלק", [ClientLanguages.ENGLISH]:"Part"}),
-        [ClientTextMessage.CANCEL_TEXT]: createLanguageText({[ClientLanguages.HEBREW]: "ביטול", [ClientLanguages.ENGLISH]:"Cancel"}),
-        [ClientTextMessage.WARNING_TEXT]: createLanguageText({[ClientLanguages.HEBREW]: "אזהרה", [ClientLanguages.ENGLISH]:"Warning"}),
-        [ClientTextMessage.ENTER_INPUT_TEXT]: createLanguageText({[ClientLanguages.HEBREW]: "אנא הכנס טקסט", [ClientLanguages.ENGLISH]:"please enter text"}),
-        [ClientTextMessage.CONTINUE_TEXT]: createLanguageText({[ClientLanguages.HEBREW]: "המשך", [ClientLanguages.ENGLISH]:"Continue"}),
-        [ClientTextMessage.MISSING_CREDS_TEXT]: createLanguageText({[ClientLanguages.HEBREW]: "חסר שם משתמש או סיסמא", [ClientLanguages.ENGLISH]:"missing username or password"}),
-        [ClientTextMessage.SUCCESSFUL_COPY]: createLanguageText({[ClientLanguages.HEBREW]: "הועתק בהצלחה", [ClientLanguages.ENGLISH]:"successfuly copied"}),
-        [ClientTextMessage.TRANSLATION_PART_TEXT]: createLanguageText({[ClientLanguages.HEBREW]: "חלק", [ClientLanguages.ENGLISH]:"Part"}),
-        [ClientTextMessage.REFERENCE_FILE_NOT_UPLOAD_TEXT]: createLanguageText({[ClientLanguages.HEBREW]: "?"+"קובץ ייחוס לא הועלה, אתה בטוח שאתה רוצה להמשיך", [ClientLanguages.ENGLISH]:"Reference File Was Not Uploaded, Are You Sure You Want To Continue?"}),
-        [ClientTextMessage.ERROR_TEXT_DOES_NOT_CONTAINS_HEBREW]: createLanguageText({[ClientLanguages.HEBREW]: "טקסט אינו מכיל עברית", [ClientLanguages.ENGLISH]:"text does not contains hebrew"}),
-        [ClientTextMessage.INPUT_TOO_SHORT_TEXT]: createLanguageText({[ClientLanguages.HEBREW]: "טקסט קצר מידי", [ClientLanguages.ENGLISH]:"text too short"}),
-        [ClientTextMessage.INPUT_EMPTY_TEXT]: createLanguageText({[ClientLanguages.HEBREW]: "טקסט ריק", [ClientLanguages.ENGLISH]:"empty text"}),
-        [ClientTextMessage.INPUT_TOO_LONG_TEXT]: createLanguageText({[ClientLanguages.HEBREW]: "טקסט ארוך מידי", [ClientLanguages.ENGLISH]:"text too long"}),
+        [ClientTextMessage.TEXT_INPUT_PLACEHOLDER_TEXT]: createLanguageText({
+            [ClientLanguages.HEBREW]: "הקלד כאן...",
+            [ClientLanguages.ENGLISH]: "הקלד כאן..."
+        }),
+        [ClientTextMessage.TRANSLATION_TEXT]: createLanguageText({
+            [ClientLanguages.HEBREW]: "תרגום",
+            [ClientLanguages.ENGLISH]: "Translation"
+        }),
+        [ClientTextMessage.TEXT_TEXT]: createLanguageText({
+            [ClientLanguages.HEBREW]: "טקסט",
+            [ClientLanguages.ENGLISH]: "Text"
+        }),
+        [ClientTextMessage.SETTINGS_TEXT]: createLanguageText({
+            [ClientLanguages.HEBREW]: "הגדרות",
+            [ClientLanguages.ENGLISH]: "Settings"
+        }),
+        [ClientTextMessage.GENERATE_BUTTON_TEXT]: createLanguageText({
+            [ClientLanguages.HEBREW]: "תרגם הכל",
+            [ClientLanguages.ENGLISH]: "Translate All"
+        }),
+        [ClientTextMessage.TRANSLATE_BUTTON_TEXT]: createLanguageText({
+            [ClientLanguages.HEBREW]: "תרגם",
+            [ClientLanguages.ENGLISH]: "Translate"
+        }),
+        [ClientTextMessage.REFERENCE_FILE_LABEL_TEXT]: createLanguageText({
+            [ClientLanguages.HEBREW]: ":קובץ ייחוס",
+            [ClientLanguages.ENGLISH]: "Reference File:"
+        }),
+        [ClientTextMessage.NO_SELECTED_FILE_TEXT]: createLanguageText({
+            [ClientLanguages.HEBREW]: "קובץ לא נבחר",
+            [ClientLanguages.ENGLISH]: "No file selected"
+        }),
+        [ClientTextMessage.HEBREW_LANGUAGE_TEXT]: createLanguageText({
+            [ClientLanguages.HEBREW]: "עברית",
+            [ClientLanguages.ENGLISH]: "Hebrew"
+        }),
+        [ClientTextMessage.ENGLISH_LANGUAGE_TEXT]: createLanguageText({
+            [ClientLanguages.HEBREW]: "אנגלית",
+            [ClientLanguages.ENGLISH]: "English"
+        }),
+        [ClientTextMessage.ARABIC_LANGUAGE_TEXT]: createLanguageText({
+            [ClientLanguages.HEBREW]: "ערבית",
+            [ClientLanguages.ENGLISH]: "Arabic"
+        }),
+        [ClientTextMessage.LANGUAGE_TEXT]: createLanguageText({
+            [ClientLanguages.HEBREW]: "שפה",
+            [ClientLanguages.ENGLISH]: "language"
+        }),
+        [ClientTextMessage.WEBSITE_HEADER_TEXT]: createLanguageText({
+            [ClientLanguages.HEBREW]: "תרגום עלוני תרופות",
+            [ClientLanguages.ENGLISH]: "Drug Leaflets Translation"
+        }),
+        [ClientTextMessage.SUPPORTED_FILE_TEXT]: createLanguageText({
+            [ClientLanguages.HEBREW]: "DOC, PDF " + " סוגי קבצים הנתמכים",
+            [ClientLanguages.ENGLISH]: "Supported file types: Docs, PDF"
+        }),
+        [ClientTextMessage.FILE_NOT_FOUND_TEXT]: createLanguageText({
+            [ClientLanguages.HEBREW]: "קובץ לא נמצא",
+            [ClientLanguages.ENGLISH]: "File not found"
+        }),
+        [ClientTextMessage.DRAG_AND_DROP_FILE_TEXT]: createLanguageText({
+            [ClientLanguages.HEBREW]: "גרור קובץ ושחרר",
+            [ClientLanguages.ENGLISH]: "Drag And drop your files"
+        }),
+        [ClientTextMessage.BROWSE_FILE_TEXT]: createLanguageText({
+            [ClientLanguages.HEBREW]: "בחר קובץ",
+            [ClientLanguages.ENGLISH]: "Browse file"
+        }),
+        [ClientTextMessage.OR_TEXT]: createLanguageText({
+            [ClientLanguages.HEBREW]: "או",
+            [ClientLanguages.ENGLISH]: "OR"
+        }),
+        [ClientTextMessage.SUCCESS_REFERENCE_UPLOAD_TEXT]: createLanguageText({
+            [ClientLanguages.HEBREW]: "קובץ ייחוס הועלה בהצלחה!",
+            [ClientLanguages.ENGLISH]: "reference file uploaded successfuly!"
+        }),
+        [ClientTextMessage.FAIL_REFERENCE_UPLOAD_TEXT]: createLanguageText({
+            [ClientLanguages.HEBREW]: "העלאת קובץ יחוס נכשלה",
+            [ClientLanguages.ENGLISH]: "failed to upload reference file"
+        }),
+        [ClientTextMessage.P_TEXT]: createLanguageText({[ClientLanguages.HEBREW]: "פ", [ClientLanguages.ENGLISH]: "P"}),
+        [ClientTextMessage.INVALID_INPUT_TEXT]: createLanguageText({
+            [ClientLanguages.HEBREW]: "טקסט שגוי",
+            [ClientLanguages.ENGLISH]: "invalid input"
+        }),
+        [ClientTextMessage.PART_TEXT]: createLanguageText({
+            [ClientLanguages.HEBREW]: "חלק",
+            [ClientLanguages.ENGLISH]: "Part"
+        }),
+        [ClientTextMessage.CANCEL_TEXT]: createLanguageText({
+            [ClientLanguages.HEBREW]: "ביטול",
+            [ClientLanguages.ENGLISH]: "Cancel"
+        }),
+        [ClientTextMessage.WARNING_TEXT]: createLanguageText({
+            [ClientLanguages.HEBREW]: "אזהרה",
+            [ClientLanguages.ENGLISH]: "Warning"
+        }),
+        [ClientTextMessage.ENTER_INPUT_TEXT]: createLanguageText({
+            [ClientLanguages.HEBREW]: "אנא הכנס טקסט",
+            [ClientLanguages.ENGLISH]: "please enter text"
+        }),
+        [ClientTextMessage.CONTINUE_TEXT]: createLanguageText({
+            [ClientLanguages.HEBREW]: "המשך",
+            [ClientLanguages.ENGLISH]: "Continue"
+        }),
+        [ClientTextMessage.MISSING_CREDS_TEXT]: createLanguageText({
+            [ClientLanguages.HEBREW]: "חסר שם משתמש או סיסמא",
+            [ClientLanguages.ENGLISH]: "missing username or password"
+        }),
+        [ClientTextMessage.SUCCESSFUL_COPY]: createLanguageText({
+            [ClientLanguages.HEBREW]: "הועתק בהצלחה",
+            [ClientLanguages.ENGLISH]: "successfuly copied"
+        }),
+        [ClientTextMessage.TRANSLATION_PART_TEXT]: createLanguageText({
+            [ClientLanguages.HEBREW]: "חלק",
+            [ClientLanguages.ENGLISH]: "Part"
+        }),
+        [ClientTextMessage.REFERENCE_FILE_NOT_UPLOAD_TEXT]: createLanguageText({
+            [ClientLanguages.HEBREW]: "?" + "קובץ ייחוס לא הועלה, אתה בטוח שאתה רוצה להמשיך",
+            [ClientLanguages.ENGLISH]: "Reference File Was Not Uploaded, Are You Sure You Want To Continue?"
+        }),
+        [ClientTextMessage.ERROR_TEXT_DOES_NOT_CONTAINS_HEBREW]: createLanguageText({
+            [ClientLanguages.HEBREW]: "טקסט אינו מכיל עברית",
+            [ClientLanguages.ENGLISH]: "text does not contains hebrew"
+        }),
+        [ClientTextMessage.INPUT_TOO_SHORT_TEXT]: createLanguageText({
+            [ClientLanguages.HEBREW]: "טקסט קצר מידי",
+            [ClientLanguages.ENGLISH]: "text too short"
+        }),
+        [ClientTextMessage.INPUT_EMPTY_TEXT]: createLanguageText({
+            [ClientLanguages.HEBREW]: "טקסט ריק",
+            [ClientLanguages.ENGLISH]: "empty text"
+        }),
+        [ClientTextMessage.INPUT_TOO_LONG_TEXT]: createLanguageText({
+            [ClientLanguages.HEBREW]: "טקסט ארוך מידי",
+            [ClientLanguages.ENGLISH]: "text too long"
+        }),
 
 
     }
@@ -101,15 +202,15 @@ class Language{
 
 const language = new Language();
 
-export function getClientStaticLanguageText(lang:ClientLanguages ,text:ClientTextMessage){
+export function getClientStaticLanguageText(lang: ClientLanguages, text: ClientTextMessage) {
     return language.staticTexts[text][lang] || "";
 }
 
-export function getServerText(textObject:any,lang:string){
-    return textObject[lang] || "";
+export function getServerText(textObject: string, lang: string) {
+    return textObject[lang as unknown as number] || "";
 }
 
-export function isValidLanguage(value:string){
+export function isValidLanguage(value: string) {
     return Object.values(ClientLanguages).some((lang) => lang === value);
 }
 

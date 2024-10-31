@@ -9,7 +9,6 @@ import Footer from "@/components/footer/Footer"
 import {redirect} from "next/navigation";
 import LeftDrawer from "@/components/drawer/LeftDrawer";
 import HeaderLayout from "@/components/header/HeaderLayout";
-import {SidebarProvider} from "@/components/ui/sidebar";
 import DrawerProvider from "@/components/drawer/DrawerProvider";
 import {log} from "@/lib/log";
 
@@ -54,7 +53,7 @@ export default async function RootLayout(
                 <DrawerProvider>
                     <LeftDrawer/>
                     <div
-                        className={`flex-1 flex flex-col transition-all duration-300 ease-in-out`}>
+                        className={`flex-1 flex flex-col pt-12 px-20 transition-all duration-300 ease-in-out`}>
                         {children}
                     </div>
                 </DrawerProvider>

@@ -1,4 +1,4 @@
-import {Typography, Container, List, ListItem, Link} from '@mui/material';
+import {Typography, Container, List, ListItem} from '@mui/material';
 
 
 export default function HelpPage() {
@@ -18,9 +18,9 @@ export default function HelpPage() {
             </List>
             <Typography variant="h4" gutterBottom>Contact Support</Typography>
             <Typography variant="body1" paragraph>
-                If you need further assistance, please don't hesitate to contact our support team at <Link
+                {`If you need further assistance, please don't hesitate to contact our support team at <Link
                 href="mailto:support@kalimera.ai">support@kalimera.ai</Link>. We're here to help you with any issues or
-                questions you may have.
+                questions you may have.`}
             </Typography>
         </Container>
     )

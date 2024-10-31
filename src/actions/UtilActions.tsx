@@ -1,5 +1,6 @@
 "use server"
 
-export default async function checkIfProjectExists(projectName: string): Promise<boolean> {
-    return false;
+export default async function checkIfProjectExists(projectName: string) {
+    if (projectName)
+        return false;
 }

@@ -4,7 +4,7 @@
 import {Project} from "@/lib/userData";
 
 export default async function getUserProjects() {
-    const allProjects: Array<Project> = await new Promise((resolve: any) => setTimeout(() => {
+    const allProjects: Array<Project> = await new Promise(() => setTimeout(() => {
         return allProjects
     }, 3000))
 

@@ -2,21 +2,22 @@
 
 import {createElement} from '@syncfusion/ej2-base';
 import {Button} from '@syncfusion/ej2-buttons';
+import {DocumentEditor, FormatType} from '@syncfusion/ej2-react-documenteditor';
 import {DropDownButton} from '@syncfusion/ej2-splitbuttons';
 
 export class TitleBar {
     tileBarDiv;
-    documentTitle;
-    documentTitleContentEditor;
-    export;
-    close;
-    print;
-    open;
+    documentTitle: HTMLElement | undefined;
+    documentTitleContentEditor: HTMLElement | undefined;
+    export: DropDownButton | Button | undefined;
+    close: DropDownButton | Button | undefined;
+    print: DropDownButton | Button | undefined;
+    open: DropDownButton | Button | undefined;
     documentEditor;
-    isRtl;
-    dialogComponent;
+    isRtl: undefined;
+    dialogComponent: { hide: () => void; } | null | undefined;
 
-    constructor(element, docEditor, isShareNeeded, isRtl, dialogComponent) {
+    constructor(element?: HTMLElement | null, docEditor?: DocumentEditor, isShareNeeded?: boolean, isRtl?: undefined, dialogComponent?: undefined) {
         //initializes title bar elements.
         this.tileBarDiv = element;
         this.documentEditor = docEditor;
@@ -26,7 +27,7 @@ export class TitleBar {
         this.wireEvents();
     }
 
-    initializeTitleBar = (isShareNeeded) => {
+    initializeTitleBar = (isShareNeeded: boolean | undefined) => {
         let downloadText;
         let downloadToolTip;
         let printText;
@@ -61,15 +62,15 @@ export class TitleBar {
             className: 'single-line'
         });
         this.documentTitleContentEditor.appendChild(this.documentTitle);
-        this.tileBarDiv.appendChild(this.documentTitleContentEditor);
+        this.tileBarDiv!.appendChild(this.documentTitleContentEditor);
         this.documentTitleContentEditor?.setAttribute('title', documentTileText);
-        let btnStyles = 'float:right;background: transparent;box-shadow:none; font-family: inherit;border-color: transparent;'
+        const btnStyles = 'float:right;background: transparent;box-shadow:none; font-family: inherit;border-color: transparent;'
             + 'border-radius: 2px;color:inherit;font-size:12px;text-transform:capitalize;height:28px;font-weight:400;margin-top: 2px;';
         // tslint:disable-next-line:max-line-length
         this.close = this.addButton('e-icons e-close e-de-padding-right', "", btnStyles, 'de-close', closeToolTip, false);
         this.print = this.addButton('e-de-icon-Print e-de-padding-right', printText, btnStyles, 'de-print', printToolTip, false);
         this.open = this.addButton('e-de-icon-Open e-de-padding-right', openText, btnStyles, 'de-open', openText, false);
-        let items = [
+        const items = [
             {text: 'Syncfusion Document Text (*.sfdt)', id: 'sfdt'},
             {text: 'Word Document (*.docx)', id: 'word'},
             {text: 'Word Template (*.dotx)', id: 'dotx'},
@@ -98,56 +99,63 @@ export class TitleBar {
     }
 
     wireEvents = () => {
-        this.print.element.addEventListener('click', this.onPrint);
-        this.close.element.addEventListener('click', this.onClose);
-        this.open.element.addEventListener('click', (e) => {
-            if (e.target.id === 'de-open') {
-                let fileUpload = document.getElementById('uploadfileButton');
-                fileUpload.value = '';
-                fileUpload.click();
-            }
-        });
-        this.documentTitleContentEditor.addEventListener('keydown', (e) => {
-            if (e.keyCode === 13) {
-                e.preventDefault();
-                this.documentTitleContentEditor.contentEditable = 'false';
-                if (this.documentTitleContentEditor.textContent === '') {
-                    this.documentTitleContentEditor.textContent = 'Document1';
+        this.print!.element.addEventListener('click', this.onPrint);
+        this.close!.element.addEventListener('click', this.onClose);
+        this.open!.element.addEventListener('click', (e) => {
+            if ((e.target as HTMLElement)?.id === 'de-open') {
+                const fileUpload: HTMLButtonElement | HTMLElement = document.getElementById('uploadfileButton')!;
+                if (fileUpload instanceof HTMLButtonElement) {
+                    fileUpload!.value = '';
+                    fileUpload?.click();
                 }
             }
         });
-        this.documentTitleContentEditor.addEventListener('blur', () => {
-            if (this.documentTitleContentEditor.textContent === '') {
-                this.documentTitleContentEditor.textContent = 'Document1';
+        this.documentTitleContentEditor!.addEventListener('keydown', (e) => {
+            if (e.keyCode === 13) {
+                e.preventDefault();
+                this.documentTitleContentEditor!.contentEditable = 'false';
+                if (this.documentTitleContentEditor!.textContent === '') {
+                    this.documentTitleContentEditor!.textContent = 'Document1';
+                }
             }
-            this.documentTitleContentEditor.contentEditable = 'false';
-            this.documentEditor.documentName = this.documentTitle.textContent;
         });
-        this.documentTitleContentEditor.addEventListener('click', () => {
+        this.documentTitleContentEditor?.addEventListener('blur', () => {
+            if (this.documentTitleContentEditor?.textContent === '') {
+                this.documentTitleContentEditor!.textContent = 'Document1';
+            }
+            this.documentTitleContentEditor!.contentEditable = 'false';
+            this.documentEditor!.documentName! = this.documentTitle!.textContent as string;
+        });
+        this.documentTitleContentEditor?.addEventListener('click', () => {
             this.updateDocumentEditorTitle();
         });
     };
     updateDocumentEditorTitle = () => {
-        this.documentTitleContentEditor.contentEditable = 'true';
-        this.documentTitleContentEditor.focus();
-        window.getSelection().selectAllChildren(this.documentTitleContentEditor);
+        this.documentTitleContentEditor!.contentEditable = 'true';
+        this.documentTitleContentEditor?.focus();
+        window.getSelection()?.selectAllChildren(this.documentTitleContentEditor!);
     };
     // Updates document title.
     updateDocumentTitle = () => {
-        if (this.documentEditor.documentName === '') {
-            this.documentEditor.documentName = 'Untitled';
+        if (this.documentEditor!.documentName === '') {
+            this.documentEditor!.documentName = 'Untitled';
         }
-        this.documentTitle.textContent = this.documentEditor.documentName;
+        this.documentTitle!.textContent = this.documentEditor!.documentName;
     };
 
     // tslint:disable-next-line:max-line-length
-    addButton(iconClass, btnText, styles, id, tooltipText, isDropDown, items) {
-        let button = createElement('button', {id: id, styles: styles});
-        this.tileBarDiv.appendChild(button);
-        button?.setAttribute('title', tooltipText);
+    addButton(iconClass?: string, btnText?: string, styles?: string, id?: string, tooltipText?: string | undefined, isDropDown?: boolean, items?: {
+        text: string;
+        id: string;
+    }[] | undefined) {
+        const button: HTMLElement = createElement('button', {id: id, styles: styles});
+        this.tileBarDiv!.appendChild(button);
+        if (typeof tooltipText === "string") {
+            button?.setAttribute('title', tooltipText);
+        }
         if (isDropDown) {
             // tslint:disable-next-line:max-line-length
-            let dropButton = new DropDownButton({
+            const dropButton = new DropDownButton({
                 select: this.onExportClick,
                 items: items,
                 iconCss: iconClass,
@@ -156,22 +164,21 @@ export class TitleBar {
                 open: () => {
                     this.setTooltipForPopup();
                 }
-            }, button);
+            }, button as HTMLButtonElement);
             return dropButton;
         } else {
-            let ejButton = new Button({iconCss: iconClass, content: btnText}, button);
-            return ejButton;
+            return new Button({iconCss: iconClass, content: btnText}, button as HTMLButtonElement);
         }
     }
 
     onPrint = () => {
-        this.documentEditor.print();
+        this.documentEditor!.print();
     };
     onClose = () => {
-        this.dialogComponent.hide();
+        this.dialogComponent!.hide();
     };
-    onExportClick = (args) => {
-        let value = args.item.id;
+    onExportClick = (args: { item: { id: string } }) => {
+        const value = args.item.id;
         switch (value) {
             case 'word':
                 this.save('Docx');
@@ -187,8 +194,8 @@ export class TitleBar {
                 break;
         }
     };
-    save = (format) => {
+    save = (format: FormatType | undefined) => {
         // tslint:disable-next-line:max-line-length
-        this.documentEditor.save(this.documentEditor.documentName === '' ? 'sample' : this.documentEditor.documentName, format);
+        this.documentEditor!.save(this.documentEditor!.documentName === '' ? 'sample' : this.documentEditor!.documentName, format!);
     };
 }

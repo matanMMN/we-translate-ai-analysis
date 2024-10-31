@@ -17,7 +17,7 @@ const RouterLink = memo(function RouterLink({primary, url, icon, onClick}: {
     return (
         <Link onClick={onClick && onClick} href={`/${url}`} className=" no-underline text-inherit">
             <ListItemButton
-                className={`${primary !== "Log out" && path === '/' + url ? 'hover:bg-[#1D3B34]' : 'hover:bg-gray-200'} mx-2 my-2 border rounded-2xl ${primary !== "Log out" && (path === '/' + url || (path === '/' + "new-project" && primary === "Home")) && 'bg-[#1D3B34]'}`}>
+                className={`${primary !== "Log out" && path === '/' + url ? 'hover:bg-[#1D3B34]' : 'hover:bg-gray-200'} my-2 border rounded-2xl ${primary !== "Log out" && (path === '/' + url || (path === '/' + "new-project" && primary === "Home")) && 'bg-[#1D3B34]'}`}>
                 <ListItemIcon
                     className={`${primary !== "Log out" && (path === '/' + url || (path === '/' + "new-project" && primary === "Home")) ? 'text-white' : ''}`}>
                     {icon}

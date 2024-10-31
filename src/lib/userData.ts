@@ -42,8 +42,8 @@ export interface Project {
     priority: number;
     status: string;
     currentStepIndex: number;
-    data: any;
-    settings: any;
+    // data: any;
+    // settings: any;
     comments: Array<string>
     dueDate: Date;
     currentUser: User;
@@ -68,8 +68,8 @@ export const allProjects: Array<Project> = [
         priority: 1,
         status: "in-progress",
         currentStepIndex: 2,
-        data: {},
-        settings: {},
+        // data: {},
+        // settings: {},
         comments: ["Initial setup", "Translation started"],
         dueDate: new Date("2024-12-31"),
         currentUser: user,

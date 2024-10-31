@@ -1,5 +1,5 @@
 'use client';
-import React, {useCallback, useRef, useEffect, useState} from 'react';
+import React, {useCallback, useRef, useEffect, useState, MouseEventHandler} from 'react';
 import {usePathname, useRouter} from 'next/navigation';
 
 export default function Modal({children}: Readonly<{ children: React.ReactNode }>) {
@@ -8,15 +8,15 @@ export default function Modal({children}: Readonly<{ children: React.ReactNode }
     const wrapper = useRef(null);
     const router = useRouter();
     const path = usePathname();
-    const [state, setState] = useState(path);
+    const [state] = useState(path);
 
     const onDismiss = useCallback(() => {
         router.back();
     }, [router]);
 
     const onClick = useCallback(
-        (e: any) => {
-            if (e.target === overlay.current || e.target === wrapper.current) {
+        (e: MouseEventHandler<HTMLDivElement>) => {
+            if ((e as unknown as MouseEvent)?.target === overlay.current || (e as unknown as MouseEvent)?.target === wrapper.current) {
                 if (onDismiss) onDismiss();
             }
         },
@@ -24,7 +24,7 @@ export default function Modal({children}: Readonly<{ children: React.ReactNode }
     );
 
     const onKeyDown = useCallback(
-        (e: any) => {
+        (e: KeyboardEvent) => {
             if (e.key === 'Escape') onDismiss();
         },
         [onDismiss]
@@ -43,7 +43,7 @@ export default function Modal({children}: Readonly<{ children: React.ReactNode }
         <div
             ref={overlay}
             className="fixed z-10 left-0 right-0 top-0 bottom-0 mx-auto bg-black/60"
-            onClick={onClick}
+            onClick={onClick as unknown as MouseEventHandler<HTMLDivElement>}
         >
             <div
                 className="w-full h-full flex-wrap flex justify-center content-center text-black p-6"

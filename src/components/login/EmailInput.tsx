@@ -2,9 +2,9 @@ import React, {ReactNode} from "react";
 import {FormControl, FormField, FormItem, FormMessage} from "@/components/ui/form";
 import {InputAdornment, TextField} from "@mui/material";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
-import {FormProps} from "@/components/login/form.interface";
+import {UseFormReturn} from "react-hook-form";
 
-export default function EmailInput({form}: FormProps): ReactNode {
+export default function EmailInput({form}: { form: UseFormReturn<{ email: string; password: string; }>; }): ReactNode {
     return (
         <FormField
             control={form.control}

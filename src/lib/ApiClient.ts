@@ -1,6 +1,6 @@
 // src/api/ApiClient.ts
 
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, CancelTokenSource } from 'axios';
+import axios, {AxiosInstance, AxiosRequestConfig, AxiosResponse, Cancel, CancelTokenSource} from 'axios';
 import config from '../config/config';
 import {User, user} from "@/lib/userData";
 
@@ -8,7 +8,7 @@ import {User, user} from "@/lib/userData";
 type HTTPMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
 interface RequestParams {
-    [key: string]: any;
+    [key: string]: string;
 }
 
 interface RequestHeaders {
@@ -38,7 +38,7 @@ class ApiClient {
             'X-Content-Type-Options': 'nosniff',
             'Referrer-Policy': 'no-referrer-when-downgrade',
         };
-        
+
         this.cancelTokenSource = axios.CancelToken.source();
 
         this.axiosInstance = axios.create({
@@ -73,15 +73,15 @@ class ApiClient {
         ApiClient.instance = this;
     }
 
-    handleApiError(error:any){
-        console.error('API Error:', error.response || error.message); 
+    handleApiError(error: { response: string; message: string; }) {
+        console.error('API Error:', error.response || error.message);
     }
 
-    handleRequestCancel(error:any){
+    handleRequestCancel(error: Cancel) {
         console.error('Request canceled:', error.message);
     }
 
-    handleTimeout(error:any){
+    handleTimeout(error: Cancel) {
         console.error('Request timeout:', error.message);
     }
 
@@ -148,9 +148,9 @@ class ApiClient {
     private async _request<T>(
         path: string,
         method: HTTPMethod,
-        data: any = null,
+        data: { accessToken: string } | FormData | null = null,
         headers: RequestHeaders | null = null,
-        params: RequestParams | null = null,
+        params: RequestParams | null | FormData = null,
         auth: Auth | null = null,
         timeout: number = this.defaultTimeout
     ): Promise<AxiosResponse<T>> {
@@ -165,7 +165,7 @@ class ApiClient {
         };
 
         if (auth) {
-            if (auth.accessToken != undefined){
+            if (auth.accessToken != undefined) {
                 config.headers = {
                     ...config.headers,
                     Authorization: auth.accessToken && `Bearer ${auth.accessToken}`,
@@ -177,15 +177,17 @@ class ApiClient {
         try {
             const response = await this.axiosInstance.request<T>(config);
             return response;
-        } catch (error: any) {
+        } catch (error) {
             if (axios.isCancel(error)) {
                 throw new Error('Request was canceled');
-            } else if (error.code === 'ECONNABORTED') {
+            } else if ((error as { code: string }).code === 'ECONNABORTED') {
                 this.abortRequests();
                 throw new Error('Request timed out');
             } else {
                 if (config.method !== 'GET' && config.method !== 'DELETE') {
-                console.error('Error in request:', error.response || error.message);
+                    console.error('Error in request:', (error as { response: string }).response || (error as {
+                        message: string
+                    }).message);
                 }
                 throw error;
             }
@@ -193,30 +195,29 @@ class ApiClient {
     }
 
 
-    private formatFilters(filters:Record<string, any> | null){
-        const formattedFilters: Record<string, any> = {
+    private formatFilters(filters: Record<string, undefined> | null) {
+        const formattedFilters: Record<string, undefined> = {
             ...filters,
         };
         return formattedFilters;
     }
 
     private async _Many(
-        path: string, 
-        method: HTTPMethod, 
-        data?: any, 
-        headers?: RequestHeaders | null, 
-        params?: RequestParams | null, 
-        auth?: Auth | null, 
+        path: string,
+        method: HTTPMethod,
+        data?: { accessToken: string } | null,
+        headers?: RequestHeaders | null,
+        params?: RequestParams | null,
+        auth?: Auth | null,
         timeout?: number,
         page: number | null = null,
         pageSize: number | null = null,
-        filters: Record<string, any> | null = null,
+        filters: Record<string, undefined> | null = null,
         searchQuery: string | null = null,
         sortBy: string | null = null,
         sortOrder: number | null = null,
-        
-    ): Promise<AxiosResponse<any>> {
-        const formattedFilters: Record<string, any> = this.formatFilters(filters);
+    ): Promise<AxiosResponse> {
+        const formattedFilters: Record<string, undefined> = this.formatFilters(filters);
         const allParams = {
             page,
             page_size: pageSize,
@@ -225,52 +226,52 @@ class ApiClient {
             sort_order: sortOrder,
             ...formattedFilters,
             ...params,
-        };
-        return this._request<any>(path, method, data, headers, allParams, auth,timeout);
+        } as unknown as FormData;
+        return this._request(path, method, data, headers, allParams, auth, timeout);
     }
 
-    public async ping(): Promise<AxiosResponse<any>> {
-        return this._request<any>('/api/ping', 'GET');
+    public async ping(): Promise<AxiosResponse> {
+        return this._request('/api/ping', 'GET');
     }
 
 
-    public async register(): Promise<AxiosResponse<any>> {
-        return this._request<any>('/auth/register', 'GET');
+    public async register(): Promise<AxiosResponse> {
+        return this._request('/auth/register', 'GET');
     }
-    
+
     public async login(email: string, password: string): Promise<User> {
-        const body = { email, password };
+        const body = {email, password};
+        console.log(body)
         // return this._request<any>('/login', 'POST', body);
         return user
     }
-    
-    
-    public async uploadFile(auth: Auth, file: File): Promise<AxiosResponse<any>> {
-        const formData = new FormData();
+
+
+    public async uploadFile(auth: Auth, file: File): Promise<AxiosResponse> {
+        const formData = new FormData() ;
         formData.append('file', file);
         const headers: RequestHeaders = {
             'Content-Type': 'multipart/form-data',
         };
-        return this._request<any>('/files/upload', 'POST', formData, headers, null, auth);
+        return this._request('/files/upload', 'POST', formData, headers, null, auth);
     }
-    
+
     public async downloadFile(auth: Auth, fileId: string): Promise<AxiosResponse<Blob>> {
-        return this._request<Blob>(`/files/download/${fileId}`, 'GET', null, { responseType: 'blob' } as RequestHeaders, null, auth);
+        return this._request<Blob>(`/files/download/${fileId}`, 'GET', null, {responseType: 'blob'} as RequestHeaders, null, auth);
     }
-    
-    public async deleteFile(auth: Auth, fileId: string): Promise<AxiosResponse<any>> {
-        return this._request<any>(`/files/${fileId}`, 'DELETE', null, null, null, auth);
+
+    public async deleteFile(auth: Auth, fileId: string): Promise<AxiosResponse> {
+        return this._request(`/files/${fileId}`, 'DELETE', null, null, null, auth);
     }
-    
-    public async getFileById(auth: Auth, fileId: string): Promise<AxiosResponse<any>> {
-        return this._request<any>(`/files/id/${fileId}`, 'GET', null, null, null, auth);
+
+    public async getFileById(auth: Auth, fileId: string): Promise<AxiosResponse> {
+        return this._request(`/files/id/${fileId}`, 'GET', null, null, null, auth);
     }
-    
-    public async getFileByTitle(auth: Auth, fileTitle: string): Promise<AxiosResponse<any>> {
-        return this._request<any>(`/files/title/${fileTitle}`, 'GET', null, null, null, auth);
+
+    public async getFileByTitle(auth: Auth, fileTitle: string): Promise<AxiosResponse> {
+        return this._request(`/files/title/${fileTitle}`, 'GET', null, null, null, auth);
     }
 }
-
 
 
 const apiClient = ApiClient.getInstance();

@@ -1,5 +1,5 @@
 import Modal from "@/components/Modal";
-import NewProjectForm from "@/components/newProject/NewProjectForm";
+import NewProjectForm from "@/components/newProjectForm/NewProjectForm";
 
 export default function InterceptedNewProjectPage() {
     return (
