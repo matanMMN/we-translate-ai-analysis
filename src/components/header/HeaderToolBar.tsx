@@ -1,6 +1,4 @@
 "use client"
-
-import IconButton from "@mui/material/IconButton";
 import {openDrawer, selectDrawer} from "@/store/slices/drawerSlice";
 import MenuIcon from "@mui/icons-material/Menu";
 import AppLogo from "@/components/header/AppLogo";
@@ -18,15 +16,15 @@ export default function HeaderToolBar() {
         <Toolbar className={"flex flex-row w-full justify-between"}>
             <div className={"flex flex-row"}>
                 {!isOpen &&
-                    <IconButton
+                    <button
                         color="inherit"
                         className={`text-white`}
                         aria-label="open drawer"
                         onClick={() => dispatch(openDrawer())}
-                        edge="start"
+
                     >
                         <MenuIcon/>
-                    </IconButton>
+                    </button>
                 }
                 <AppLogo/>
             </div>

@@ -7,15 +7,16 @@ import {usePathname} from 'next/navigation'
 import {cn} from '@/lib/utils'
 import {Button} from '@/components/ui/button'
 
-export default function ProjectNavBar() {
+export default function ProjectNavBar({projectId}: { projectId: string }) {
     // const router = useRouter()
+
     const path = usePathname()
     const navItems = [
-        {name: 'Project details', path: '/project/details'},
-        {name: 'Editor', path: '/project/editor'},
-        {name: 'Side by side', path: '/project/side-by-side'},
-        {name: 'Translate file', path: '/project/translate-file'},
-        {name: 'Reference file', path: '/project/reference-file'},
+        {name: 'Project details', path: `/${projectId}/details`},
+        {name: 'Editor', path: `/${projectId}/editor`},
+        {name: 'Side by side', path: `/${projectId}/side-by-side`},
+        {name: 'Translate file', path: `/${projectId}/translate-file`},
+        {name: 'Reference file', path: `/${projectId}/reference-file`},
     ]
 
     return (

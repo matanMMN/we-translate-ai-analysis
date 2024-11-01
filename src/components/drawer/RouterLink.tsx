@@ -2,7 +2,7 @@
 
 import React, {MouseEventHandler, ReactNode, memo} from "react";
 import Link from "next/link";
-import {ListItemButton, ListItemIcon, ListItemText} from "@mui/material";
+import {ListItemIcon, ListItemText} from "@mui/material";
 import {usePathname} from "next/navigation";
 
 const RouterLink = memo(function RouterLink({primary, url, icon, onClick}: {
@@ -13,19 +13,19 @@ const RouterLink = memo(function RouterLink({primary, url, icon, onClick}: {
 }): ReactNode {
 
     const path = usePathname();
-
+    console.log(primary, (primary !== "Log out" && (path === '/' + url || (path === '/' + "new-project" && primary === "Home"))))
     return (
         <Link onClick={onClick && onClick} href={`/${url}`} className=" no-underline text-inherit">
-            <ListItemButton
-                className={`${primary !== "Log out" && path === '/' + url ? 'hover:bg-[#1D3B34]' : 'hover:bg-gray-200'} my-2 border rounded-2xl ${primary !== "Log out" && (path === '/' + url || (path === '/' + "new-project" && primary === "Home")) && 'bg-[#1D3B34]'}`}>
+            <button
+                className={`w-full justify-center items-center text-start hover:border-none border-none border-b-4 hover:rounded-md rounded-md inline-flex px-2 py-1 pl-2 ring-transparent ring-0 m-0 gap-0 ${primary !== "Log out" && path === '/' + url ? 'hover:bg-[#1D3B34]' : 'hover:bg-gray-200'} my-2 border rounded-2xl ${primary !== "Log out" && (path === '/' + url || (path === '/' + "new-project" && primary === "Home")) ? 'bg-[#1D3B34]' : 'bg-transparent'}`}>
                 <ListItemIcon
-                    className={`${primary !== "Log out" && (path === '/' + url || (path === '/' + "new-project" && primary === "Home")) ? 'text-white' : ''}`}>
+                    className={`gap-0 m-0 p-0 ${primary !== "Log out" && (path === '/' + url || (path === '/' + "new-project" && primary === "Home")) ? 'text-white' : ''}`}>
                     {icon}
                 </ListItemIcon>
                 <ListItemText
                     className={`text-2xl ${primary !== "Log out" && (path === '/' + url || (path === '/' + "new-project" && primary === "Home")) ? 'text-white' : 'text-black'}`}
                     primary={primary}/>
-            </ListItemButton>
+            </button>
         </Link>
     )
 }, (prevProps, nextProps) => {
