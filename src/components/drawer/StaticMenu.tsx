@@ -16,7 +16,7 @@ export default function StaticMenu() {
     }, [])
 
     return (
-        <div className={" mb-[150px]"}>
+        <nav className="px-2">
             <Divider/>
             <List>
                 <RouterLink primary={"Help Center"} url={"help"} icon={<HelpOutlineIcon/>}/>
@@ -24,6 +24,6 @@ export default function StaticMenu() {
                 <RouterLink primary="Log out" url={""} icon={<ExitToAppIcon/>} onClick={handleSignOut}/>
                 <RouterLink primary={"Settings"} url={"settings"} icon={<SettingsIcon/>}/>
             </List>
-        </div>
+        </nav>
     )
 }

@@ -22,7 +22,7 @@ interface Auth {
 class ApiClient {
     private static instance: ApiClient;
     private baseUrl: string | undefined;
-    private languagePreference: string;
+    // private languagePreference: string;
     private defaultHeaders: RequestHeaders;
     private axiosInstance: AxiosInstance;
     private cancelTokenSource: CancelTokenSource;
@@ -31,10 +31,10 @@ class ApiClient {
     private constructor() {
         this.defaultTimeout = 10000;
         this.baseUrl = config.serverUrl;
-        this.languagePreference = this.mapLanguage(navigator.language);
+        // this.languagePreference = this.mapLanguage(navigator.language);
         this.defaultHeaders = {
             'Content-Type': 'application/json',
-            'Accept-Language': this.languagePreference,
+            // 'Accept-Language': this.languagePreference,
             'X-Content-Type-Options': 'nosniff',
             'Referrer-Policy': 'no-referrer-when-downgrade',
         };
@@ -113,9 +113,9 @@ class ApiClient {
     /**
      * Gets the current language preference.
      */
-    public getLanguagePreference(): string {
-        return this.languagePreference;
-    }
+    // public getLanguagePreference(): string {
+    //     return this.languagePreference;
+    // }
 
     /**
      * Maps the browser language to the application's language settings.
@@ -130,7 +130,7 @@ class ApiClient {
      * @param language The language code to set.
      */
     public setLanguagePreference(language: string): void {
-        this.languagePreference = language;
+        // this.languagePreference = language;
         this.defaultHeaders['Accept-Language'] = language;
         this.axiosInstance.defaults.headers['Accept-Language'] = language;
     }
@@ -248,7 +248,7 @@ class ApiClient {
 
 
     public async uploadFile(auth: Auth, file: File): Promise<AxiosResponse> {
-        const formData = new FormData() ;
+        const formData = new FormData();
         formData.append('file', file);
         const headers: RequestHeaders = {
             'Content-Type': 'multipart/form-data',

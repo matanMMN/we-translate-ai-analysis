@@ -246,7 +246,7 @@ export default function ProjectTable() {
                                             </TableCell>
                                             <TableCell style={{width: '10%'}} className="py-6">
                                                 <DropdownMenu>
-                                                    <Link href={`/project/${project.id}`}>
+                                                    <Link href={`/${project.id}/details`}>
                                                         <Button variant="ghost" size="icon"
                                                                 className="hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full w-12 h-12">
                                                             <Edit2 className="w-6 h-6"/>

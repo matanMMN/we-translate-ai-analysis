@@ -1,8 +1,8 @@
 "use client"
 import {selectDrawer, toggleDrawer} from "@/store/slices/drawerSlice";
-import {ChildrenProps} from "@/app/(content)/layout";
 import {useDispatch, useSelector} from "react-redux";
 import {SidebarProvider} from "@/components/ui/sidebar";
+import {ChildrenProps} from "@/app/layout";
 
 export default function DrawerProvider({children}: ChildrenProps) {
     const isOpen = useSelector(selectDrawer)

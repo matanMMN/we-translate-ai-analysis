@@ -7,9 +7,11 @@ import ProjectNavBar from "@/components/project/ProjectNavBar";
 
 export default async function ProjectLayout(
     {
-        children
+        children,
+        params
     }: {
         children: ReactNode,
+        params: { projectId: string }
     }): Promise<ReactNode> {
 
     if (!await AuthGuard())
@@ -17,9 +19,10 @@ export default async function ProjectLayout(
 
     log("Rendering specific project layout");
 
+    const { projectId } = await params
     return (
         <>
-            <ProjectNavBar/>
+            <ProjectNavBar projectId={projectId}/>
             {children}
         </>
     );

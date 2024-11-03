@@ -10,10 +10,11 @@ import MenuBar from "@/components/drawer/MenuBar";
 const LeftDrawer = (): ReactNode => {
 
     const {toggleSidebar} = useSidebar()
+    // className={`fixed top-0 mt-[80px] left-0 h-full transition-all duration-300 ease-in-out`}>
 
     return (
         <Sidebar
-            className={`fixed top-0 mt-[80px] left-0 h-full transition-all duration-300 ease-in-out`}>
+            className={` fixed top-0 mt-[80px] pb-[130px] xl:w-[--sidebar-width] left-0 transition-all duration-300 ease-in-out`}>
             <SidebarContent className="flex flex-col h-full bg-[#F0F2F5]">
                 <button className="p-4 w-full justify-end items-end content-end flex flex-row"
                         onClick={toggleSidebar}>

@@ -16,14 +16,14 @@ export default function IndustriesMenu(): ReactNode {
     return (
         <>
 
-            <ListItemButton onClick={() => setIsIndustriesOpen(!isIndustriesOpen)}
-                            className="flex items-center text-black border rounded-2xl my-2 hover:bg-gray-200">
+            <button onClick={() => setIsIndustriesOpen(!isIndustriesOpen)}
+                            className=" w-full text-start hover:border-none border-none border-b-4 hover:rounded-md rounded-md inline-flex px-2 py-1 pl-2 ring-transparent ring-0 m-0 gap-0 items-center text-black border  my-2 hover:bg-gray-200">
                 <ListItemIcon>
                     <AssignmentIcon className="mr-3"/>
                 </ListItemIcon>
                 <ListItemText className="text-2xl text-black" primary="Industries"/>
                 {isIndustriesOpen ? <ChevronUp size={20}/> : <ChevronDown size={20}/>}
-            </ListItemButton>
+            </button>
 
 
             <Collapse in={isIndustriesOpen}>
