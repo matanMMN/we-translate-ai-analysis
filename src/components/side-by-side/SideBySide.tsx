@@ -11,7 +11,7 @@ import {useSections} from '@/hooks/useSections';
 import {useAppDispatch} from '@/hooks/useAppDispatch';
 import {useAppSelector} from '@/hooks/useAppSelector';
 import {
-    selectActiveSectionData,
+    selectActiveSectionData, selectSections,
     selectSourceLanguage,
     selectTargetLanguage,
     updateSection
@@ -27,19 +27,24 @@ export default function SideBySide() {
     const params = useParams();
     const projectId = params.projectId as string;
 
+    const sidebysideSlice = useAppSelector(state => state.sideBySide)
+    console.log(sidebysideSlice)
+
     const dispatch = useAppDispatch();
-    const {isLoading, error} = useSections();
-    const activeSection = useAppSelector(selectActiveSectionData);
+    // const {isLoading, error} = useSections();
+    const activeSection = useAppSelector(selectActiveSectionData)
     const sourceLang = useAppSelector(selectSourceLanguage);
     const targetLang = useAppSelector(selectTargetLanguage);
     const [isGlossaryOpen, setIsGlossaryOpen] = useState(false);
     const [isTranslating, setIsTranslating] = useState(false);
 
-    useEffect(() => {
-        if (error) {
-            toast.error('Failed to load sections');
-        }
-    }, [error]);
+
+    console.log(activeSection)
+    // useEffect(() => {
+    //     if (error) {
+    //         toast.error('Failed to load sections');
+    //     }
+    // }, [error]);
 
     const handleTranslate = async () => {
         if (!activeSection?.sourceContent) {
@@ -75,13 +80,13 @@ export default function SideBySide() {
         }
     };
 
-    if (isLoading) {
-        return (
-            <div className="flex items-center justify-center h-[calc(100vh-300px)]">
-                <LoadingSpinner/>
-            </div>
-        );
-    }
+    // if (isLoading) {
+    //     return (
+    //         <div className="flex items-center justify-center h-[calc(100vh-300px)]">
+    //             <LoadingSpinner/>
+    //         </div>
+    //     );
+    // }
 
     if (!activeSection) {
         return (
@@ -90,7 +95,6 @@ export default function SideBySide() {
             </div>
         );
     }
-    console.log(activeSection.sourceContent)
     return (
         <div className="flex h-[calc(100vh-300px)]">
             <SectionNavigation/>
@@ -105,12 +109,12 @@ export default function SideBySide() {
                         isRTL={sourceLang === 'he'}
                         readOnly={true} // Source content is read-only as it comes from the editor
                     />
-                    <QuillEditor
-                        id={activeSection.id}
-                        content={activeSection.targetContent}
-                        readOnly={false} // Target content is editable for translation
-                        isRTL={true} // Hebrew is always RTL
-                    />
+                    {/*<QuillEditor*/}
+                    {/*    id={activeSection.id}*/}
+                    {/*    content={activeSection.targetContent}*/}
+                    {/*    readOnly={false} // Target content is editable for translation*/}
+                    {/*    isRTL={true} // Hebrew is always RTL*/}
+                    {/*/>*/}
                 </div>
 
                 <div className="flex justify-between items-center mt-4">

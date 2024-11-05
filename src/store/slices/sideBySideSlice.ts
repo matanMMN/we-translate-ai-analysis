@@ -174,7 +174,10 @@ export const selectActiveSection = (state: RootState) => state.sideBySide.active
 export const selectSourceLanguage = (state: RootState) => state.sideBySide.sourceLanguage;
 export const selectTargetLanguage = (state: RootState) => state.sideBySide.targetLanguage;
 export const selectActiveSectionData = (state: RootState) =>
-    state.sideBySide.sections.find((section: Section) => section.id === state.sideBySide.activeSection);
+    state.sideBySide.sections.find((section: Section) => {
+        console.log(section.id, state.sideBySide.activeSection, typeof section.id, typeof state.sideBySide.activeSection)
+        return section.id == state.sideBySide.activeSection
+    });
 export const selectIsLoading = (state: RootState) => state.sideBySide.isLoading;
 export const selectError = (state: RootState) => state.sideBySide.error;
 
