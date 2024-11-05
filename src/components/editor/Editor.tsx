@@ -16,7 +16,7 @@ import {useAppDispatch} from "@/hooks/useAppDispatch";
 
 DocumentEditorContainerComponent.Inject(Toolbar);
 
-export default function Editor({userSession, headerTitle, readOnly = false, closeButton = false}: EditorConfig) {
+export default function Editor({userSession, headerTitle, readOnly = false, closeButton = false, projectId}: EditorConfig) {
 
     const dispatch = useAppDispatch();
     const router = useRouter();
@@ -26,6 +26,7 @@ export default function Editor({userSession, headerTitle, readOnly = false, clos
     const [docxHash, setDocxHash] = useState<string | null>(null);
     const [commentsHash, setCommentsHash] = useState<string | null>(null);
     const hostUrl = "https://services.syncfusion.com/react/production/api/documenteditor/";
+    const sourceLanguage = "he";
     let titleBar: TitleBar;
 
     useEffect(() => {
@@ -56,7 +57,12 @@ export default function Editor({userSession, headerTitle, readOnly = false, clos
         await handleFileLoad(container, userSession, headerTitle, titleBar);
 
         if (!readOnly) {
-            setupContextMenu(container, dispatch, router.push);
+            setupContextMenu({
+                container,
+                dispatch,
+                navigate: router.push,
+                projectId,
+                sourceLanguage});
         }
 
         // Set toolbar items based on mode

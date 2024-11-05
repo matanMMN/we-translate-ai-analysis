@@ -6,12 +6,14 @@ interface CopyToSideBySideOptions {
     text: string;
     sourceLanguage: string;
     dispatch: AppDispatch;
+    projectId: string | undefined;
 }
 
 export const copyTextToSideBySide = async ({
                                                text,
                                                sourceLanguage,
                                                dispatch,
+                                               projectId,
                                            }: CopyToSideBySideOptions): Promise<boolean> => {
     try {
         const cleanedText = text.trim();
@@ -22,17 +24,16 @@ export const copyTextToSideBySide = async ({
         }
 
         // Initialize the section in Redux
-        await dispatch(initializeWithText({
-            text: cleanedText,
-            sourceLanguage
-        }));
+        dispatch(initializeWithText({text: cleanedText, sourceLanguage}));
 
         // Save the section to file system and backend
-        const result = await dispatch(saveSectionToFile({
-            id: '1',
-            sourceContent: cleanedText,
-            targetContent: '',
-        })).unwrap();
+        const result = "success"
+        // const result = await dispatch(saveSectionToFile({
+        //     id: '1',
+        //     sourceContent: cleanedText,
+        //     targetContent: '',
+        //     projectId
+        // })).unwrap();
 
         if (result) {
             toast.success('Text copied to Side by Side');

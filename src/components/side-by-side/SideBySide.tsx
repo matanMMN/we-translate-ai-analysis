@@ -1,31 +1,37 @@
 'use client'
 
-import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { ThumbsUp, ThumbsDown } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { LanguageSelector } from './LanguageSelector';
-import { QuillEditor } from './QuillEditor';
-import { GlossaryModal } from './GlossaryModal';
-import { SectionNavigation } from './SectionNavigation';
-import { useSections } from '@/hooks/useSections';
-import { 
-    selectActiveSectionData, 
-    selectSourceLanguage, 
-    selectTargetLanguage, 
-    updateSection 
+import {useEffect} from 'react';
+import {ThumbsUp, ThumbsDown} from 'lucide-react';
+import {Button} from '@/components/ui/button';
+import {LanguageSelector} from './LanguageSelector';
+import {QuillEditor} from './QuillEditor';
+import {GlossaryModal} from './GlossaryModal';
+import {SectionNavigation} from './SectionNavigation';
+import {useSections} from '@/hooks/useSections';
+import {useAppDispatch} from '@/hooks/useAppDispatch';
+import {useAppSelector} from '@/hooks/useAppSelector';
+import {
+    selectActiveSectionData,
+    selectSourceLanguage,
+    selectTargetLanguage,
+    updateSection
 } from '@/store/slices/sideBySideSlice';
-import { translateText } from '@/services/translationService';
-import { useState } from 'react';
-import { toast } from 'sonner';
+import {translateText} from '@/services/translationService';
+import {useState} from 'react';
+import {toast} from 'sonner';
+import {useParams} from 'next/navigation';
 import LoadingSpinner from "@/components/LoadingSpinner";
 
+
 export default function SideBySide() {
-    const dispatch = useDispatch();
-    const { isLoading, error } = useSections(); // Fetch sections on mount
-    const activeSection = useSelector(selectActiveSectionData);
-    const sourceLang = useSelector(selectSourceLanguage);
-    const targetLang = useSelector(selectTargetLanguage);
+    const params = useParams();
+    const projectId = params.projectId as string;
+
+    const dispatch = useAppDispatch();
+    const {isLoading, error} = useSections();
+    const activeSection = useAppSelector(selectActiveSectionData);
+    const sourceLang = useAppSelector(selectSourceLanguage);
+    const targetLang = useAppSelector(selectTargetLanguage);
     const [isGlossaryOpen, setIsGlossaryOpen] = useState(false);
     const [isTranslating, setIsTranslating] = useState(false);
 
@@ -42,17 +48,18 @@ export default function SideBySide() {
         }
 
         if (!sourceLang) {
-            toast.error('Please select source language');
+            toast.error('Source language not detected');
             return;
         }
 
         setIsTranslating(true);
         try {
-            const result = await translateText(
-                activeSection.sourceContent,
+            const result = await translateText({
+                text: activeSection.sourceContent,
                 sourceLang,
-                targetLang
-            );
+                targetLang,
+                projectId
+            });
 
             dispatch(updateSection({
                 id: activeSection.id,
@@ -62,13 +69,18 @@ export default function SideBySide() {
             toast.success('Translation completed!');
         } catch (error) {
             console.error('Translation failed:', error);
+            toast.error('Translation failed. Please try again.');
         } finally {
             setIsTranslating(false);
         }
     };
 
     if (isLoading) {
-        return <LoadingSpinner />;
+        return (
+            <div className="flex items-center justify-center h-[calc(100vh-300px)]">
+                <LoadingSpinner/>
+            </div>
+        );
     }
 
     if (!activeSection) {
@@ -78,42 +90,43 @@ export default function SideBySide() {
             </div>
         );
     }
-
+    console.log(activeSection.sourceContent)
     return (
         <div className="flex h-[calc(100vh-300px)]">
-            <SectionNavigation />
-            
+            <SectionNavigation/>
+
             <div className="flex-1 flex flex-col p-4">
-                <LanguageSelector />
+                <LanguageSelector sourceLanguage={sourceLang || ''}/>
 
                 <div className="grid grid-cols-2 gap-4 flex-1">
                     <QuillEditor
                         id={activeSection.id}
                         content={activeSection.sourceContent}
                         isRTL={sourceLang === 'he'}
+                        readOnly={true} // Source content is read-only as it comes from the editor
                     />
                     <QuillEditor
                         id={activeSection.id}
                         content={activeSection.targetContent}
-                        readOnly
-                        isRTL={true}
+                        readOnly={false} // Target content is editable for translation
+                        isRTL={true} // Hebrew is always RTL
                     />
                 </div>
 
                 <div className="flex justify-between items-center mt-4">
                     <div className="flex gap-2">
                         <Button variant="ghost" size="icon" className="rounded-full">
-                            <ThumbsUp className="h-4 w-4" />
+                            <ThumbsUp className="h-4 w-4"/>
                         </Button>
                         <Button variant="ghost" size="icon" className="rounded-full">
-                            <ThumbsDown className="h-4 w-4" />
+                            <ThumbsDown className="h-4 w-4"/>
                         </Button>
                     </div>
                     <div className="flex gap-2">
                         <Button
                             className="bg-[#1D3B34] hover:bg-[#1D3B34]/90 text-white px-8"
                             onClick={handleTranslate}
-                            disabled={isTranslating}
+                            disabled={isTranslating || !sourceLang}
                         >
                             {isTranslating ? 'Translating...' : 'Translate'}
                         </Button>
@@ -127,17 +140,13 @@ export default function SideBySide() {
                 </div>
             </div>
 
-            <GlossaryModal 
-                open={isGlossaryOpen} 
+            <GlossaryModal
+                open={isGlossaryOpen}
                 onOpenChange={setIsGlossaryOpen}
                 sourceLang={sourceLang || ''}
                 targetLang={targetLang}
+                projectId={projectId}
             />
         </div>
     );
 }
-
-
-
-
-

@@ -1,31 +1,57 @@
 'use client'
 
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
-import { useDispatch, useSelector } from "react-redux";
-import { 
+import { Plus, Trash2 } from "lucide-react";
+import { useAppDispatch } from "@/hooks/useAppDispatch";
+import { useAppSelector } from "@/hooks/useAppSelector";
+import {
     addSection, 
+    deleteSection,
     selectActiveSection, 
-    selectSections, 
-    setActiveSection 
+    selectSections,
+    updateSection 
 } from "@/store/slices/sideBySideSlice";
+import { toast } from "sonner";
 
 export function SectionNavigation() {
-    const dispatch = useDispatch();
-    const sections = useSelector(selectSections);
-    const activeSection = useSelector(selectActiveSection);
+    const dispatch = useAppDispatch();
+    const sections = useAppSelector(selectSections);
+    const activeSection = useAppSelector(selectActiveSection);
+
+    const handleDeleteSection = (id: string) => {
+        if (sections.length <= 1) {
+            toast.error("Cannot delete the last section");
+            return;
+        }
+        dispatch(deleteSection(id));
+    };
+
+    const handleSectionClick = (id: string) => {
+        dispatch(updateSection({ id }));
+    };
 
     return (
         <div className="w-12 border-r bg-background flex flex-col items-center py-4 space-y-2">
             {sections.map((section) => (
-                <Button
-                    key={section.id}
-                    variant={activeSection === section.id ? "default" : "ghost"}
-                    className="w-8 h-8 rounded-full"
-                    onClick={() => dispatch(setActiveSection(section.id))}
-                >
-                    {section.id}
-                </Button>
+                <div key={section.id} className="relative group">
+                    <Button
+                        variant={activeSection === section.id ? "default" : "ghost"}
+                        className="w-8 h-8 rounded-full"
+                        onClick={() => handleSectionClick(section.id)}
+                    >
+                        {section.id}
+                    </Button>
+                    {sections.length > 1 && (
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="absolute -right-8 top-0 hidden group-hover:flex"
+                            onClick={() => handleDeleteSection(section.id)}
+                        >
+                            <Trash2 className="h-4 w-4" />
+                        </Button>
+                    )}
+                </div>
             ))}
             <Button
                 variant="ghost"

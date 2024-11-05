@@ -5,6 +5,7 @@ export interface GlossaryEntry {
     targetText: string;
     sourceLang: string;
     targetLang: string;
+    projectId: string;
 }
 
 export async function addGlossaryEntry(entry: GlossaryEntry) {
@@ -25,6 +26,21 @@ export async function addGlossaryEntry(entry: GlossaryEntry) {
         return await response.json();
     } catch (error) {
         toast.error('Failed to add glossary entry');
+        throw error;
+    }
+}
+
+export async function fetchGlossaryEntries(projectId: string) {
+    try {
+        const response = await fetch(`/api/glossary?projectId=${projectId}`);
+        
+        if (!response.ok) {
+            throw new Error('Failed to fetch glossary entries');
+        }
+
+        return await response.json();
+    } catch (error) {
+        toast.error('Failed to fetch glossary entries');
         throw error;
     }
 } 

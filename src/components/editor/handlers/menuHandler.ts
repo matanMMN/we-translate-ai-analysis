@@ -5,11 +5,21 @@ import {AppDispatch} from '@/store/store.types';
 import {copyTextToSideBySide} from '@/services/editorService';
 import {toast} from 'sonner';
 
-export const setupContextMenu = (
-    container: RefObject<DocumentEditorContainerComponent>,
-    dispatch: AppDispatch,
-    navigate: (path: string) => void
-) => {
+interface SetupContextMenuProps {
+    container: RefObject<DocumentEditorContainerComponent>;
+    dispatch: AppDispatch;
+    navigate: (path: string) => void;
+    projectId: string | undefined
+    sourceLanguage: string;
+}
+
+export const setupContextMenu = ({
+                                     container,
+                                     dispatch,
+                                     navigate,
+                                     projectId,
+                                     sourceLanguage
+                                 }: SetupContextMenuProps) => {
     if (!container.current) return;
 
     const menuItems: MenuItemModel[] = [
@@ -46,8 +56,12 @@ export const setupContextMenu = (
                         await container.current.documentEditor.saveAsBlob("Docx");
 
                         // Copy the selected text to side-by-side
-                        const success = await copyTextToSideBySide(selectedText, dispatch);
-
+                        const success = await copyTextToSideBySide({
+                            text: selectedText,
+                            sourceLanguage,
+                            dispatch,
+                            projectId
+                        });
                         if (success) {
                             toast.success('Text copied to Side by Side');
                             // Navigate to side-by-side page
@@ -65,4 +79,4 @@ export const setupContextMenu = (
                 break;
         }
     };
-}; 
+};

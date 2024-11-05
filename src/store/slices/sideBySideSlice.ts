@@ -1,5 +1,5 @@
-import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
-import { RootState } from '../store.types';
+import {createSlice, PayloadAction, createAsyncThunk} from '@reduxjs/toolkit';
+import {RootState} from '../store.types';
 
 interface Section {
     id: string;
@@ -7,6 +7,7 @@ interface Section {
     targetContent: string;
     filePath?: string;  // Path to stored file
     lastModified?: string;
+    projectId?: string | undefined
 }
 
 interface SideBySideState {
@@ -30,7 +31,7 @@ const initialState: SideBySideState = {
 // Async thunks for file operations
 export const saveSectionToFile = createAsyncThunk(
     'sideBySide/saveSection',
-    async (section: Section, { rejectWithValue }) => {
+    async (section: Section, {rejectWithValue}) => {
         try {
             // First save to public/uploads
             const formData = new FormData();
@@ -55,11 +56,12 @@ export const saveSectionToFile = createAsyncThunk(
 
 export const fetchUserSections = createAsyncThunk(
     'sideBySide/fetchSections',
-    async (_, { rejectWithValue }) => {
+    async (_, {rejectWithValue}) => {
         try {
-            const response = await fetch('/api/sections');
-            if (!response.ok) throw new Error('Failed to fetch sections');
-            return await response.json();
+            return []
+            // const response = await fetch('/api/sections');
+            // if (!response.ok) throw new Error('Failed to fetch sections');
+            // return await response.json();
         } catch (error) {
             return rejectWithValue((error as Error).message);
         }
@@ -72,10 +74,10 @@ const sideBySideSlice = createSlice({
     reducers: {
         addSection: (state) => {
             const newId = (state.sections.length + 1).toString();
-            state.sections.push({ 
-                id: newId, 
-                sourceContent: '', 
-                targetContent: '' 
+            state.sections.push({
+                id: newId,
+                sourceContent: '',
+                targetContent: ''
             });
             state.activeSection = newId;
         },
@@ -171,7 +173,7 @@ export const selectSections = (state: RootState) => state.sideBySide.sections;
 export const selectActiveSection = (state: RootState) => state.sideBySide.activeSection;
 export const selectSourceLanguage = (state: RootState) => state.sideBySide.sourceLanguage;
 export const selectTargetLanguage = (state: RootState) => state.sideBySide.targetLanguage;
-export const selectActiveSectionData = (state: RootState) => 
+export const selectActiveSectionData = (state: RootState) =>
     state.sideBySide.sections.find((section: Section) => section.id === state.sideBySide.activeSection);
 export const selectIsLoading = (state: RootState) => state.sideBySide.isLoading;
 export const selectError = (state: RootState) => state.sideBySide.error;

@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { useDispatch } from 'react-redux';
+import { useAppDispatch } from '@/hooks/useAppDispatch';
 import { updateSection } from '@/store/slices/sideBySideSlice';
+import 'react-quill/dist/quill.snow.css';
 
 const ReactQuill = dynamic(() => import('react-quill'), {
     ssr: false,
@@ -40,7 +41,7 @@ const formats = [
 ];
 
 export function QuillEditor({ id, content, readOnly = false, isRTL = false }: QuillEditorProps) {
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
@@ -50,7 +51,7 @@ export function QuillEditor({ id, content, readOnly = false, isRTL = false }: Qu
     const handleChange = (value: string) => {
         dispatch(updateSection({
             id,
-            [readOnly ? 'targetContent' : 'sourceContent']: value
+            [readOnly ? 'sourceContent' : 'targetContent']: value
         }));
     };
 
@@ -67,8 +68,8 @@ export function QuillEditor({ id, content, readOnly = false, isRTL = false }: Qu
                 modules={modules}
                 formats={formats}
                 readOnly={readOnly}
-                placeholder={readOnly ? "Enter target text..." : "Enter source text..."}
-                className="h-[calc(100%-42px)]"
+                placeholder={readOnly ? "Source text will appear here..." : "Enter translation..."}
+                className={`h-[calc(100%-42px)] ${isRTL ? 'ql-rtl' : 'ql-ltr'}`}
             />
         </div>
     );

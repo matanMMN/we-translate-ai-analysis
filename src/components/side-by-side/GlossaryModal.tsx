@@ -5,8 +5,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { addGlossaryEntry } from '@/services/glossaryService';
+import { addGlossaryEntry, fetchGlossaryEntries, type GlossaryEntry } from '@/services/glossaryService';
 import { toast } from 'sonner';
+import { useEffect } from 'react';
 import { GlossaryList } from './GlossaryList';
 
 interface GlossaryModalProps {
@@ -14,17 +15,38 @@ interface GlossaryModalProps {
     onOpenChange: (open: boolean) => void;
     sourceLang: string;
     targetLang: string;
+    projectId: string;
 }
 
 export function GlossaryModal({ 
     open, 
     onOpenChange,
     sourceLang,
-    targetLang 
+    targetLang,
+    projectId
 }: GlossaryModalProps) {
     const [sourceText, setSourceText] = useState('');
     const [targetText, setTargetText] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [entries, setEntries] = useState<GlossaryEntry[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        if (open) {
+            loadGlossaryEntries();
+        }
+    }, [open, projectId]);
+
+    const loadGlossaryEntries = async () => {
+        try {
+            const data = await fetchGlossaryEntries(projectId);
+            setEntries(data);
+        } catch (error) {
+            console.error('Failed to load glossary entries:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -40,13 +62,16 @@ export function GlossaryModal({
                 sourceText,
                 targetText,
                 sourceLang,
-                targetLang
+                targetLang,
+                projectId
             });
+
+            // Refresh entries
+            await loadGlossaryEntries();
 
             // Reset form
             setSourceText('');
             setTargetText('');
-            onOpenChange(false);
         } catch (error) {
             console.error('Failed to add glossary entry:', error);
         } finally {
@@ -62,7 +87,11 @@ export function GlossaryModal({
                 </DialogHeader>
                 
                 <div className="space-y-6">
-                    <GlossaryList sourceLang={sourceLang} targetLang={targetLang} />
+                    <GlossaryList 
+                        entries={entries} 
+                        isLoading={isLoading} 
+                        sourceLang={sourceLang}
+                    />
                     
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div className="space-y-2">
@@ -73,6 +102,7 @@ export function GlossaryModal({
                                 onChange={(e) => setSourceText(e.target.value)}
                                 placeholder="Enter source text..."
                                 className={sourceLang === 'he' ? 'text-right' : 'text-left'}
+                                dir={sourceLang === 'he' ? 'rtl' : 'ltr'}
                             />
                         </div>
                         <div className="space-y-2">
@@ -82,7 +112,8 @@ export function GlossaryModal({
                                 value={targetText}
                                 onChange={(e) => setTargetText(e.target.value)}
                                 placeholder="Enter target text..."
-                                className="text-right" // Hebrew is always RTL
+                                className="text-right"
+                                dir="rtl"
                             />
                         </div>
                         <div className="flex justify-end gap-2">

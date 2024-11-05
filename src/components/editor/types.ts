@@ -11,7 +11,8 @@ export interface EditorConfig {
     userSession: Session | null;
     headerTitle: string;
     readOnly?: boolean;
-    closeButton?: boolean
+    closeButton?: boolean,
+    projectId?: string;
 }
 
 export interface FileData {

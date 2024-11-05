@@ -1,6 +1,5 @@
 'use client'
 
-import { useEffect, useState } from 'react';
 import {
     Table,
     TableBody,
@@ -10,39 +9,18 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { GlossaryEntry } from "@/services/glossaryService";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
-interface GlossaryEntry {
-    id: string;
-    sourceText: string;
-    targetText: string;
+interface GlossaryListProps {
+    entries: GlossaryEntry[];
+    isLoading: boolean;
     sourceLang: string;
-    targetLang: string;
-    createdAt: string;
 }
 
-export function GlossaryList({ sourceLang, targetLang }: { sourceLang: string; targetLang: string }) {
-    const [entries, setEntries] = useState<GlossaryEntry[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-
-    useEffect(() => {
-        const fetchGlossary = async () => {
-            try {
-                const response = await fetch(`/api/glossary?sourceLang=${sourceLang}&targetLang=${targetLang}`);
-                if (!response.ok) throw new Error('Failed to fetch glossary');
-                const data = await response.json();
-                setEntries(data);
-            } catch (error) {
-                console.error('Error fetching glossary:', error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        fetchGlossary();
-    }, [sourceLang, targetLang]);
-
+export function GlossaryList({ entries, isLoading, sourceLang }: GlossaryListProps) {
     if (isLoading) {
-        return <div className="flex justify-center p-4">Loading...</div>;
+        return <div className="flex justify-center p-4"><LoadingSpinner /></div>;
     }
 
     return (
@@ -57,16 +35,16 @@ export function GlossaryList({ sourceLang, targetLang }: { sourceLang: string; t
                 </TableHeader>
                 <TableBody>
                     {entries.map((entry) => (
-                        <TableRow key={entry.id}>
+                        <TableRow key={entry.sourceText}>
                             <TableCell className={sourceLang === 'he' ? 'text-right' : 'text-left'}>
                                 {entry.sourceText}
                             </TableCell>
                             <TableCell className="text-right">
                                 {entry.targetText}
                             </TableCell>
-                            <TableCell>
-                                {new Date(entry.createdAt).toLocaleDateString()}
-                            </TableCell>
+                            {/*<TableCell>*/}
+                            {/*    {new Date(entry.createdAt).toLocaleDateString()}*/}
+                            {/*</TableCell>*/}
                         </TableRow>
                     ))}
                 </TableBody>

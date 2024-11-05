@@ -1,6 +1,18 @@
 import { toast } from 'sonner';
 
-export async function translateText(text: string, sourceLang: string, targetLang: string) {
+interface TranslateOptions {
+    text: string;
+    sourceLang: string;
+    targetLang: string;
+    projectId: string;
+}
+
+export async function translateText({
+    text,
+    sourceLang,
+    targetLang,
+    projectId
+}: TranslateOptions) {
     try {
         const response = await fetch('/api/translate', {
             method: 'POST',
@@ -10,7 +22,8 @@ export async function translateText(text: string, sourceLang: string, targetLang
             body: JSON.stringify({
                 text,
                 sourceLang,
-                targetLang
+                targetLang,
+                projectId
             })
         });
 
