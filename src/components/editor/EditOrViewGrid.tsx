@@ -101,7 +101,7 @@ export default function EditOrViewGrid({userSession}: { userSession: Session | n
                     <div id="documenteditor_titlebar" className="e-de-ctn-title"></div>
                     <div id="documenteditor_container_body">
                         <DocumentEditorContainerComponent showPropertiesPane={false}
-                                                          id="container" height='780px'
+                                                          id="container" height='calc(90vh - 70px)'
                                                           ref={container}
                                                           style={{display: "block"}}
                                                           serviceUrl={hostUrl}

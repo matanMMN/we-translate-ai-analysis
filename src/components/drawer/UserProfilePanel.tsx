@@ -32,12 +32,6 @@ const UserProfilePanel = (): ReactNode => {
                     <span className="mx-2 text-2xl">+</span><span className="mx-2 text-xl">New Project</span>
                 </button>
             </div>
-
-            {/*<Button className="mx-2 mb-2 bg-[#1D3B34] hover:bg-[#1D3B34]/90 text-white border rounded-2xl h-[45px]"*/}
-            {/*        onClick={() => router.push('/new-project')}>*/}
-            {/*    + New Project*/}
-            {/*</Button>*/}
-
             <Divider className="my-[10px]"/>
         </>)
 };

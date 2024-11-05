@@ -3,10 +3,16 @@ import type {Config} from "tailwindcss";
 const config: Config = {
     darkMode: ["class"],
     content: [
-        "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
-        "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
-        "./src/assets/**/*.{js,ts,jsx,tsx,mdx}",
-        "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+        './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
+        './src/components/**/*.{js,ts,jsx,tsx,mdx}',
+        './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+        './src/lib/**/*.{js,ts,jsx,tsx,mdx}',
+        './src/utils/**/*.{js,ts,jsx,tsx,mdx}',
+        './src/styles/**/*.{js,ts,jsx,tsx,mdx}',
+        './src/features/**/*.{js,ts,jsx,tsx,mdx}',
+        './src/layouts/**/*.{js,ts,jsx,tsx,mdx}',
+        './src/hooks/**/*.{js,ts,jsx,tsx,mdx}',
+        './src/providers/**/*.{js,ts,jsx,tsx,mdx}',
     ],
     theme: {
         extend: {
@@ -22,8 +28,8 @@ const config: Config = {
                     foreground: 'hsl(var(--popover-foreground))'
                 },
                 primary: {
-                    DEFAULT: 'hsl(var(--primary))',
-                    foreground: 'hsl(var(--primary-foreground))'
+                    DEFAULT: '#1D3B34',
+                    hover: '#2A574C',
                 },
                 secondary: {
                     DEFAULT: 'hsl(var(--secondary))',
@@ -61,6 +67,10 @@ const config: Config = {
                     border: 'hsl(var(--sidebar-border))',
                     ring: 'hsl(var(--sidebar-ring))'
                 }
+            },
+            backgroundImage: {
+                'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+                'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
             },
             borderRadius: {
                 lg: 'var(--radius)',

@@ -3,7 +3,6 @@ import RouterLink from "@/components/drawer/RouterLink";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import React, {useCallback} from "react";
 import {signOut} from "next-auth/react";
-import {LogOut} from "lucide-react"
 import {useState} from "react"
 import {Button} from "@/components/ui/button"
 import {

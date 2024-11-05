@@ -1,6 +1,6 @@
-import { DocumentEditorContainerComponent } from '@syncfusion/ej2-react-documenteditor';
-import { RefObject } from 'react';
-import { Session } from 'next-auth';
+import {DocumentEditorContainerComponent} from '@syncfusion/ej2-react-documenteditor';
+import {RefObject} from 'react';
+import {Session} from 'next-auth';
 
 export interface EditorProps {
     container: RefObject<DocumentEditorContainerComponent>;
@@ -10,6 +10,8 @@ export interface EditorProps {
 export interface EditorConfig {
     userSession: Session | null;
     headerTitle: string;
+    readOnly?: boolean;
+    closeButton?: boolean
 }
 
 export interface FileData {

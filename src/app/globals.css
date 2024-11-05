@@ -166,7 +166,17 @@ body, html {
 
 
 }
+.e-dialog.e-control.e-popup {
+    max-height: 90vh !important;
+}
 
+.e-dialog .e-dlg-content {
+    overflow: hidden !important;
+}
+
+#documenteditor_container_body {
+    height: calc(90vh - 40px) !important;
+}
 
 .ej2-new {
     height: 590px;

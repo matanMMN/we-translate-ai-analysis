@@ -25,10 +25,15 @@ export default async function ProjectLayout(
 
     const {projectId} = await params;
     const project = await getUserProject(projectId);
+
+    if (!project) {
+        return <div>Project not found</div>;
+    }
+
     return (
-        <ProjectProvider projectId={projectId}>
+        <ProjectProvider projectId={projectId} initialProject={project}>
             <div>
-                {project ? <ProjectNavBar project={project}/> : <div>Project not found</div>}
+                <ProjectNavBar project={project}/>
                 {children}
             </div>
         </ProjectProvider>

@@ -7,6 +7,6 @@ export default function EditorContainer() {
 
     const session = useSelector(selectSession)
 
-    return <Editor userSession={session.userSession} headerTitle={session.project.name}/>
+    return <Editor userSession={session.userSession} headerTitle={session.project?.name}/>
 
 }

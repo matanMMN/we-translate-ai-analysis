@@ -1,39 +1,40 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import {createSlice, PayloadAction} from '@reduxjs/toolkit';
+import {RootState} from '../store.types';
+import {Project} from '@/lib/userData';
+import {Session} from 'next-auth';
 
 export interface ProjectState {
     projectId: string | null;
-    userSession: any | null;
-    project: any | null;
+    project: Project | null;
+    userSession: Session | null;
 }
 
 const initialState: ProjectState = {
     projectId: null,
-    userSession: null,
     project: null,
+    userSession: null,
 };
 
 const projectSlice = createSlice({
-    name: 'project',
+    name: 'session',
     initialState,
     reducers: {
         setSessionSlice: (state, action: PayloadAction<ProjectState>) => {
-            return action.payload;
+            state.projectId = action.payload.projectId;
+            state.project = action.payload.project;
+            state.userSession = action.payload.userSession;
         },
-        setProjectId: (state, action: PayloadAction<string>) => {
-            state.projectId = action.payload;
+        clearSession: (state) => {
+            state.projectId = null;
+            state.project = null;
+            state.userSession = null;
         },
-        setUserSession: (state, action: PayloadAction<any>) => {
-            state.userSession = action.payload;
-        },
-        setProject: (state, action: PayloadAction<any>) => {
+        updateProject: (state, action: PayloadAction<Project>) => {
             state.project = action.payload;
         },
     },
 });
 
-export const selectSession = (state: { project: ProjectState }) => state.project;
-export const selectProjectId = (state: { project: ProjectState }) => state.project.projectId;
-export const selectUserSession = (state: { project: ProjectState }) => state.project.userSession;
-export const selectProject = (state: { project: ProjectState }) => state.project.project;
-export const { setProjectId, setUserSession, setProject, setSessionSlice } = projectSlice.actions;
+export const {setSessionSlice, clearSession, updateProject} = projectSlice.actions;
+export const selectSession = (state: RootState) => state.session;
 export default projectSlice.reducer;
