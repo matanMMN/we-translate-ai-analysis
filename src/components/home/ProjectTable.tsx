@@ -2,6 +2,7 @@
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
 import {Badge} from "@/components/ui/badge";
 import {cn} from "@/lib/utils";
+import {getPriorityColor, getStatusColor} from "@/lib/functions";
 import {DropdownMenu} from "@/components/ui/dropdown-menu";
 import {Button} from "@/components/ui/button";
 import {ChevronDown, ChevronUp, Edit2, Search} from "lucide-react";
@@ -11,16 +12,18 @@ import {useVirtualizer} from "@tanstack/react-virtual";
 import {useDebounce} from "use-debounce";
 import {Input} from "@/components/ui/input";
 import Link from "next/link";
+import {useSession} from "next-auth/react";
+import LoadingLogoGif from "@/components/LoadingLogoGif";
+import {Project} from "@/lib/userData";
+import {useRouter} from "next/navigation";
 
 
-const searchProjects = ['Fostimon', 'Fluoxetine', 'Finasteride', 'Fluconazole']
-
-export interface Project {
-    id: string
-    project_name: string
-    priority: 'Low' | 'Normal' | 'High' | 'Critical'
-    status: 'Planned' | 'In Progress' | 'Completed' | 'On Hold'
-}
+// export interface Project {
+//     id: string
+//     project_name: string
+//     priority: 'Low' | 'Normal' | 'High' | 'Critical'
+//     status: 'Planned' | 'In Progress' | 'Completed' | 'On Hold'
+// }
 
 export type SortConfig = {
     key: keyof Project | null
@@ -30,83 +33,55 @@ export type SortConfig = {
 
 export default function ProjectTable() {
 
-    const projects: Project[] = useMemo(() =>
-            Array.from({length: 15}, (_, i) => ({
-                id: `project-${i}`,
-                project_name: `Project ${i + 1}`,
-                priority: ['Low', 'Normal', 'High', 'Critical'][Math.floor(Math.random() * 4)] as Project['priority'],
-                status: ['Planned', 'In Progress', 'Completed', 'On Hold'][Math.floor(Math.random() * 4)] as Project['status'],
-            }))
-        , [])
+
+    const {data: session, status} = useSession()
+    const projects = session?.userData?.allProjects
+    const router = useRouter()
 
     const [sortConfig, setSortConfig] = useState<SortConfig>({key: null, direction: 'asc'})
     const parentRef = useRef<HTMLDivElement>(null)
     const [searchQuery, setSearchQuery] = useState('')
     const [debouncedQuery] = useDebounce(searchQuery, 300)
-    const [searchResults, setSearchResults] = useState<string[]>([])
+    const [searchResults, setSearchResults] = useState<Project[]>([])
     const [showResults, setShowResults] = useState(false)
 
     useEffect(() => {
         if (debouncedQuery) {
-            const results = searchProjects.filter(term =>
-                term.toLowerCase().includes(debouncedQuery.toLowerCase())
+            const results = projects?.filter(project =>
+                project.name.toLowerCase().includes(debouncedQuery.toLowerCase())
             )
-            setSearchResults(results)
+            setSearchResults(results ?? [])
             setShowResults(true)
         } else {
             setSearchResults([])
             setShowResults(false)
         }
-    }, [debouncedQuery])
+    }, [debouncedQuery, projects])
 
     const sortedProjects = useMemo(() => {
         if (!sortConfig.key) return projects
-
-        return [...projects].sort((a, b) => {
-            if (a[sortConfig.key!] <= b[sortConfig.key!]) {
-                return sortConfig.direction === 'asc' ? -1 : 1
-            }
-            if (a[sortConfig.key!] > b[sortConfig.key!]) {
-                return sortConfig.direction === 'asc' ? 1 : -1
-            }
-            return 0
-        })
+        if (projects) {
+            return [...projects].sort((a, b) => {
+                if (a[sortConfig.key] <= b[sortConfig.key]) {
+                    return sortConfig.direction === 'asc' ? -1 : 1
+                }
+                if (a[sortConfig.key] > b[sortConfig.key]) {
+                    return sortConfig.direction === 'asc' ? 1 : -1
+                }
+                return 0
+            })
+        }
     }, [projects, sortConfig])
 
     const rowVirtualizer = useVirtualizer({
-        count: sortedProjects.length,
+        count: searchResults.length > 0 ? searchResults.length : projects?.length ?? 0,
         getScrollElement: () => parentRef.current,
         estimateSize: () => 60,
         overscan: 10,
     })
 
-    const getPriorityColor = (priority: Project['priority']) => {
-        switch (priority) {
-            case 'Low':
-                return 'bg-emerald-500/10 text-emerald-500'
-            case 'Normal':
-                return 'bg-blue-500/10 text-blue-500'
-            case 'High':
-                return 'bg-amber-500/10 text-amber-500'
-            case 'Critical':
-                return 'bg-red-500/10 text-red-500'
-        }
-    }
 
-    const getStatusColor = (status: Project['status']) => {
-        console.log(status)
-        return 'text-slate-500'
-        // switch (status) {
-        //     case 'Planned':
-        //         return 'text-slate-500'
-        //     case 'In Progress':
-        //         return 'text-blue-500'
-        //     case 'Completed':
-        //         return 'text-emerald-500'
-        //     case 'On Hold':
-        //         return 'text-amber-500'
-        // }
-    }
+
 
 
     const SortableHeader = ({column, width}: { column: keyof Project, width: string }) => {
@@ -146,9 +121,7 @@ export default function ProjectTable() {
             </TableHead>
         )
     }
-
-    return (
-
+    return status === 'loading' ? <LoadingLogoGif/> : (
         <>
             <motion.header
                 initial={{y: -20, opacity: 0}}
@@ -174,19 +147,19 @@ export default function ProjectTable() {
                             >
                                 {searchResults.map((result) => (
                                     <motion.div
-                                        key={result}
+                                        key={result.name}
                                         initial={{opacity: 0}}
                                         animate={{opacity: 1}}
                                         exit={{opacity: 0}}
                                         className="px-4 py-2 transition-all duration-250 hover:bg-gray-300 cursor-pointer bg-[#98A7A3]"
                                         onClick={() => {
-                                            setSearchQuery(result)
+                                            setSearchQuery(result.name)
                                             setShowResults(false)
                                         }}
                                     >
-                                        <span className="font-normal">{result.slice(0, searchQuery.length)}</span>
+                                        <span className="font-normal">{result.name.slice(0, searchQuery.length)}</span>
                                         <span
-                                            className="text-white font-normal">{result.slice(searchQuery.length)}</span>
+                                            className="text-white font-normal">{result.name.slice(searchQuery.length)}</span>
                                     </motion.div>
                                 ))}
                             </motion.div>
@@ -207,10 +180,11 @@ export default function ProjectTable() {
                     <div className="min-w-[900px]">
                         <Table>
                             <TableHeader className="sticky top-0 bg-gray-50 dark:bg-gray-900 z-10">
-                                <TableRow className="hover:bg-transparent">
-                                    <SortableHeader column={`${'project Name' as "project_name"}`} width="25%"/>
-                                    <SortableHeader column="priority" width="35%"/>
-                                    <SortableHeader column="status" width="25%"/>
+                                <TableRow
+                                    className="hover:bg-transparent">
+                                    <SortableHeader column={`${'project Name' as "name"}`} width="30%"/>
+                                    <SortableHeader column="priority" width="30%"/>
+                                    <SortableHeader column="status" width="30%"/>
                                     <TableHead style={{width: '10%'}}
                                                className="text-lg font-semibold">Actions</TableHead>
                                 </TableRow>
@@ -221,30 +195,40 @@ export default function ProjectTable() {
                                 position: 'relative',
                             }}>
                                 {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-                                    const project = sortedProjects[virtualRow.index]
+                                    let project
+                                    if (searchResults.length > 0) {
+                                        project = searchResults[virtualRow.index]
+                                    } else {
+                                        project = sortedProjects![virtualRow.index]
+                                    }
                                     return (
                                         <TableRow
                                             key={project.id}
-                                            className="absolute w-full flex items-center text-center justify-around hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                                            className="absolute w-full flex items-center text-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                                             style={{
                                                 height: `${virtualRow.size}px`,
                                                 transform: `translateY(${virtualRow.start}px)`,
                                             }}
                                         >
-                                            <TableCell
-                                                className="text-lg">{project.project_name}</TableCell>
-                                            <TableCell style={{width: '30%'}} className="py-6">
+
+                                            <TableCell onClick={() => router.push(`/${project.id}/details`)}
+                                                       className="text-lg hover:cursor-pointer max-w-[30%] w-full text-start">{project.name}</TableCell>
+
+                                            <TableCell style={{width: '30%'}}
+                                                       className="py-6 text-start w-full max-w-[30%]">
                                                 <Badge variant="secondary"
-                                                       className={cn('text-base font-medium px-4 py-2', getPriorityColor(project.priority))}>
+                                                       className={cn('text-base font-medium px-4 py-2 ', getPriorityColor(project.priority))}>
                                                     {project.priority}
                                                 </Badge>
                                             </TableCell>
-                                            <TableCell style={{width: '30%'}} className="py-6">
+                                            <TableCell style={{width: '30%'}}
+                                                       className="py-6 text-start w-full max-w-[30%]">
                                         <span className={cn('text-lg font-bold', getStatusColor(project.status))}>
                                           {project.status}
                                         </span>
                                             </TableCell>
-                                            <TableCell style={{width: '10%'}} className="py-6">
+                                            <TableCell style={{width: '10%'}}
+                                                       className="py-6 text-start w-full max-w-[30%]">
                                                 <DropdownMenu>
                                                     <Link href={`/${project.id}/details`}>
                                                         <Button variant="ghost" size="icon"

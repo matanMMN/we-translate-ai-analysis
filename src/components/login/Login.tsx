@@ -6,7 +6,7 @@ import {
     Paper,
     Typography,
 } from '@mui/material';
-// import Logo from '@/app/icon.png';
+import Logo from '@/assets/icon.png';
 import Image from "next/image";
 import LoginForm from "@/components/login/LoginForm";
 
@@ -31,7 +31,7 @@ export default async function Login() {
                 }}
             >
                 <Box sx={{display: 'flex', alignItems: 'center'}}>
-                    {/*<Image src={Logo} alt="WeTranslate AI" style={{width: '150px', marginRight: '20px'}}/>*/}
+                    <Image src={Logo} alt="WeTranslate AI" style={{width: '150px', marginRight: '20px'}}/>
                     <Typography component="h1" variant="h1" align="center" style={{
                         userSelect: "none"
                     }}>

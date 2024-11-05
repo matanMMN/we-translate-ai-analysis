@@ -1,8 +1,12 @@
+import "@/app/globals.css"
+import '@/app/(content)/[projectId]/editor/page.module.css'
 import {ReactNode} from "react";
 import {AuthGuard} from "@/lib/AuthGuard";
 import {redirect} from "next/navigation";
 import {log} from "@/lib/log";
 import ProjectNavBar from "@/components/project/ProjectNavBar";
+import ProjectProvider from "@/components/ProjectProvider";
+import {getUserProject} from "@/actions/getUserProjects";
 
 
 export default async function ProjectLayout(
@@ -19,11 +23,14 @@ export default async function ProjectLayout(
 
     log("Rendering specific project layout");
 
-    const { projectId } = await params
+    const {projectId} = await params;
+    const project = await getUserProject(projectId);
     return (
-        <>
-            <ProjectNavBar projectId={projectId}/>
-            {children}
-        </>
+        <ProjectProvider projectId={projectId}>
+            <div>
+                {project ? <ProjectNavBar project={project}/> : <div>Project not found</div>}
+                {children}
+            </div>
+        </ProjectProvider>
     );
 }

@@ -1,9 +1,10 @@
 import ProjectDetails from "@/components/project-details/ProjectDetails";
 
-export default function ProjectDetailsPage() {
+
+export default async function ProjectDetailsPage() {
+
+
     return (
-        <div>
             <ProjectDetails/>
-        </div>
     )
 }

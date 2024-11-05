@@ -67,7 +67,7 @@ export const authOptions: NextAuthOptions = {
                 return defaultEncode(params);
             return defaultEncode(params)
         }
-    }
+    },
 }
 
 //'Authorization' = `Bearer ${accessToken}`

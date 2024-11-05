@@ -70,7 +70,7 @@ export default function SideBySide() {
     }
 
     return (
-        <div className="flex h-[calc(100vh-120px)]">
+        <div className="flex h-[calc(100vh-300px)]">
             {/* Section Navigation */}
             <div className="w-12 border-r bg-background flex flex-col items-center py-4 space-y-2">
                 {sections.map((section) => (

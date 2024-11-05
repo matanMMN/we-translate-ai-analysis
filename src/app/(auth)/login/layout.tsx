@@ -3,8 +3,7 @@ import "@/app/globals.css";
 import {ReactNode} from "react";
 import {StoreProvider} from "@/components/StoreProvider";
 import AuthProviders from "@/components/AuthProviders";
-import {AuthGuard} from "@/lib/AuthGuard";
-import {redirect} from "next/navigation";
+import {protectLogin} from "@/lib/AuthGuard";
 
 
 export const metadata: Metadata = {
@@ -17,18 +16,13 @@ export interface ChildrenProps {
 
 export default async function RootAuthLayout({children}: ChildrenProps): Promise<ReactNode> {
 
-    if (await AuthGuard())
-        return redirect('/')
+    await protectLogin();
 
     return (
-        <html lang="en">
-        <body>
         <AuthProviders>
             <StoreProvider>
                 {children}
             </StoreProvider>
         </AuthProviders>
-        </body>
-        </html>
     );
 }

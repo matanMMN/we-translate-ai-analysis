@@ -13,7 +13,7 @@ export default function HeaderToolBar() {
     const isOpen = useSelector(selectDrawer)
 
     return (
-        <Toolbar className={"flex flex-row w-full justify-between"}>
+        <Toolbar className={"flex flex-row w-full justify-between "}>
             <div className={"flex flex-row"}>
                 {!isOpen &&
                     <button

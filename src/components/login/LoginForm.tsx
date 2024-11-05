@@ -29,7 +29,6 @@ export default function LoginForm(): ReactNode {
     const [error, setError] = useState<string | null | undefined>(null);
 
     useEffect(() => {
-        console.log("session: ", session)
         if (session && session?.accessToken) {
             writeToStorage("access_token", session?.accessToken);
         }

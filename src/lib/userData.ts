@@ -1,3 +1,20 @@
+import avatar1 from '@/assets/user1avatar.svg'
+import avatar2 from '@/assets/user2avatar.svg'
+import fs from "fs"
+import path from "path"
+
+const getPriority = () => {
+    return ['Low', 'Normal', 'High', 'Critical'][Math.floor(Math.random() * 4)];
+}
+
+const getStatus = () => {
+    return ['Planned', 'In Progress', 'Completed', 'On Hold'][Math.floor(Math.random() * 4)] as Project['status']
+}
+
+
+// export const srcFile = new Blob([fs.readFileSync(path.join(process.cwd(), 'src', 'assets', 'src.txt'), 'utf-8')], {type: 'text/plain'})
+
+
 export interface User {
     id: string;
     role_id: number;
@@ -13,7 +30,26 @@ export interface User {
     settings: null;
     auth: boolean;
     accessToken: string;
+    allProjects?: Array<Project>
 }
+
+interface ProjectMember {
+    id: string
+    name: string
+    avatar?: string
+}
+
+interface ActivityItem {
+    id: string
+    user: ProjectMember
+    action: string
+    timestamp: string
+}
+
+export const members: ProjectMember[] = [
+    {id: '1', name: 'Aviram Shabtay', avatar: avatar1.src},
+    {id: '2', name: 'Emma K.', avatar: avatar2.src},
+]
 
 export const user = {
     id: "1",
@@ -29,22 +65,215 @@ export const user = {
     updated_by: "admin",
     settings: null,
     auth: true,
-    accessToken: "access"
+    accessToken: "access",
+    allProjects: [
+        {
+            id: 1,
+            clientId: 1,
+            sourceFileId: 1,
+            destFileId: 2,
+            reference_file_id: 10,
+            name: "Fostimon",
+            description: "The translation of the Fostimon medicine for injection.",
+            sourceLanguage: "Hebrew",
+            destLanguage: "English",
+            priority: getPriority(),
+            status: getStatus(),
+            currentStepIndex: 2,
+            comments: ["Initial setup", "Translation started"],
+            members: members,
+            activities: [
+                {
+                    id: '1',
+                    user: members[0],
+                    action: 'deleted the word "slovent"',
+                    timestamp: '2 days ago'
+                },
+                {
+                    id: '2',
+                    user: members[1],
+                    action: 'changed the name of the project',
+                    timestamp: '3 days ago'
+                },
+                {
+                    id: '3',
+                    user: members[0],
+                    action: 'started the project',
+                    timestamp: '4 days ago'
+                },
+            ],
+            dueDate: new Date("2024-12-31").toLocaleDateString("en"),
+            currentUser: "Admin Adminel",
+            createdAt: new Date("2024-10-28").toLocaleDateString("en"),
+            createdBy: "Admin Adminel",
+            updatedAt: new Date("2024-10-29").toLocaleDateString("en"),
+            updatedBy: "Admin Adminel",
+            deletedAt: undefined,
+            deletedBy: undefined,
+            approvedAt: undefined,
+            approvedBy: undefined
+        },
+        {
+            id: 2,
+            clientId: 2,
+            sourceFileId: 3,
+            destFileId: 4,
+            reference_file_id: 10,
+            name: "Fluoxetine",
+            description: "The translation of the Fostimon medicine for injection.",
+            sourceLanguage: "Hebrew",
+            destLanguage: "English",
+            priority: getPriority(),
+            status: getStatus(),
+            currentStepIndex: 1,
+            comments: ["Initial setup", "Translation started"],
+            members: members,
+            activities: [
+                {
+                    id: '1',
+                    user: members[0],
+                    action: 'deleted the word "slovent"',
+                    timestamp: '2 days ago'
+                },
+                {
+                    id: '2',
+                    user: members[1],
+                    action: 'changed the name of the project',
+                    timestamp: '3 days ago'
+                },
+                {
+                    id: '3',
+                    user: members[0],
+                    action: 'started the project',
+                    timestamp: '4 days ago'
+                },
+            ],
+            dueDate: new Date("2024-11-30").toLocaleDateString("en"),
+            currentUser: "Admin Adminel",
+            createdAt: new Date("2024-10-28").toLocaleDateString("en"),
+            createdBy: "Admin Adminel",
+            updatedAt: new Date("2024-10-29").toLocaleDateString("en"),
+            updatedBy: "Admin Adminel",
+            deletedAt: undefined,
+            deletedBy: undefined,
+            approvedAt: undefined,
+            approvedBy: undefined
+        },
+        {
+            id: 3,
+            clientId: 3,
+            sourceFileId: 5,
+            destFileId: 6,
+            reference_file_id: 10,
+            name: "Finasteride",
+            description: "The translation of the Fostimon medicine for injection.",
+            sourceLanguage: "Hebrew",
+            destLanguage: "English",
+            priority: getPriority(),
+            status: getStatus(),
+            currentStepIndex: 3,
+            comments: ["Initial setup", "Translation started", "Review in progress"],
+            members: members,
+            activities: [
+                {
+                    id: '1',
+                    user: members[0],
+                    action: 'deleted the word "slovent"',
+                    timestamp: '2 days ago'
+                },
+                {
+                    id: '2',
+                    user: members[1],
+                    action: 'changed the name of the project',
+                    timestamp: '3 days ago'
+                },
+                {
+                    id: '3',
+                    user: members[0],
+                    action: 'started the project',
+                    timestamp: '4 days ago'
+                },
+            ],
+            dueDate: new Date("2024-10-31").toLocaleDateString("en"),
+            currentUser: "Admin Adminel",
+            createdAt: new Date("2024-10-28").toLocaleDateString("en"),
+            createdBy: "Admin Adminel",
+            updatedAt: new Date("2024-10-29").toLocaleDateString("en"),
+            updatedBy: "Admin Adminel",
+            deletedAt: undefined,
+            deletedBy: undefined,
+            approvedAt: undefined,
+            approvedBy: undefined
+        },
+        {
+            id: 4,
+            clientId: 4,
+            sourceFileId: 7,
+            destFileId: 8,
+            reference_file_id: 10,
+            name: "Fluconazole",
+            description: "The translation of the Fostimon medicine for injection.",
+            sourceLanguage: "Hebrew",
+            destLanguage: "English",
+            priority: getPriority(),
+            status: getStatus(),
+            currentStepIndex: 0,
+            comments: ["Initial setup", "Translation started"],
+            members: members,
+            activities: [
+                {
+                    id: '1',
+                    user: members[0],
+                    action: 'deleted the word "slovent"',
+                    timestamp: '2 days ago'
+                },
+                {
+                    id: '2',
+                    user: members[1],
+                    action: 'changed the name of the project',
+                    timestamp: '3 days ago'
+                },
+                {
+                    id: '3',
+                    user: members[0],
+                    action: 'started the project',
+                    timestamp: '4 days ago'
+                },
+            ],
+            dueDate: new Date("2024-12-15").toLocaleDateString("en"),
+            currentUser: "Admin Adminel",
+            createdAt: new Date("2024-10-28").toLocaleDateString("en"),
+            createdBy: "Admin Adminel",
+            updatedAt: new Date("2024-10-29").toLocaleDateString("en"),
+            updatedBy: "Admin Adminel",
+            deletedAt: undefined,
+            deletedBy: undefined,
+            approvedAt: undefined,
+            approvedBy: undefined
+        }
+    ]
+
 }
 
-export interface Project {
+export interface Project extends Iterator<Project, Project, Project> {
     id: number | string;
     clientId: number | string;
     sourceFileId: number | string;
+    srcFile: File,
     destFileId: number | string;
+    description: string,
+    reference_file_id: number | string;
+    name: string;
     sourceLanguage: string;
     destLanguage: string;
-    priority: number;
+    priority: number | string;
     status: string;
     currentStepIndex: number;
     // data: any;
     // settings: any;
     comments: Array<string>
+    activities: Array<ActivityItem>
+    members: Array<ProjectMember>
     dueDate: Date;
     currentUser: User;
     createdAt: Date;
@@ -57,29 +286,15 @@ export interface Project {
     approvedBy: User | undefined
 }
 
-export const allProjects: Array<Project> = [
-    {
-        id: 1,
-        clientId: 1,
-        sourceFileId: 1,
-        destFileId: 2,
-        sourceLanguage: "en",
-        destLanguage: "es",
-        priority: 1,
-        status: "in-progress",
-        currentStepIndex: 2,
-        // data: {},
-        // settings: {},
-        comments: ["Initial setup", "Translation started"],
-        dueDate: new Date("2024-12-31"),
-        currentUser: user,
-        createdAt: new Date("2024-10-28"),
-        createdBy: user,
-        updatedAt: new Date("2024-10-29"),
-        updatedBy: user,
-        deletedAt: undefined,
-        deletedBy: undefined,
-        approvedAt: undefined,
-        approvedBy: undefined
-    }
-]
+interface ProjectMember {
+    id: string
+    name: string
+    avatar?: string
+}
+
+interface ActivityItem {
+    id: string
+    user: ProjectMember
+    action: string
+    timestamp: string
+}

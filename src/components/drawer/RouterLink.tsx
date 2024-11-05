@@ -13,7 +13,6 @@ const RouterLink = memo(function RouterLink({primary, url, icon, onClick}: {
 }): ReactNode {
 
     const path = usePathname();
-    console.log(primary, (primary !== "Log out" && (path === '/' + url || (path === '/' + "new-project" && primary === "Home"))))
     return (
         <Link onClick={onClick && onClick} href={`/${url}`} className=" no-underline text-inherit">
             <button

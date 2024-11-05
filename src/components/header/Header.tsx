@@ -7,7 +7,7 @@ const AppHeader = ({theme}: { theme: Theme }): ReactNode => {
     log("Rendering Header");
 
     return (
-        <header className={"flex justify-between w-full duration-300 transition-all ease-out"}
+        <header className={"fixed flex justify-between w-full duration-300 transition-all ease-out z-50"}
                 style={{backgroundColor: theme.colors.mainColor}}>
             <HeaderToolBar/>
         </header>
