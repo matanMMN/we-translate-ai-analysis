@@ -1,0 +1,17 @@
+__pycache__/
+node_modules/
+**/*secret*
+venv
+logs
+.hypothesis
+.pytest_cache
+CHANGELOG.md
+LICENSE
+CONTRIBUTING.md
+README.md
+.env.*
+
+# Exclude .env.example from being ignored
+!.env.example
+.coverage
+.hypothesis

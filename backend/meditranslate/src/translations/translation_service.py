@@ -1,0 +1,56 @@
+from typing import Any,Dict,List,Optional,Tuple
+from meditranslate.src.translations.translation_repository import TranslationRepository
+from meditranslate.app.db.models import Translation
+from meditranslate.app.shared.base_service import BaseService
+from meditranslate.app.errors import AppError,ErrorSeverity,ErrorType,HTTPStatus
+from meditranslate.app.db.models import Translation
+from meditranslate.src.translations.translation_schemas import (
+    TranslationCreateSchema,
+    GetManySchema,
+)
+from meditranslate.translation import TranslationEngine
+
+class TranslationService(BaseService[Translation]):
+    def __init__(self, translation_repository: TranslationRepository,translation_engine:TranslationEngine):
+        super().__init__(model=Translation, repository=translation_repository)
+        self.translation_repository = translation_repository
+        self.translation_engine = translation_engine
+
+    async def create_translation(self,translation_create_schema:TranslationCreateSchema) -> Translation:
+        new_translation_data = translation_create_schema.model_dump()
+        new_translation = await self.translation_repository.create(new_translation_data)
+        return new_translation
+
+    async def get_translation(self,translation_id: str) -> Translation:
+        translation = await self.translation_repository.get_by(field="id",value=translation_id,joins=None,unique=True)
+        if not translation:
+            raise AppError(
+                title="get translation endpoint",
+                http_status=HTTPStatus.NOT_FOUND
+            )
+        return translation
+
+    async def delete_translation(self,translation_id: str) -> None:
+        translation = await self.translation_repository.get_by("id",translation_id,unique=True)
+        if not translation:
+            raise AppError(
+                title="delete translation endpoint",
+                http_status=HTTPStatus.NOT_FOUND
+            )
+        return await self.translation_repository.delete(translation)
+
+
+    async def get_many_translations(self,get_many_schema: GetManySchema) -> Tuple[List[Translation],int]:
+        translations,total = await self.translation_repository.get_many(**get_many_schema.model_dump())
+        return translations,total
+
+    def export_translations(self):
+        pass
+
+    async def translate_file(self):
+        pass
+
+    async def translate_text(self):
+        self.create_translation(TranslationCreateSchema(
+
+        ))

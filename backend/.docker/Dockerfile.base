@@ -1,0 +1,64 @@
+# After each FROM instruction, all previously defined ARG values are discarded , redefine for reuse.
+ARG BASE_IMAGE
+FROM $BASE_IMAGE
+
+ARG BASE_IMAGE
+ARG ENVIRONMENT
+ARG USER
+ARG PROJECT_ROOT
+ARG DOCKER_ROOT
+ARG GROUP
+ARG GROUP_ID
+ARG USER_ID
+ARG ECHO=false
+ARG ECHO_SLEEP_SECONDS=2
+ARG COPY_FILES=false
+
+
+RUN groupadd -g ${GROUP_ID} ${GROUP} && \
+    useradd -m -u ${USER_ID} -g ${GROUP} ${USER}
+
+USER root
+RUN mkdir /${DOCKER_ROOT}
+RUN chown -R ${USER} /${DOCKER_ROOT}
+RUN apt-get update
+
+USER ${USER}
+
+WORKDIR /${DOCKER_ROOT}
+
+COPY ../requirements/requirements.base.txt /${DOCKER_ROOT}/
+COPY ../requirements/requirements.${ENVIRONMENT}.txt /${DOCKER_ROOT}/
+COPY ../requirements/requirements.lint.txt /${DOCKER_ROOT}/
+
+RUN rm -rf requirements
+
+
+RUN pip install --no-cache-dir -r requirements.base.txt
+RUN pip install --no-cache-dir -r requirements.lint.txt
+RUN pip install --no-cache-dir -r requirements.${ENVIRONMENT}.txt
+
+ENV PYTHONPATH=/${DOCKER_ROOT}
+#:/code/server:/code/server/lib:/code/server/core:/code/services:/code/server/config:code/tests$
+ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE 1
+
+ENV FASTAPI_ENV=${ENVIRONMENT}
+ENV RUN_IN_DOCKER=True
+
+
+# COPY ${PROJECT_ROOT} /${DOCKER_ROOT}/
+
+# RUN if [ "${COPY_FILES}" = "true" ]; then \
+#        \
+#     fi
+RUN if [ "${ENVIRONMENT}" = "production" ]; then \
+        echo "Copying project files for production..."; \
+        cp -r ${PROJECT_ROOT}/* /${DOCKER_ROOT}/; \
+    else \
+        echo "Development mode: skipping file copy."; \
+    fi
+
+
+
+
