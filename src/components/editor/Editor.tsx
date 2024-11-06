@@ -3,21 +3,30 @@
 import {useEffect, useRef, useState} from 'react';
 import {DocumentEditorContainerComponent, Toolbar} from '@syncfusion/ej2-react-documenteditor';
 import {TitleBar} from './TitleBar';
-// import { useSelector } from 'react-redux';
-// import { selectSession } from '@/store/slices/projectSlice';
 import {EditorConfig} from './types';
 import {handleFileLoad} from './handlers/fileHandler';
 import {setupContextMenu} from './handlers/menuHandler';
 import {handleAutoSave} from './handlers/autoSaveHandler';
 import DocumentContainer from './DocumentContainer';
-import { useRouter } from 'next/navigation';
+import {useRouter} from 'next/navigation';
 import {useAppDispatch} from "@/hooks/useAppDispatch";
+import {useAppSelector} from "@/hooks/useAppSelector";
+import {selectSession} from "@/store/slices/projectSlice";
+import {Project} from "@/lib/userData";
 
 
 DocumentEditorContainerComponent.Inject(Toolbar);
 
-export default function Editor({userSession, headerTitle, readOnly = false, closeButton = false, projectId}: EditorConfig) {
+export default function Editor({
+                                   readOnly = false,
+                                   closeButton = false,
+                                   projectId,
+                                   dialogRef
+                               }: EditorConfig) {
 
+    const session = useAppSelector(selectSession)
+    const {userSession} = session;
+    const {name: headerTitle} = session.project as Project
     const dispatch = useAppDispatch();
     const router = useRouter();
     const isInitialized = useRef(false);
@@ -29,12 +38,6 @@ export default function Editor({userSession, headerTitle, readOnly = false, clos
     const sourceLanguage = "he";
     let titleBar: TitleBar;
 
-    useEffect(() => {
-        if (!isInitialized.current) {
-            initializeEditor();
-            isInitialized.current = true;
-        }
-    }, []);
 
     useEffect(() => {
         return handleAutoSave(container, contentChanged, docxHash, commentsHash, setDocxHash, setCommentsHash);
@@ -51,30 +54,35 @@ export default function Editor({userSession, headerTitle, readOnly = false, clos
         titleBar = new TitleBar(
             document.getElementById(`documenteditor_titlebar`),
             container.current.documentEditor,
-            true
+            true,
+            false,
+            dialogRef && dialogRef.current!
         );
 
         await handleFileLoad(container, userSession, headerTitle, titleBar);
 
         if (!readOnly) {
+            document.getElementById("defaultDialog_dialog-content")?.remove()
             setupContextMenu({
                 container,
                 dispatch,
                 navigate: router.push,
                 projectId,
-                sourceLanguage});
+                sourceLanguage
+            });
         }
 
         // Set toolbar items based on mode
         if (readOnly) {
             container.current.documentEditor.isReadOnly = true;
             container.current.documentEditor.enableContextMenu = false;
-            container.current.resize();
+            document.getElementById("defaultDialog_dialog-content")?.remove()
+            // container.current.resize();
             const downloadButton = document.getElementById("documenteditor-share") as HTMLButtonElement | null;
             if (downloadButton) {
                 downloadButton.style.display = "none";
             }
-            container.current.toolbarItems = ['Open', 'Separator', 'Find'];
+            container.current.toolbarItems = ['Find'];
         }
 
         if (closeButton) {
@@ -88,12 +96,20 @@ export default function Editor({userSession, headerTitle, readOnly = false, clos
         };
     };
 
+    useEffect(() => {
+        if (!isInitialized.current) {
+            initializeEditor();
+            isInitialized.current = true;
+            console.log("Editor initialized");
+        }
+    }, [initializeEditor]);
+
     return (
         <div id="documenteditor_container_body">
             <div className="control-pane">
                 <div className="control-section">
                     <div id="documenteditor_titlebar" className="e-de-ctn-title"/>
-                    <DocumentContainer container={container} hostUrl={hostUrl}/>
+                    <DocumentContainer container={container} hostUrl={hostUrl} isView={readOnly}/>
                 </div>
             </div>
         </div>

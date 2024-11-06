@@ -1,15 +1,25 @@
 'use client'
 
-import { useEffect, useState } from 'react';
+import {useEffect, useState, useRef} from 'react';
 import dynamic from 'next/dynamic';
-import { useAppDispatch } from '@/hooks/useAppDispatch';
-import { updateSection } from '@/store/slices/sideBySideSlice';
-import 'react-quill/dist/quill.snow.css';
+import {useAppDispatch} from '@/hooks/useAppDispatch';
+import {updateSection} from '@/store/slices/sideBySideSlice';
+import 'react-quill-new/dist/quill.snow.css';
 
-const ReactQuill = dynamic(() => import('react-quill'), {
-    ssr: false,
-    loading: () => <div className="h-full animate-pulse bg-gray-100 rounded-md" />
-});
+// Dynamic import with specific settings to avoid SSR issues
+const ReactQuill = dynamic(
+    async () => {
+        const {default: RQ} = await import('react-quill-new');
+        // @ts-ignore
+        return function comp({forwardedRef, ...props}) {
+            return <RQ ref={forwardedRef} {...props} />;
+        };
+    },
+    {
+        ssr: false,
+        loading: () => <div className="h-full animate-pulse bg-gray-100 rounded-md"/>
+    }
+);
 
 interface QuillEditorProps {
     id: string;
@@ -20,27 +30,27 @@ interface QuillEditorProps {
 
 const modules = {
     toolbar: [
-        [{ 'font': ['Arial'] }],
-        [{ 'size': ['Normal'] }],
-        ['bold', 'italic', 'underline', 'strike'],
-        [{ 'script': 'sub'}, { 'script': 'super' }],
-        [{ 'align': [] }],
+        [{'header': '1'}, {'header': '2'}, {'font': ['Arial']}],
+        [{'size': ['Normal']}],
+        ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+        [{'list': 'ordered'}, {'list': 'bullet'}, {'indent': '-1'}, {'indent': '+1'}],
+        [{'script': 'sub'}, {'script': 'super'}],
+        [{'align': ''}, {'align': 'center'}, {'align': 'right'}, {'align': 'justify'}],
         ['clean']
     ]
 };
 
 const formats = [
-    'font',
-    'size',
-    'bold',
-    'italic',
-    'underline',
-    'strike',
+    'header', 'font', 'size',
+    'bold', 'italic', 'underline', 'strike', 'blockquote',
+    'list', 'indent',
     'script',
-    'align'
+    'align', 'direction'
 ];
 
-export function QuillEditor({ id, content, readOnly = false, isRTL = false }: QuillEditorProps) {
+export function QuillEditor({id, content, readOnly = false, isRTL = false}: QuillEditorProps) {
+
+    const editor = useRef(null)
     const dispatch = useAppDispatch();
     const [mounted, setMounted] = useState(false);
 
@@ -56,21 +66,34 @@ export function QuillEditor({ id, content, readOnly = false, isRTL = false }: Qu
     };
 
     if (!mounted) {
-        return <div className="h-full animate-pulse bg-gray-100 rounded-md" />;
+        return <div className="h-full animate-pulse bg-gray-100 rounded-md"/>;
     }
 
+    // Add wrapper div for RTL support
     return (
-        <div className={`h-full ${isRTL ? 'text-right' : 'text-left'}`}>
-            <ReactQuill
-                theme="snow"
-                value={content}
-                onChange={handleChange}
-                modules={modules}
-                formats={formats}
-                readOnly={readOnly}
-                placeholder={readOnly ? "Source text will appear here..." : "Enter translation..."}
-                className={`h-[calc(100%-42px)] ${isRTL ? 'ql-rtl' : 'ql-ltr'}`}
-            />
+        <div className={`${isRTL ? 'text-right' : 'text-left'} flex max-h-[calc(100vh-500px)]`}>
+            <div className={`${isRTL ? 'ql-rtl' : 'ql-ltr'}`}>
+                <ReactQuill
+                    ref={editor}
+                    id={id + (readOnly ? '-source' : '-target')}
+                    theme="snow"
+                    value={content}
+                    defaultValue={"Waiting for data"}
+                    onChange={handleChange}
+                    tabIndex={1}
+                    bounds={'#quills'}
+                    modules={modules}
+                    formats={formats}
+                    style={{flex: "1", textAlign: `${isRTL ? 'right' : 'left'}`}}
+                    readOnly={readOnly || !content}
+                    // onChangeSelection={}
+                    // onFocus={}
+                    // onBlur={}
+                    placeholder={readOnly ? "Source text will appear here..." : "Translate text will appear here..."}
+                    className="h-[calc(100%-42px)] max-h-[calc(100vh-300px)]"
+                    preserveWhitespace={false}
+                />
+            </div>
         </div>
     );
-} 
+}

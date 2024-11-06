@@ -1,6 +1,6 @@
 import {createSlice, PayloadAction, createAsyncThunk} from '@reduxjs/toolkit';
 import {RootState} from '../store.types';
-
+import {v4 as uuid} from 'uuid';
 interface Section {
     id: string;
     sourceContent: string;
@@ -73,7 +73,7 @@ const sideBySideSlice = createSlice({
     initialState,
     reducers: {
         addSection: (state) => {
-            const newId = (state.sections.length + 1).toString();
+            const newId = uuid();
             state.sections.push({
                 id: newId,
                 sourceContent: '',
@@ -107,7 +107,7 @@ const sideBySideSlice = createSlice({
             sourceLanguage: string;
         }>) => {
             const newSection = {
-                id: (state.sections.length + 1).toString(),
+                id: uuid(),
                 sourceContent: action.payload.text,
                 targetContent: ''
             };

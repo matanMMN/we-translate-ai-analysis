@@ -26,10 +26,6 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 export default function SideBySide() {
     const params = useParams();
     const projectId = params.projectId as string;
-
-    const sidebysideSlice = useAppSelector(state => state.sideBySide)
-    console.log(sidebysideSlice)
-
     const dispatch = useAppDispatch();
     // const {isLoading, error} = useSections();
     const activeSection = useAppSelector(selectActiveSectionData)
@@ -102,19 +98,19 @@ export default function SideBySide() {
             <div className="flex-1 flex flex-col p-4">
                 <LanguageSelector sourceLanguage={sourceLang || ''}/>
 
-                <div className="grid grid-cols-2 gap-4 flex-1">
+                <div id="quills" className="grid grid-cols-2 gap-4 flex-1" >
+                    <QuillEditor
+                        id={activeSection.id}
+                        content={activeSection.targetContent}
+                        readOnly={false} // Target content is editable for translation
+                        isRTL={true} // Hebrew is always RTL
+                    />
                     <QuillEditor
                         id={activeSection.id}
                         content={activeSection.sourceContent}
-                        isRTL={sourceLang === 'he'}
+                        isRTL={sourceLang === 'he' || sourceLang === 'ar'}
                         readOnly={true} // Source content is read-only as it comes from the editor
                     />
-                    {/*<QuillEditor*/}
-                    {/*    id={activeSection.id}*/}
-                    {/*    content={activeSection.targetContent}*/}
-                    {/*    readOnly={false} // Target content is editable for translation*/}
-                    {/*    isRTL={true} // Hebrew is always RTL*/}
-                    {/*/>*/}
                 </div>
 
                 <div className="flex justify-between items-center mt-4">

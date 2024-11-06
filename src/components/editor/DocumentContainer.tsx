@@ -5,7 +5,8 @@ import { EditorProps } from './types';
 
 export default function DocumentContainer({ 
     container, 
-    hostUrl 
+    hostUrl,
+    isView
 }: EditorProps) {
     return (
         <DocumentEditorContainerComponent 
@@ -16,7 +17,7 @@ export default function DocumentContainer({
             zIndex={3000}
             enableToolbar={true}
             height={"780px"}
-            showPropertiesPane={true}
+            showPropertiesPane={!isView}
             enableTrackChanges={true}
             layoutType={"Pages"}
             locale="en-US"

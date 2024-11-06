@@ -35,10 +35,9 @@ export const copyTextToSideBySide = async ({
         //     projectId
         // })).unwrap();
 
-        if (result) {
-            toast.success('Text copied to Side by Side');
+        if (result)
             return true;
-        }
+
 
         return false;
     } catch (error) {

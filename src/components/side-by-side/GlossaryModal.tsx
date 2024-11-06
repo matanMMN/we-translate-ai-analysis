@@ -33,7 +33,7 @@ export function GlossaryModal({
 
     useEffect(() => {
         if (open) {
-            loadGlossaryEntries();
+            // loadGlossaryEntries();
         }
     }, [open, projectId]);
 

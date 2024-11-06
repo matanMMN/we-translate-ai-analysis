@@ -20,19 +20,24 @@ export const handleFileLoad = async (
         `${userSession?.userData?.first_name} ${userSession?.userData?.last_name}`;
 
     try {
-        const srcFileData = await srcFile();
-
-        if (srcFileData) {
-            const binaryContent = atob(srcFileData.content);
-            const fileBlob = new Blob(
-                [Uint8Array.from(binaryContent.split('').map(char => char.charCodeAt(0)))],
-                {type: srcFileData.type}
-            );
-
-            await loadFileContent(container, fileBlob, srcFileData.type);
+        const savedContent = localStorage.getItem('editorContent');
+        if (savedContent) {
+            container.current.documentEditor.open(savedContent);
         } else {
-            // Load default content if no file exists
-            container.current.documentEditor.open(JSON.stringify(defaultData));
+            const srcFileData = await srcFile();
+
+            if (srcFileData) {
+                const binaryContent = atob(srcFileData.content);
+                const fileBlob = new Blob(
+                    [Uint8Array.from(binaryContent.split('').map(char => char.charCodeAt(0)))],
+                    {type: srcFileData.type}
+                );
+
+                await loadFileContent(container, fileBlob, srcFileData.type);
+            } else {
+                // Load default content if no file exists
+                container.current.documentEditor.open(JSON.stringify(defaultData));
+            }
         }
 
         // Set document properties
