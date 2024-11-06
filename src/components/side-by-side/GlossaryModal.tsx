@@ -15,7 +15,7 @@ interface GlossaryModalProps {
     onOpenChange: (open: boolean) => void;
     sourceLang: string;
     targetLang: string;
-    projectId: string;
+    projectId: string | null;
 }
 
 export function GlossaryModal({ 
@@ -39,8 +39,12 @@ export function GlossaryModal({
 
     const loadGlossaryEntries = async () => {
         try {
-            const data = await fetchGlossaryEntries(projectId);
-            setEntries(data);
+            if (projectId) {
+                const data = await fetchGlossaryEntries(projectId);
+                setEntries(data);
+            } else {
+                throw new Error("Project ID is missing");
+            }
         } catch (error) {
             console.error('Failed to load glossary entries:', error);
         } finally {

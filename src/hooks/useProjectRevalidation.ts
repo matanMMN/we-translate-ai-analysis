@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectSession, setSessionSlice } from '@/store/slices/projectSlice';
+import { selectSession, setSessionSlice } from '@/store/slices/sessionSlice';
 import { getUserProject } from '@/actions/getUserProjects';
 import { cacheProject } from '@/store/slices/projectCacheSlice';
 

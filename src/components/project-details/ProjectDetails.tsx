@@ -1,7 +1,7 @@
 'use client'
 
 import { useSelector } from "react-redux";
-import { selectSession } from "@/store/slices/projectSlice";
+import { selectSession } from "@/store/slices/sessionSlice";
 import dynamic from 'next/dynamic';
 import ProjectInfo from "./sections/ProjectInfo";
 import ProjectDescription from "./sections/ProjectDescription";

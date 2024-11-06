@@ -11,28 +11,6 @@ interface EditorChangesResult {
     error?: string;
 }
 
-export const srcFile = async (fileName="src.txt") => {
-    const fileExt = path.extname(fileName).toLowerCase();
-    const filePath = path.join(process.cwd(), 'src', 'assets', fileName);
-
-    // Read file content
-    const fileBuffer = await fs.readFile(filePath);
-    const base64Content = fileBuffer.toString('base64');
-
-    // Determine MIME type
-    const mimeTypes = {
-        '.txt': 'text/plain',
-        '.pdf': 'application/pdf',
-        '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-    };
-
-    return {
-        content: base64Content,
-        name: fileName,
-        type: mimeTypes[fileExt as keyof typeof mimeTypes] || 'application/octet-stream',
-        lastModified: new Date().getTime()
-    };
-}
 
 export const handleEditorChanges = async (
     blob: Blob,

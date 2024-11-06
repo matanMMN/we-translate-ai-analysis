@@ -11,7 +11,7 @@ import DocumentContainer from './DocumentContainer';
 import {useRouter} from 'next/navigation';
 import {useAppDispatch} from "@/hooks/useAppDispatch";
 import {useAppSelector} from "@/hooks/useAppSelector";
-import {selectSession} from "@/store/slices/projectSlice";
+import {selectSession} from "@/store/slices/sessionSlice";
 import {Project} from "@/lib/userData";
 
 

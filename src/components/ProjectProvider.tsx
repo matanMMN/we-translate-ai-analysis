@@ -2,7 +2,7 @@
 
 import { ReactNode, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { ProjectState, selectSession, setSessionSlice } from "@/store/slices/projectSlice";
+import { ProjectState, selectSession, setSessionSlice } from "@/store/slices/sessionSlice";
 import { getUser } from "@/lib/AuthGuard";
 import { useProjectCache } from "@/hooks/useProjectCache";
 import { useProjectRevalidation } from "@/hooks/useProjectRevalidation";

@@ -50,6 +50,20 @@ body, html {
     background: #EEEEEE; /* Background of the scrollbar track */
 }
 
+.e-de-review-pane {
+    width: 300px !important;
+}
+
+/* Adjust the main content to account for the smaller pane */
+.e-de-content-wrapper.e-de-review-enabled {
+    right: 300px !important;
+}
+
+/* Ensure the review pane header adjusts to the new width */
+.e-de-review-header {
+    width: 300px !important;
+}
+
 ::-webkit-scrollbar-thumb {
     background-color: #536d69; /* Color of the scrollbar thumb */
     border-radius: 10px; /* Rounded corners of the scrollbar thumb */

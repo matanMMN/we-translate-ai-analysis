@@ -89,7 +89,7 @@ export function QuillEditor({id, content, readOnly = false, isRTL = false}: Quil
                     // onChangeSelection={}
                     // onFocus={}
                     // onBlur={}
-                    placeholder={readOnly ? "Source text will appear here..." : "Translate text will appear here..."}
+                    placeholder={readOnly ? "Source text will appear here..." : "Translates text will appear here..."}
                     className="h-[calc(100%-42px)] max-h-[calc(100vh-300px)]"
                     preserveWhitespace={false}
                 />

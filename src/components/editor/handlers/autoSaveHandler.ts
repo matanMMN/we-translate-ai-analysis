@@ -1,7 +1,13 @@
-import {DocumentEditorContainerComponent} from '@syncfusion/ej2-react-documenteditor';
-import {RefObject, MutableRefObject} from 'react';
-import {handleEditorChanges} from '@/actions/EditorChanges';
+'use client'
 
+import { DocumentEditorContainerComponent } from '@syncfusion/ej2-react-documenteditor';
+import { RefObject, MutableRefObject } from 'react';
+import { handleEditorChanges } from '@/actions/EditorChanges';
+import store from '@/store/store';
+import { updateFileMetadata } from '@/store/slices/projectSlice';
+
+const LOCAL_SAVE_INTERVAL = 1000;   // 1 seconds
+const BACKEND_SAVE_INTERVAL = 30000; // 30 seconds
 
 export const handleAutoSave = (
     container: RefObject<DocumentEditorContainerComponent>,
@@ -11,38 +17,81 @@ export const handleAutoSave = (
     setDocxHash: (hash: string | null) => void,
     setCommentsHash: (hash: string | null) => void
 ) => {
-    const saveChanges = async () => {
-        console.log("saveChanges")
-        if (contentChanged.current && container.current) {
-            try {
-                console.log("performing an auto save")
-                const blob = await container.current.documentEditor.saveAsBlob("Docx");
 
-                const comments = container.current.documentEditor.getComments().map(comment => ({
-                    ...comment,
-                    replies: JSON.parse(JSON.stringify(comment.replies))
-                }));
+    const saveToLocalStorage = (content: string) => {
+        localStorage.setItem('editorContent', content);
+        localStorage.setItem('lastSaveTime', Date.now().toString());
+        contentChanged.current = false;
+    };
 
-                const result = await handleEditorChanges(blob, comments, docxHash, commentsHash);
+    const saveToBackend = async () => {
+        if (!container.current || !contentChanged.current) return;
 
-                if (result.success) {
-                    if (result.docxHash) setDocxHash(result.docxHash);
-                    if (result.commentsHash) setCommentsHash(result.commentsHash);
+        try {
+            const blob = await container.current.documentEditor.saveAsBlob("Docx");
+            const comments = container.current.documentEditor.getComments().map(comment => ({
+                ...comment,
+                replies: JSON.parse(JSON.stringify(comment.replies))
+            }));
+
+            const result = await handleEditorChanges(blob, comments, docxHash, commentsHash);
+
+            if (result.success) {
+                const newMetadata = {
+                    docxHash: result.docxHash || null,
+                    commentsHash: result.commentsHash || null,
+                    lastModified: Date.now()
                 }
-
-                updateSaveIndicator();
+                
+                // Update Redux state
+                store.dispatch(updateFileMetadata(newMetadata))
+                
+                // Update local state
+                if (result.docxHash) setDocxHash(result.docxHash);
+                if (result.commentsHash) setCommentsHash(result.commentsHash);
+                
                 contentChanged.current = false;
-
-                const content = container.current.documentEditor.serialize();
-                localStorage.setItem('editorContent', content);
-            } catch (error) {
-                console.error('Auto-save failed:', error);
+                updateSaveIndicator();
             }
+        } catch (error) {
+            console.error('Backend save failed:', error);
         }
+    };
+
+    // Local storage save interval (every 3 seconds)
+    const localSaveIntervalId = setInterval(() => {
+        if (container.current && contentChanged.current) {
+            const content = container.current.documentEditor.serialize();
+            saveToLocalStorage(content);
+            console.log('Saved to localStorage');
+        }
+    }, LOCAL_SAVE_INTERVAL);
+
+    // Backend save interval (every 30 seconds)
+    const backendSaveIntervalId = setInterval(async () => {
+        if (contentChanged.current) {
+            console.log('Backend save triggered');
+            await saveToBackend();
+        }
+    }, BACKEND_SAVE_INTERVAL);
+
+    // Set up the content change handler
+    if (container.current) {
+        container.current.contentChange = () => {
+            contentChanged.current = true;
+        };
+
+        // Also set up the documentChange event as backup
+        container.current.documentEditor.documentChange = () => {
+            contentChanged.current = true;
+        };
     }
-    // const debouncedSaveChanges = debounce(saveChanges, 5000);
-    const intervalId = setInterval(saveChanges, 3000);
-    return () => clearInterval(intervalId);
+
+    // Cleanup function
+    return () => {
+        clearInterval(localSaveIntervalId);
+        clearInterval(backendSaveIntervalId);
+    };
 };
 
 function updateSaveIndicator() {

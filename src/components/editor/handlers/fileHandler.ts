@@ -1,11 +1,15 @@
+'use client'
+
 import {DocumentEditorContainerComponent} from '@syncfusion/ej2-react-documenteditor';
 import {RefObject} from 'react';
 import {Session} from 'next-auth';
 import {TitleBar} from '../TitleBar';
 import {containsRTL} from '@/lib/utils/textUtils';
-import {srcFile} from '@/actions/EditorChanges';
 import {createSfdtContent} from '@/lib/utils/documentUtils';
 import * as defaultData from '@/app/(content)/[projectId]/editor/data-default.json';
+import store from '@/store/store';
+import {selectProjectFiles, selectCurrentFile, selectProjectId} from '@/store/slices/projectSlice';
+import {fetchProjectFile} from '@/actions/fetchProjectFile';
 
 export const handleFileLoad = async (
     container: RefObject<DocumentEditorContainerComponent>,
@@ -20,25 +24,48 @@ export const handleFileLoad = async (
         `${userSession?.userData?.first_name} ${userSession?.userData?.last_name}`;
 
     try {
+        const state = store.getState();
+        const projectFiles = selectProjectFiles(state);
+        const currentFile = selectCurrentFile(state);
+        const projectId = selectProjectId(state);
+
+        // Check localStorage first
         const savedContent = localStorage.getItem('editorContent');
-        if (savedContent) {
-            container.current.documentEditor.open(savedContent);
-        } else {
-            const srcFileData = await srcFile();
-
-            if (srcFileData) {
-                const binaryContent = atob(srcFileData.content);
-                const fileBlob = new Blob(
-                    [Uint8Array.from(binaryContent.split('').map(char => char.charCodeAt(0)))],
-                    {type: srcFileData.type}
-                );
-
-                await loadFileContent(container, fileBlob, srcFileData.type);
-            } else {
-                // Load default content if no file exists
-                container.current.documentEditor.open(JSON.stringify(defaultData));
+        const lastSaveTime = localStorage.getItem('lastSaveTime');
+        
+        // If we have a lastModified timestamp from the backend/translation
+        if (currentFile.lastModified) {
+            // Check if localStorage is newer than our last known modification
+            if (savedContent && lastSaveTime && parseInt(lastSaveTime) > currentFile.lastModified) {
+                console.log('Using newer localStorage content');
+                container.current.documentEditor.open(savedContent);
+                return;
             }
+            
+            // If localStorage is older or doesn't exist, try to fetch from backend
+            if (projectId && projectFiles.srcFileId) {
+                try {
+                    console.log('Fetching newer content from backend');
+                    const fileData = await fetchProjectFile(projectId, projectFiles.srcFileId);
+                    if (fileData) {
+                        const blob = base64ToBlob(fileData.content, fileData.type);
+                        await loadFileContent(container, blob, fileData.type);
+                        return;
+                    }
+                } catch (error) {
+                    console.error('Error fetching file:', error);
+                }
+            }
+        } else if (savedContent) {
+            // If we don't have a lastModified timestamp but have localStorage content
+            console.log('Using localStorage content (no lastModified timestamp)');
+            container.current.documentEditor.open(savedContent);
+            return;
         }
+
+        // Fallback to default content
+        console.log('Using default content');
+        container.current.documentEditor.open(JSON.stringify(defaultData));
 
         // Set document properties
         container.current.documentEditor.documentName = headerTitle;
@@ -132,4 +159,14 @@ async function handleDocxContent(
         container.current?.documentEditor.open(event.target?.result as string);
     };
     reader.readAsBinaryString(fileBlob);
+}
+
+// Helper function to convert base64 to Blob
+function base64ToBlob(base64: string, type: string): Blob {
+    const binaryString = window.atob(base64);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+    }
+    return new Blob([bytes], {type});
 } 

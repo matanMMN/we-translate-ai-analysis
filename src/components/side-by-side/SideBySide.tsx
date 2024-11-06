@@ -21,13 +21,13 @@ import {useState} from 'react';
 import {toast} from 'sonner';
 import {useParams} from 'next/navigation';
 import LoadingSpinner from "@/components/LoadingSpinner";
+import {initializeProject, selectProjectId} from '@/store/slices/projectSlice'
 
 
 export default function SideBySide() {
     const params = useParams();
-    const projectId = params.projectId as string;
     const dispatch = useAppDispatch();
-    // const {isLoading, error} = useSections();
+    const projectId = useAppSelector(selectProjectId);
     const activeSection = useAppSelector(selectActiveSectionData)
     const sourceLang = useAppSelector(selectSourceLanguage);
     const targetLang = useAppSelector(selectTargetLanguage);
@@ -36,53 +36,46 @@ export default function SideBySide() {
 
 
     console.log(activeSection)
-    // useEffect(() => {
-    //     if (error) {
-    //         toast.error('Failed to load sections');
-    //     }
-    // }, [error]);
+
+    useEffect(() => {
+        if (params.projectId && !projectId) {
+            dispatch(initializeProject({ id: params.projectId as string }))
+        }
+    }, [params.projectId, projectId, dispatch])
 
     const handleTranslate = async () => {
-        if (!activeSection?.sourceContent) {
-            toast.error('Please enter source text first');
-            return;
+        if (!activeSection?.sourceContent || !projectId) {
+            toast.error('Missing required data')
+            return
         }
 
         if (!sourceLang) {
-            toast.error('Source language not detected');
-            return;
+            toast.error('Source language not detected')
+            return
         }
 
-        setIsTranslating(true);
+        setIsTranslating(true)
         try {
             const result = await translateText({
                 text: activeSection.sourceContent,
                 sourceLang,
                 targetLang,
                 projectId
-            });
+            })
 
             dispatch(updateSection({
                 id: activeSection.id,
                 targetContent: result.translatedText
-            }));
+            }))
 
-            toast.success('Translation completed!');
+            toast.success('Translation completed!')
         } catch (error) {
-            console.error('Translation failed:', error);
-            toast.error('Translation failed. Please try again.');
+            console.error('Translation failed:', error)
+            toast.error('Translation failed. Please try again.')
         } finally {
-            setIsTranslating(false);
+            setIsTranslating(false)
         }
-    };
-
-    // if (isLoading) {
-    //     return (
-    //         <div className="flex items-center justify-center h-[calc(100vh-300px)]">
-    //             <LoadingSpinner/>
-    //         </div>
-    //     );
-    // }
+    }
 
     if (!activeSection) {
         return (

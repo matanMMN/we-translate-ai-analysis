@@ -5,7 +5,7 @@ export interface GlossaryEntry {
     targetText: string;
     sourceLang: string;
     targetLang: string;
-    projectId: string;
+    projectId: string | null;
 }
 
 export async function addGlossaryEntry(entry: GlossaryEntry) {
