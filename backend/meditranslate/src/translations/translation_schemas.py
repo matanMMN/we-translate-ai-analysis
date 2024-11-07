@@ -129,6 +129,11 @@ class TranslationsResponseSchema(BaseResponseSchema):
 
 
 
+class TranslationFileSchema(BaseModel):
+    pass
+
+class TranslationTextSchema(BaseModel):
+    pass
 
 
 

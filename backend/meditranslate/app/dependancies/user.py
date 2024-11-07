@@ -18,30 +18,34 @@ async def get_current_user(user_controller: Annotated[UserController,Depends(Fac
     try:
         payload = decode_jwt_token(secret_key=config.SECRET_KEY,token=token,algorithms=[config.JWT_ALGORITHM])
     except ValidationError as e:
+        logger.error(f"exception in validation in jwt  data after successful decoding {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Validation Error {str(e)}",
+            detail=f"unauth",
         )
     except JWTDecodeError as e:
+        logger.error(f"exception in deconding in jwt  data after successful decoding {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"failed to decode {str(e)}",
+            detail=f"unauth",
         )
     except JWTExpiredError as e:
+        logger.error(f"exception in expired in jwt  data after successful decoding {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail=f"expired token {str(e)}",
+            detail="unauth"
         )
     try:
         token_data = JWTPayload(**payload)
-        data:JWTData = token_data.data
+        data:JWTData = JWTData(**token_data.data)
         user_id = data.user_id
     except Exception as e:
+        logger.error(f"exception in parsing jwt data after successful decoding {str(e)}")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"JWTPayload Payload Extraction Error {str(e)}",
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"unauth",
         )
-    user = user_controller.get_user(user_id)
+    user = await user_controller.get_user(user_id)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

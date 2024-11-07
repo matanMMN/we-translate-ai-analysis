@@ -71,11 +71,9 @@ async def get_user(
     "/{user_id}",
     response_model=UserResponseSchema,
     status_code=200,
-    dependencies=[Depends(AuthenticationRequired)]
 )
 async def update_user(
     user_id: str,
-    current_user: CurrentUserDep,
     user_update_schema: Annotated[UserUpdateSchema,Body()],
     user_controller: UserController = Depends(Factory.get_user_controller)
 )-> UserResponseSchema:
@@ -83,7 +81,6 @@ async def update_user(
     Update a user's information.
     """
 
-    logger.info(current_user)
     await user_controller.update_user(user_id, user_update_schema)
     update_user = await user_controller.get_user(user_id=user_id)
     return UserResponseSchema(
@@ -111,14 +108,17 @@ async def delete_user(
     "",
     response_model=UsersResponseSchema,
     status_code=200,
+    dependencies=[Depends(AuthenticationRequired)]
 )
 async def get_many_users(
+    current_user: CurrentUserDep,
     get_many_schema:Annotated[GetManySchema, Query()],
     user_controller: UserController = Depends(Factory.get_user_controller)
 )-> UsersResponseSchema:
     """
     Retrieve a list of users with pagination.
     """
+    logger.error(current_user)
     users,total = await user_controller.get_many_users(get_many_schema)
     pagination = PaginationSchema(
         total=total,

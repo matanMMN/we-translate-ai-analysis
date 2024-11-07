@@ -43,4 +43,12 @@ class Language:
             )
         return False
 
+    def __hash__(self) -> int:
+        return hash((
+            self.name,
+            self.native_name,
+            self.direction,
+            self.charset,
+            self.linguistic_family
+        ))
 

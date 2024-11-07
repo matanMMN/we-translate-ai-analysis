@@ -17,8 +17,9 @@ auth_router = APIRouter(
     tags=["auth"]
 )
 
+
 @auth_router.post(
-    "/login",
+    "/token",
     response_model=TokenResponseSchema,
     status_code=200
 )

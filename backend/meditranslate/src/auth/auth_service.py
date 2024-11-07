@@ -10,7 +10,7 @@ from meditranslate.src.users.user_repository import UserRepository
 
 import asyncio
 from meditranslate.app.errors import AppError,ErrorSeverity,HTTPStatus,ErrorType
-from meditranslate.utils.security.json_web_tokens import create_jwt_token,JWTAlgorithm
+from meditranslate.utils.security.json_web_tokens import create_jwt_token
 from meditranslate.utils.security.password import verify_password
 from meditranslate.app.configurations import config
 from meditranslate.src.auth.auth_constants import JWTData
@@ -42,13 +42,14 @@ class AuthService(BaseService[User]):
                 )
             else:
                 data:JWTData = JWTData(
-                    user_id=user.id
+                    user_id=user.id,
+                    username=user.username
                 )
                 token = create_jwt_token(
                     config.SECRET_KEY,
                     data=data.model_dump(),
-                    expire_minutes=100,
+                    expire_minutes=config.JWT_EXPIRE_MINUTES,
                     token_type="access_token",
-                    algorithm=JWTAlgorithm.HS256
+                    algorithm=config.JWT_ALGORITHM
                 )
                 return token
