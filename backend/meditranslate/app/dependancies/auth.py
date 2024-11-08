@@ -10,7 +10,7 @@ TokenDep = Annotated[str, Depends(oauth2_scheme)]
 class AuthenticationRequired:
     def __init__(
         self,
-        token: Annotated[str, Depends(oauth2_scheme)],
+        token: TokenDep,
     ):
         if not token:
             raise AppError(

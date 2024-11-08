@@ -60,7 +60,7 @@ class BaseUserSchema(BaseSchema):
                         min_length=None,
                         # pattern=r'^\+?[1-9]\d{1,14}$',
                     ),
-                ] = Field(None, title="Password", description="Password")
+                ] = Field(None, title="Password", description="Password",repr=False)
 
 
     first_name : Annotated[

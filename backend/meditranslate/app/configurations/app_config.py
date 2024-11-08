@@ -16,7 +16,7 @@ class AppConfig(Config):
     )] = Field(os.environ.get("APP_NAME","wetranslateai"))
 
     JWT_EXPIRE_MINUTES: int = Field(os.environ.get("JWT_EXPIRE_MINUTES", 100),title="jwt expire",description="",gt=5)
-    JWT_ALGORITHM: JWTAlgorithm = Field(JWTAlgorithm(os.environ.get("JWT_ALGORITHM", JWTAlgorithm.HS256.value)),title="jwt algo",description="",validate_default=True,repr=False)
+    JWT_ALGORITHM: JWTAlgorithm = Field(JWTAlgorithm.HS256,title="jwt algo",description="",validate_default=True,repr=False)
 
     APP_DESCRIPTION:Annotated[str,StringConstraints(
         strip_whitespace=True

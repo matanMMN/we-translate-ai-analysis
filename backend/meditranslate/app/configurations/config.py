@@ -93,6 +93,8 @@ class Config(BaseConfig):
     DEBUG: bool = Field(os.environ.get("DEBUG",False),title="debug",description="")
     DEBUG_ON_INIT: bool = Field(os.environ.get("DEBUG",True),title="debug",description="")
     PRINT_ENVIRONMENT: str = Field(os.environ.get("PRINT_ENVIRONMENT",""),title="print env",description="")
+    PRINT_APP: str = Field(os.environ.get("PRINT_APP",""),title="print app",description="")
+
 
     ENVIRONMENT: Annotated[
         str,

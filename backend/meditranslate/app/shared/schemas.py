@@ -15,7 +15,7 @@ class MetaSchema(BaseModel):
     pagination: Optional[PaginationSchema] = None
 
 
-class GetManySchema(BaseSchema):
+class GetManySchema(BaseModel):
     model_config:ConfigDict = ConfigDict(
         from_attributes=True
     )

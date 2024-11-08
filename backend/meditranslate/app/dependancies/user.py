@@ -12,10 +12,18 @@ from meditranslate.app.shared.factory import Factory
 from fastapi import Depends
 from meditranslate.src.auth.auth_constants import JWTData
 from meditranslate.app.loggers import logger
-
+import json
 
 async def get_current_user(user_controller: Annotated[UserController,Depends(Factory.get_user_controller)], token: TokenDep) -> User:
     try:
+        logger.debug(
+            f"""
+                decoding jwt token:
+                {config.SECRET_KEY}
+                {token}
+                {config.JWT_ALGORITHM}
+            """
+        )
         payload = decode_jwt_token(secret_key=config.SECRET_KEY,token=token,algorithms=[config.JWT_ALGORITHM])
     except ValidationError as e:
         logger.error(f"exception in validation in jwt  data after successful decoding {str(e)}")
@@ -36,17 +44,21 @@ async def get_current_user(user_controller: Annotated[UserController,Depends(Fac
             detail="unauth"
         )
     try:
-        token_data = JWTPayload(**payload)
-        data:JWTData = JWTData(**token_data.data)
+        token_data:JWTPayload = JWTPayload(**payload)
+        data = JWTData(**token_data.data)
+        logger.error(data)
         user_id = data.user_id
+        logger.error("user_id")
+        logger.error(user_id)
     except Exception as e:
         logger.error(f"exception in parsing jwt data after successful decoding {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"unauth",
         )
-    user = await user_controller.get_user(user_id)
-    if not user:
+    logger.error(user_id)
+    user = await user_controller.get_user(user_id,raise_exception=False)
+    if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid authentication credentials",

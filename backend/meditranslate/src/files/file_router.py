@@ -3,6 +3,8 @@ from fastapi import APIRouter, Depends,Request,Query,UploadFile,File,Form
 from meditranslate.app.shared.factory import Factory
 from meditranslate.app.shared.schemas import MetaSchema, PaginationSchema
 from meditranslate.src.files.file_controller import FileController
+from meditranslate.app.dependancies.auth import AuthenticationRequired
+from meditranslate.app.dependancies.user import CurrentUserDep
 from typing import Any,List,Annotated,Optional
 from meditranslate.src.files.file_schemas import (
     FileCreateSchema,
@@ -15,7 +17,10 @@ from meditranslate.src.files.file_schemas import (
 from fastapi.responses import FileResponse,StreamingResponse
 import json
 
-file_router = APIRouter()
+file_router = APIRouter(
+    tags=["files"],
+    dependencies=[Depends(AuthenticationRequired)]
+)
 
 @file_router.get("/{file_id}", response_model=FilePointerResponseSchema,status_code=200)
 async def get_file(
@@ -35,6 +40,7 @@ async def get_file(
 
 @file_router.post("/upload/", response_model=FilePointerResponseSchema,status_code=201)
 async def upload_file(
+    current_user: CurrentUserDep,
     file: Annotated[UploadFile, File(description="A file read as UploadFile")],
     file_create_form_schema: Annotated[FileCreateSchema,Form(...,media_type="multipart/form-data")],
     file_controller: FileController = Depends(Factory.get_file_controller),

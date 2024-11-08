@@ -29,4 +29,7 @@ class Base(AsyncAttrs,DeclarativeBase, IdMixin, TimestampMixin):
         return f"<{self.__class__.__name__}(id={self.id})>"
 
     def as_dict(self):
-        return {c.name: str(getattr(self, c.name)) for c in self.__table__.columns}
+        return {
+            c.name: (str(getattr(self, c.name)) if getattr(self, c.name) is not None else None)
+            for c in self.__table__.columns
+        }

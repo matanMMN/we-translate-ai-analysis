@@ -25,22 +25,23 @@ from meditranslate.src.users.user_controller import UserController
 
 user_router = APIRouter(
     tags=["users"],
+    dependencies=[Depends(AuthenticationRequired)]
 )
 
 @user_router.post(
     path="",
     response_model=UserResponseSchema,
     status_code=201,
-    dependencies=[],
 )
 async def create_user(
+    current_user: CurrentUserDep,
     user_create_schema: Annotated[UserCreateSchema,Body()],
     user_controller: UserController = Depends(Factory.get_user_controller)
 )-> UserResponseSchema:
     """
     Create a new user.
     """
-    user = await user_controller.create_user(user_create_schema)
+    user = await user_controller.create_user(current_user,user_create_schema)
     return UserResponseSchema(
         data=user,
         status_code=201,
@@ -50,15 +51,17 @@ async def create_user(
 @user_router.get(
     "/{user_id}",
     response_model=UserResponseSchema,
-    status_code=200
+    status_code=200,
 )
 async def get_user(
+    current_user: CurrentUserDep,
     user_id: str,
     user_controller: UserController = Depends(Factory.get_user_controller)
 )-> UserResponseSchema:
     """
     Retrieve a user by their ID.
     """
+    logger.info(current_user)
     user = await user_controller.get_user(user_id)
     return UserResponseSchema(
         data=user,
@@ -73,6 +76,7 @@ async def get_user(
     status_code=200,
 )
 async def update_user(
+    current_user: CurrentUserDep,
     user_id: str,
     user_update_schema: Annotated[UserUpdateSchema,Body()],
     user_controller: UserController = Depends(Factory.get_user_controller)
@@ -94,6 +98,7 @@ async def update_user(
     status_code=200,
 )
 async def delete_user(
+    current_user: CurrentUserDep,
     user_id: str,
     user_controller: UserController = Depends(Factory.get_user_controller)
 )-> Any:
@@ -108,17 +113,14 @@ async def delete_user(
     "",
     response_model=UsersResponseSchema,
     status_code=200,
-    dependencies=[Depends(AuthenticationRequired)]
 )
 async def get_many_users(
-    current_user: CurrentUserDep,
     get_many_schema:Annotated[GetManySchema, Query()],
     user_controller: UserController = Depends(Factory.get_user_controller)
 )-> UsersResponseSchema:
     """
     Retrieve a list of users with pagination.
     """
-    logger.error(current_user)
     users,total = await user_controller.get_many_users(get_many_schema)
     pagination = PaginationSchema(
         total=total,

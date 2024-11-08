@@ -26,9 +26,8 @@ class User(Base):
     created_by: Mapped[Optional[str]] = mapped_column(ForeignKey('users.id'),nullable=True)
     updated_by: Mapped[Optional[str]] = mapped_column(ForeignKey('users.id'),nullable=True)
 
-
-    created_by_user: Mapped[Optional['User']] = relationship('User',foreign_keys=[created_by])
-    updated_by_user: Mapped[Optional['User']] = relationship('User',foreign_keys=[updated_by])
+    created_by_user: Mapped[Optional['User']] = relationship('User',foreign_keys=[created_by], lazy='select', remote_side='User.id')
+    updated_by_user: Mapped[Optional['User']] = relationship('User',foreign_keys=[updated_by], lazy='select',  remote_side='User.id')
 
 
     @property

@@ -7,12 +7,10 @@ from meditranslate.app.configurations import config
 
 class BaseSchema(PydanticBaseModel):
 
-
-
     model_config = ConfigDict(
         json_encoders={datetime: lambda _: datetime_to_str(config.TIMEZONE)},
         populate_by_name=True,
-        extra='forbid', # for raising error
+        extra='ignore', # for raising error
         json_schema_extra={
 
         }

@@ -15,6 +15,46 @@ from meditranslate.app.db import get_session
 from meditranslate.app.db.base import Base
 from meditranslate.app.loggers import logger
 
+
+TEST_DATABASE_URL = "postgresql+asyncpg://myuser:mypassword@localhost:5432/mydatabase"
+BASE_URL = "http://testserver"
+
+
+
+@pytest_asyncio.fixture(autouse=True) # initialize database for session
+async def initial_database(anyio_backend) -> None:
+    async_engine = create_async_engine(str(TEST_DATABASE_URL))
+    async with async_engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+        await conn.run_sync(Base.metadata.create_all)
+    await async_engine.dispose()
+
+
+@pytest_asyncio.fixture(autouse=True)
+async def initial_app(initial_database):
+    app = create_app()
+    yield app
+
+@pytest_asyncio.fixture(autouse=True)
+async def async_client(initial_app: FastAPI):
+    transport:ASGITransport = ASGITransport(
+        app=initial_app,
+        raise_app_exceptions=True,
+        # client=("1.2.3.4",123),
+        # root_path="/submount"
+    )
+
+    async with AsyncClient(
+        transport=transport,
+        base_url=BASE_URL,
+        headers={
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+        },
+    ) as ac:
+        yield ac
+
+
 @pytest_asyncio.fixture(loop_scope="session",scope="session")
 async def app(anyio_backend):
     app = create_app()

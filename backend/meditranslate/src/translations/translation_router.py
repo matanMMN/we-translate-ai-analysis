@@ -1,4 +1,6 @@
 from fastapi import APIRouter,Request,Query,Body
+from meditranslate.app.dependancies.auth import AuthenticationRequired
+from meditranslate.app.dependancies.user import CurrentUserDep
 from meditranslate.app.shared.factory import Factory
 from typing import Any,List,Annotated,Optional
 from meditranslate.src.translations.translation_schemas import (
@@ -16,6 +18,7 @@ from meditranslate.src.translations.translation_controller import TranslationCon
 
 translation_router = APIRouter(
     tags=["translations"],
+    dependencies=[Depends(AuthenticationRequired)]
 )
 
 @translation_router.post(
@@ -27,6 +30,7 @@ translation_router = APIRouter(
     ],
 )
 async def create_translation(
+    current_user: CurrentUserDep,
     translation_create_schema: Annotated[TranslationCreateSchema,Body()],
     translation_controller: TranslationController = Depends(Factory.get_translation_controller)
 )-> TranslationResponseSchema:
@@ -48,6 +52,7 @@ async def create_translation(
     ],
 )
 async def translation_text(
+    current_user: CurrentUserDep,
     translation_create_schema: Annotated[TranslationTextSchema,Body()],
     translation_controller: TranslationController = Depends(Factory.get_translation_controller)
 )-> TranslationResponseSchema:
@@ -70,6 +75,7 @@ async def translation_text(
     ],
 )
 async def translation_file(
+    current_user: CurrentUserDep,
     file_id:str,
     translation_create_schema: Annotated[TranslationFileSchema,Body()],
     translation_controller: TranslationController = Depends(Factory.get_translation_controller)

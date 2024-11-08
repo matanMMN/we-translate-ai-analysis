@@ -1,6 +1,8 @@
 from fastapi import APIRouter
 from fastapi import APIRouter,Request,Query,Body
 
+from meditranslate.app.dependancies.auth import AuthenticationRequired
+from meditranslate.app.dependancies.user import CurrentUserDep
 from meditranslate.app.shared.factory import Factory
 from meditranslate.app.shared.schemas import PaginationSchema,MetaSchema
 
@@ -22,27 +24,25 @@ from meditranslate.src.translation_jobs.translation_job_controller import Transl
 
 translation_job_router = APIRouter(
     tags=["translation jobs"],
+    dependencies=[Depends(AuthenticationRequired)]
 )
+
 
 
 @translation_job_router.post(
     path="",
     response_model=TranslationJobResponseSchema,
     status_code=201,
-    dependencies=[
-
-    ],
 )
 async def create_translation_job(
+    current_user: CurrentUserDep,
     translation_job_create_schema: Annotated[TranslationJobCreateSchema,Body()],
     translation_job_controller: TranslationJobController = Depends(Factory.get_translation_job_controller)
 )-> TranslationJobResponseSchema:
     """
     Create a new translation_job.
     """
-    translation_job = await translation_job_controller.create_translation_job(translation_job_create_schema)
-    logger.error("TRANS")
-    logger.error(translation_job)
+    translation_job = await translation_job_controller.create_translation_job(current_user,translation_job_create_schema)
     return TranslationJobResponseSchema(
         data=translation_job,
         status_code=201,
@@ -74,6 +74,7 @@ async def get_translation_job(
     status_code=200
 )
 async def update_translation_job(
+    current_user: CurrentUserDep,
     translation_job_id: str,
     translation_job_update_schema: Annotated[TranslationJobUpdateSchema,Body()],
     translation_job_controller: TranslationJobController = Depends(Factory.get_translation_job_controller)
@@ -94,13 +95,14 @@ async def update_translation_job(
     status_code=200,
 )
 async def delete_translation_job(
+    current_user: CurrentUserDep,
     translation_job_id: str,
     translation_job_controller: TranslationJobController = Depends(Factory.get_translation_job_controller)
 )-> Any:
     """
     Delete a translation_job by their ID.
     """
-    await translation_job_controller.delete_translation_job(translation_job_id)
+    await translation_job_controller.delete_translation_job(current_user,translation_job_id)
 
 
 

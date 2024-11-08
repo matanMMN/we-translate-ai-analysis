@@ -31,15 +31,23 @@ class BaseRepository(Generic[ModelType]):
             raise AppError(title="WE NEED DB SESSION",http_status=HTTPStatus.INTERNAL_SERVER_ERROR)
 
     async def create(self, attributes: dict[str, Any] = None) -> ModelType:
-        logger.error(attributes)
-        attributes.pop("id")
-        """Creates the model instance."""
-        if attributes is None:
-            attributes = {}
-        model = self.model_class(**attributes)
-        self.session.add(model)
-        await self.session.flush()
-        return model
+        try:
+            logger.info(attributes)
+            if attributes is None:
+                attributes = {}
+            else:
+                attributes.pop("id",None)
+
+            """Creates the model instance."""
+            if attributes is None:
+                attributes = {}
+            model = self.model_class(**attributes)
+            self.session.add(model)
+            await self.session.flush()
+            return model
+        except Exception as e:
+            logger.error(f"Error creating model instance: {e}")
+            raise
 
     async def update(self, model_instance: ModelType, attributes: dict[str, Any]) -> ModelType:
         """
@@ -83,7 +91,7 @@ class BaseRepository(Generic[ModelType]):
         # results = self.session.execute(
         #     select(self.model_class).where(getattr(self.model_class,field) == value)
         # )
-
+        logger.debug(f"Building query for field: {field} with value: {value}")
         query = await self.add_filter(self.build_query(joins=joins), field, value)
         return await (self.fetch_one(query) if unique else self.fetch_all(query))
 

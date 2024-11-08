@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends,Request,Query
+from fastapi import APIRouter, Body, Depends,Request,Query
 
 from typing import Any,List,Annotated,Optional
 
@@ -6,10 +6,12 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 from meditranslate.app.shared.factory import Factory
 from meditranslate.src.auth.auth_controller import AuthController
+from meditranslate.src.users.user_schemas import UserResponseSchema
 from .auth_schemas import (
     LoginSchema,
     TokenSchema,
-    TokenResponseSchema
+    TokenResponseSchema,
+    RegisterUserSchema
 )
 
 
@@ -19,14 +21,34 @@ auth_router = APIRouter(
 
 
 @auth_router.post(
+    path="/register",
+    response_model=UserResponseSchema,
+    status_code=201,
+
+)
+async def register_user(
+    user_create_schema: Annotated[RegisterUserSchema,Body()],
+    auth_controller: AuthController = Depends(Factory.get_auth_controller)
+)-> UserResponseSchema:
+    """
+    Create a new user.
+    """
+    new_user = await auth_controller.register_user(user_create_schema)
+    return UserResponseSchema(
+        data=new_user,
+        status_code=201
+    )
+
+
+@auth_router.post(
     "/token",
-    response_model=TokenResponseSchema,
+    response_model=TokenSchema,
     status_code=200
 )
 async def login(
     form_schema:Annotated[OAuth2PasswordRequestForm, Depends()],
     auth_controller:AuthController = Depends(Factory.get_auth_controller)
-) -> TokenResponseSchema:
+) -> TokenSchema:
     data = {}
     data["scopes"] = []
     for scope in form_schema.scopes:
@@ -38,6 +60,5 @@ async def login(
 
     login_schema = LoginSchema(username=form_schema.username,password=form_schema.password)
     access_token = await auth_controller.login(login_schema)
-    return TokenResponseSchema(
-        data=TokenSchema(access_token=access_token,token_type="bearer").model_dump()
-    )
+
+    return TokenSchema(access_token=access_token,token_type="bearer").model_dump()

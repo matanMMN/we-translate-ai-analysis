@@ -53,7 +53,7 @@ class ErrorHandler:
             return HTTPStatus.BAD_REQUEST.value, {"error": "Validation Error", "details": str(app_error)}
 
         elif isinstance(app_error,IntegrityError): # custom parsing is needed for this.
-            return HTTPStatus.CONFLICT.value, {"error": f"Already Exists Error"}
+            return HTTPStatus.CONFLICT.value, {"error": f"Database Integrity Error"}
 
         elif isinstance(app_error, SQLAlchemyError):
             return HTTPStatus.INTERNAL_SERVER_ERROR.value, {"error": "Database error occurred. Please try again later."}

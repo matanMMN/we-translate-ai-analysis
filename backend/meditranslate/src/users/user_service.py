@@ -30,21 +30,24 @@ class UserService(BaseService[User]):
     async def create_user(self,user_create_schema: UserCreateSchema) -> User:
 
         new_user_data = user_create_schema.model_dump()
-        new_user_data.pop("id",None)
         password = new_user_data.pop("password",None)
         new_user_data['hashed_password'] = hash_password(password)
         new_user = await self.user_repository.create(new_user_data)
         public_user = self._to_public(new_user)
         return public_user
 
-    async def get_user(self,user_id: str) -> User:
+
+    async def get_user(self,user_id: str,raise_exception=True) -> Optional[User]:
         user = await self.user_repository.get_by(field="id",value=user_id,joins=None,unique=True)
-        if not user:
-            raise AppError(
-                title="get user endpoint",
-                http_status=HTTPStatus.NOT_FOUND,
-                user_message="User was not found",
-            )
+        if user is None:
+            if raise_exception:
+                raise AppError(
+                    title="get user endpoint",
+                    http_status=HTTPStatus.NOT_FOUND,
+                    user_message="User was not found",
+                )
+            else:
+                return None
         public_user = self._to_public(user)
         return public_user
 

@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any, List,Optional
 from meditranslate.app.shared.base_controller import BaseController
 from meditranslate.src.users.user_service import UserService
 from meditranslate.src.users.user_schemas import (
@@ -16,18 +16,18 @@ class UserController(BaseController[User]):
         self.user_service:UserService = user_service
 
     @Transactional(propagation=Propagation.REQUIRED_NEW)
-    async def create_user(self,user_create_schema:UserCreateSchema) -> User:
+    async def create_user(self,current_user:User,user_create_schema:UserCreateSchema) -> User:
         return await self.user_service.create_user(user_create_schema)
 
-    async def get_user(self,user_id: str) -> User:
-        return await self.user_service.get_user(user_id)
+    async def get_user(self,user_id: str,raise_exception:bool=True) -> Optional[User]:
+        return await self.user_service.get_user(user_id,raise_exception)
 
     @Transactional(propagation=Propagation.REQUIRED)
-    async def update_user(self,user_id: str, user_update_schema:UserUpdateSchema) -> None:
+    async def update_user(self,current_user:User,user_id: str, user_update_schema:UserUpdateSchema) -> None:
         return await self.user_service.update_user(user_id, user_update_schema)
 
     @Transactional(propagation=Propagation.REQUIRED_NEW)
-    async def delete_user(self,user_id: str) -> None:
+    async def delete_user(self,current_user:User,user_id: str) -> None:
         return await self.user_service.delete_user(user_id)
 
     async def get_many_users(self,users_get_many_schema:GetManySchema) -> List[User]:
