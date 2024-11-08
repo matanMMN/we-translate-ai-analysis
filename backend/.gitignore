@@ -6,7 +6,6 @@ logs
 .hypothesis
 .pytest_cache
 CHANGELOG.md
-LICENSE
 CONTRIBUTING.md
 README.md
 .env.*
