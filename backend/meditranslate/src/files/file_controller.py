@@ -7,6 +7,7 @@ from meditranslate.src.files.file_schemas import (
 )
 from meditranslate.app.db.models import File
 from meditranslate.app.db.transaction import Transactional,Propagation
+from fastapi import UploadFile
 
 
 class FileController(BaseController[File]):
@@ -15,8 +16,8 @@ class FileController(BaseController[File]):
         self.file_service:FileService = file_service
 
     @Transactional(propagation=Propagation.REQUIRED_NEW)
-    async def create_file(self,file_create_schema:FileCreateSchema) -> File:
-        return await self.file_service.create_file(file_create_schema)
+    async def upload_file(self,file:UploadFile,file_create_schema:FileCreateSchema) -> File:
+        return await self.file_service.upload_file(file,file_create_schema)
 
     async def get_file(self,file_id: str) -> File:
         return await self.file_service.get_file(file_id)
@@ -27,3 +28,8 @@ class FileController(BaseController[File]):
 
     async def get_many_files(self,files_get_many_schema:GetManySchema) -> Tuple[List[File],int]:
         return await self.file_service.get_many_files(files_get_many_schema)
+
+    async def download_file(self,file_id:str):
+        return await self.file_service.download_file(file_id=file_id)
+
+

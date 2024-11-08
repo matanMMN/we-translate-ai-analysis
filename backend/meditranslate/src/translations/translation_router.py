@@ -40,7 +40,7 @@ async def create_translation(
     )
 
 @translation_router.post(
-    path="",
+    path="/text",
     response_model=TranslationResponseSchema,
     status_code=201,
     dependencies=[
@@ -62,7 +62,7 @@ async def translation_text(
 
 
 @translation_router.post(
-    path="",
+    path="/file/{file_id}",
     response_model=TranslationResponseSchema,
     status_code=201,
     dependencies=[
@@ -70,6 +70,7 @@ async def translation_text(
     ],
 )
 async def translation_file(
+    file_id:str,
     translation_create_schema: Annotated[TranslationFileSchema,Body()],
     translation_controller: TranslationController = Depends(Factory.get_translation_controller)
 )-> TranslationResponseSchema:

@@ -46,7 +46,7 @@ class Factory:
 
     @staticmethod
     def get_translation_controller(db_session=Depends(get_session)) -> TranslationController:
-        return TranslationController(TranslationService(TranslationRepository(db_session),translation_engine))
+        return TranslationController(TranslationService(TranslationRepository(db_session=db_session),translation_engine),FileService(FileRepository(db_session=db_session),storage_service=file_storage_service))
 
 
 

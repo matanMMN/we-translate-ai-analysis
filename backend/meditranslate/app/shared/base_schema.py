@@ -6,6 +6,9 @@ from meditranslate.utils.datetime import datetime_to_str
 from meditranslate.app.configurations import config
 
 class BaseSchema(PydanticBaseModel):
+
+
+
     model_config = ConfigDict(
         json_encoders={datetime: lambda _: datetime_to_str(config.TIMEZONE)},
         populate_by_name=True,
@@ -28,3 +31,6 @@ class BaseSchema(PydanticBaseModel):
     def model_parametrized_name(cls, params: Tuple[Type[Any], ...]) -> str:
         return f'{params[0].__name__.title()}Schema'
 
+    id :Optional[str] = Field(None,title="",description="")
+    created_at:Optional[datetime.datetime] = Field(None,title="",description="")
+    updated_at:Optional[datetime.datetime] = Field(None,title="",description="")

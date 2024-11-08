@@ -41,3 +41,7 @@ python-magic          # For MIME type detection (useful in file uploads)
 
 # file storage
 pymongo
+
+python-multipart
+aiofiles
+boto3

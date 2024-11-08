@@ -1,81 +1,71 @@
-from fastapi import APIRouter, Depends,Request,Query
+from fastapi import APIRouter, Depends,Request,Query,UploadFile,File,Form
 
 from meditranslate.app.shared.factory import Factory
 from meditranslate.app.shared.schemas import MetaSchema, PaginationSchema
 from meditranslate.src.files.file_controller import FileController
-from fastapi import File
 from typing import Any,List,Annotated,Optional
 from meditranslate.src.files.file_schemas import (
     FileCreateSchema,
     GetManySchema,
-    FileResponseSchema,
-    FilesResponseSchema,
+    FilePointerResponseSchema,
+    FilePointersResponseSchema,
 
 )
-from fastapi.responses import JSONResponse
+
+from fastapi.responses import FileResponse,StreamingResponse
 import json
-
-
 
 file_router = APIRouter()
 
-@file_router.post("", response_model=FileResponseSchema,status_code=201)
-async def create_file(
-    file_create_schema: FileCreateSchema,
-    file_controller: FileController = Depends(Factory.get_file_controller)
-)-> FileResponseSchema:
-    """
-    Create a new file.
-    """
-    file = await file_controller.create_file(file_create_schema)
-    return FileResponseSchema(
-        data=file.as_dict(),
-        status_code=201,
-    )
-
-@file_router.get("/{file_id}", response_model=FileResponseSchema,status_code=200)
+@file_router.get("/{file_id}", response_model=FilePointerResponseSchema,status_code=200)
 async def get_file(
     file_id: str,
     file_controller: FileController = Depends(Factory.get_file_controller)
 
-)-> FileResponseSchema:
+)-> FilePointerResponseSchema:
     """
     Retrieve a file by their ID.
     """
     file = await file_controller.get_file(file_id)
-    return FileResponseSchema(
+    return FilePointerResponseSchema(
         data=file,
         status_code=200,
     )
 
 
-@file_router.get("", response_model=FileResponseSchema,status_code=200)
+@file_router.post("/upload/", response_model=FilePointerResponseSchema,status_code=201)
 async def upload_file(
-    file: Annotated[bytes, File()],
+    file: Annotated[UploadFile, File(description="A file read as UploadFile")],
+    file_create_form_schema: Annotated[FileCreateSchema,Form(...,media_type="multipart/form-data")],
     file_controller: FileController = Depends(Factory.get_file_controller),
-)-> FileResponseSchema:
+)-> FilePointerResponseSchema:
     """
     Upload File
     """
-    file = await file_controller.get_file(file_id)
-    return FileResponseSchema(
+    file = await file_controller.upload_file(file,file_create_form_schema)
+    return FilePointerResponseSchema(
         data=file.as_dict(),
-        status_code=200,
+        status_code=201,
     )
 
-# @file_router.get("/{file_id}", response_model=FileResponseSchema,status_code=200)
-# async def download_file(
-#     file_id: str,
-#     file_controller: FileController = Depends(Factory.get_file_controller)
-# )-> Any:
-#     """
-#     Retrieve a file by their ID.
-#     """
-#     file = await file_controller.(request, file_id,[],{})
-#     return fileResponseSchema(
-#         data=file.as_dict(),
-#         status_code=200,
-#     )
+@file_router.get("/{file_id}" ,status_code=200)
+async def download_file(
+    file_id: str,
+    file_controller: FileController = Depends(Factory.get_file_controller)
+)-> StreamingResponse:
+    """
+    Retrieve a file by their ID.
+    """
+
+    file_stream,filename = await file_controller.download_file(file_id)
+    return StreamingResponse( # StreamingResponse more flexible and able to send any file size unlike FileResponse
+        file_stream,
+        media_type="application/octet-stream",
+        headers={
+            "Content-Disposition":f"attachment; filename={filename}",
+        },
+        status_code=200,
+    )
 
 
 
@@ -94,11 +84,11 @@ async def delete_file(
 
 
 
-@file_router.get("", response_model=FilesResponseSchema,status_code=200)
+@file_router.get("", response_model=FilePointersResponseSchema,status_code=200)
 async def get_many_files(
     get_many_schema:Annotated[GetManySchema, Query()],
     file_controller: FileController = Depends(Factory.get_file_controller)
-)-> FilesResponseSchema:
+)-> FilePointersResponseSchema:
     """
     Retrieve a list of files with pagination.
     """
@@ -123,7 +113,7 @@ async def get_many_files(
         pagination=pagination
     )
 
-    return FilesResponseSchema(
+    return FilePointersResponseSchema(
         data=files,
         status_code=200,
         meta=meta.model_dump(),

@@ -16,4 +16,5 @@ class ErrorType(Enum):
     RESOURCE_LIMIT_ERROR = "Resource Limit Error"
     TIMEOUT_ERROR = "Timeout Error"
     EXTERNAL_SERVICE_ERROR = "external service Error"
+    TRANSLATION_ERROR = "translation error"
 

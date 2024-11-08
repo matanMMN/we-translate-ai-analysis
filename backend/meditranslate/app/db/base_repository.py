@@ -15,6 +15,8 @@ from sqlalchemy import Select, func, and_
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql.expression import select
+from meditranslate.app.loggers import logger
+
 
 ModelType = TypeVar("ModelType", bound=Base)
 
@@ -29,6 +31,8 @@ class BaseRepository(Generic[ModelType]):
             raise AppError(title="WE NEED DB SESSION",http_status=HTTPStatus.INTERNAL_SERVER_ERROR)
 
     async def create(self, attributes: dict[str, Any] = None) -> ModelType:
+        logger.error(attributes)
+        attributes.pop("id")
         """Creates the model instance."""
         if attributes is None:
             attributes = {}

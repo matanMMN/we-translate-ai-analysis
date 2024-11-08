@@ -98,14 +98,14 @@ class BaseUserSchema(BaseSchema):
     # avatar: Optional[bytes] = Field(None, title="avatar", description="Any additional user data")
     # avatar_url:  Optional[str] = Field(None, title="avatar_url", description="Any additional user data")
 
-    # last_login: Optional[date] = Field(None, title="last_login", description="Any additional user data")
+    last_login: Optional[date] = Field(None, title="last_login", description="Any additional user data")
     # is_disabled: Optional[bool] = Field(None, title="is_disabled", description="Any additional user data")
     # is_deleted: Optional[bool] = Field(None, title="is_deleted", description="Any additional user data")
 
     # # roles: Optional[List[Any]] = Field(None, title="roles", description="Any additional user data")
 
-    # created_by: Optional[datetime]  = Field(None, title="created_by", description="Any additional user data")
-    # updated_by: Optional[datetime]  = Field(None, title="updated_by", description="Any additional user data")
+    created_by: Optional[str]  = Field(None, title="created_by", description="Any additional user data")
+    updated_by: Optional[str]  = Field(None, title="updated_by", description="Any additional user data")
 
 
 class UserCreateSchema(BaseUserSchema):

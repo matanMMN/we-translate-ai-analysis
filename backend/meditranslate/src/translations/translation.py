@@ -8,21 +8,26 @@ from meditranslate.app.db import Base
 
 class Translation(Base):
     __tablename__ = 'translations'
+    
 
-    translation_job_id: Mapped[str] = mapped_column(ForeignKey('translation_jobs.id', onupdate="CASCADE",),nullable=True)
-
+    translation_job_id: Mapped[Optional[str]] = mapped_column(
+        ForeignKey('translation_jobs.id', ondelete="SET NULL"), nullable=True
+    )
     input_text: Mapped[str] = mapped_column(Text, nullable=False)
     output_text: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
-    source_language: Mapped[String] = mapped_column(String(50), nullable=False)
-    target_language: Mapped[String] = mapped_column(String(50), nullable=False)
+    source_language: Mapped[str] = mapped_column(String(50), nullable=False)
+    target_language: Mapped[str] = mapped_column(String(50), nullable=False)
 
-    created_by: Mapped[str] = mapped_column(ForeignKey('users.id', onupdate="CASCADE"))
-    updated_by: Mapped[str] = mapped_column(ForeignKey('users.id', onupdate="CASCADE"))
+    created_by: Mapped[Optional[str]] = mapped_column(ForeignKey('users.id', onupdate="CASCADE"),nullable=True,default=None)
+    updated_by: Mapped[Optional[str]] = mapped_column(ForeignKey('users.id', onupdate="CASCADE"),nullable=True,default=None)
 
     meta: Mapped[dict] = mapped_column(JSON,nullable=False,default={})
 
     # Relationships
-    # translation_job: Mapped["TranslationJob"] = relationship('TranslationJob', back_populates='translations')
-    created_by_user: Mapped["User"] = relationship('User', foreign_keys=created_by)
-    updated_by_user: Mapped["User"] = relationship('User', foreign_keys=updated_by)
+    translation_job: Mapped[Optional["TranslationJob"]] = relationship(
+        'TranslationJob', back_populates="translations", lazy='select'
+    )
+
+    created_by_user: Mapped[Optional["User"]] = relationship('User', foreign_keys=[created_by])
+    updated_by_user: Mapped[Optional["User"]] = relationship('User', foreign_keys=[updated_by])

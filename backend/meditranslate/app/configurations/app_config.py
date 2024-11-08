@@ -74,7 +74,7 @@ class AppConfig(Config):
 
     ALLOWED_TARGET_LANGUAGES: Set[Language] = Field({Hebrew,English},title="", description="")
 
-
+    UPLOAD_FILE_MAX_SIZE_IN_KB: float = Field(os.environ.get("UPLOAD_FILE_MAX_SIZE_IN_KB",100000), title="", description="", gt=0)
 
 
     TIMEZONE:Annotated[
@@ -98,4 +98,35 @@ class AppConfig(Config):
         )
     ] = Field(os.environ.get("ANTHROPIC_API_KEY"),title="ANTHROPIC_API_KEY",description="")
 
+    AWS_ENDPOINT_URL:Annotated[
+        str,
+        StringConstraints(
+            strip_whitespace=True
+        )
+    ] = Field(os.environ.get("AWS_ENDPOINT_URL","http://0.0.0.0:4566"),title="AWS_ENDPOINT_URL",description="")
+
+    AWS_ACCESS_KEY_ID:Annotated[
+        str,
+        StringConstraints(
+            strip_whitespace=True
+        )
+    ] = Field(os.environ.get("AWS_ACCESS_KEY_ID"),title="AWS_ACCESS_KEY_ID",description="")
+
+    AWS_SECRET_ACCESS_KEY:Annotated[
+        str,
+        StringConstraints(
+            strip_whitespace=True
+        )
+    ] = Field(os.environ.get("AWS_SECRET_ACCESS_KEY"),title="AWS_SECRET_ACCESS_KEY",description="")
+
+
+    AWS_REGION_NAME:Annotated[
+        str,
+        StringConstraints(
+            strip_whitespace=True
+        )
+    ] = Field(os.environ.get("AWS_REGION_NAME"),title="AWS_REGION_NAME",description="")
+
+
+    # endpoint_url = "http://localhost:4566"
 

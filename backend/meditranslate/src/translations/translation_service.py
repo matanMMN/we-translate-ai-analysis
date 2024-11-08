@@ -9,6 +9,8 @@ from meditranslate.src.translations.translation_schemas import (
     GetManySchema,
 )
 from meditranslate.translation import TranslationEngine
+from meditranslate.translation.translation_input import TranslationInput
+from meditranslate.translation.translation_output import TranslationOutput
 
 class TranslationService(BaseService[Translation]):
     def __init__(self, translation_repository: TranslationRepository,translation_engine:TranslationEngine):
@@ -50,7 +52,10 @@ class TranslationService(BaseService[Translation]):
     async def translate_file(self):
         pass
 
-    async def translate_text(self):
+    async def translate_text(self,translation_create_schema:TranslationCreateSchema):
+        input_text = translation_create_schema.input_text
+        translation_input = TranslationInput()
+        translation_output:TranslationOutput = await self.translation_engine.translate(translation_input)
         self.create_translation(TranslationCreateSchema(
 
         ))

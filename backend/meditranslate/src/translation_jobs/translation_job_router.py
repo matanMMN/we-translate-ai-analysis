@@ -36,11 +36,13 @@ translation_job_router = APIRouter(
 async def create_translation_job(
     translation_job_create_schema: Annotated[TranslationJobCreateSchema,Body()],
     translation_job_controller: TranslationJobController = Depends(Factory.get_translation_job_controller)
-)-> Any:
+)-> TranslationJobResponseSchema:
     """
     Create a new translation_job.
     """
     translation_job = await translation_job_controller.create_translation_job(translation_job_create_schema)
+    logger.error("TRANS")
+    logger.error(translation_job)
     return TranslationJobResponseSchema(
         data=translation_job,
         status_code=201,

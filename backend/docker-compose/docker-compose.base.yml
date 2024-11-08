@@ -32,6 +32,12 @@ services:
       - APP_HOST=${APP_HOST}
       - APP_PORT=${APP_PORT}
       - APP_DEBUG_PORT=${APP_DEBUG_PORT}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_ENDPOINT=${AWS_ENDPOINT}
+      - BUCKET_NAME=${BUCKET_NAME}
+      - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
+      - AWS_REGION_NAME=${AWS_REGION_NAME}
     depends_on:
       - postgresql
       - redis
