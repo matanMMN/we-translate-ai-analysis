@@ -192,20 +192,20 @@ class Config(BaseConfig):
         description=""
     )
 
-    FILE_STORAGE_URL: Annotated[
-        Url,
-        UrlConstraints()
-    ] = Field(os.environ.get("FILE_STORAGE_URL","mongodb://user:password@mongo:27017/"), title="file storage url", description="")
+    # FILE_STORAGE_URL: Annotated[
+    #     Url,
+    #     UrlConstraints()
+    # ] = Field(os.environ.get("FILE_STORAGE_URL","mongodb://user:password@mongo:27017/"), title="file storage url", description="")
 
 
-    FILE_STORAGE_NAME: Annotated[
-        str,
-        StringConstraints(
-            strip_whitespace=True,
-            to_lower=True,
-            min_length=4
-        )
-    ] = Field(os.environ.get("FILE_STORAGE_NAME","filedb"),title="FILE_STORAGE_NAME",description="")
+    # FILE_STORAGE_NAME: Annotated[
+    #     str,
+    #     StringConstraints(
+    #         strip_whitespace=True,
+    #         to_lower=True,
+    #         min_length=4
+    #     )
+    # ] = Field(os.environ.get("FILE_STORAGE_NAME","filestorage"),title="FILE_STORAGE_NAME",description="")
 
 
     CELERY_WORKER_NAME: Annotated[
@@ -216,6 +216,17 @@ class Config(BaseConfig):
             min_length=4
         )
     ] = Field(os.environ.get("CELERY_WORKER_NAME","worker"),title="CELERY_WORKER_NAME",description="",validate_default=True,repr=False)
+    REDIS_URL: Annotated[
+        str,
+        StringConstraints(),
+        # UrlConstraints(
+        #     # allowed_schemes=['redis', 'rediss'],
+        #     # default_host='localhost',
+        #     # default_port=6379,
+        #     # default_path='/0'
+        # ),
+    ] = Field(os.environ.get("REDIS_URL"), title="REDIS_URL", description="")
+
 
     CELERY_BACKEND_URL: Annotated[
         str,

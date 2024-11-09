@@ -16,21 +16,38 @@ class TranslationJobService(BaseService[TranslationJob]):
         super().__init__(model=TranslationJob, repository=translation_job_repository)
         self.translation_job_repository = translation_job_repository
 
+    def _to_public_translation_job(self,translation_job:TranslationJob) -> dict:
+        public_translation_job = translation_job.as_dict()
+        return public_translation_job
 
     async def create_translation_job(self,current_user:User,translation_job_create_schema:TranslationJobCreateSchema) -> TranslationJob:
         translation_job_create_schema.created_by = current_user.id
+        translation_job_create_schema.updated_by = current_user.id
         new_translation_job_data = translation_job_create_schema.model_dump()
+        new_translation_job_data.pop("approved_at")
+        new_translation_job_data.pop("approved_by")
+        new_translation_job_data.pop("archived_at")
+        new_translation_job_data.pop("archived_by")
+        new_translation_job_data.pop("deleted_at")
+        new_translation_job_data.pop("deleted_by")
+        new_translation_job_data.pop("current_user_id")
+        new_translation_job_data.pop("data")
         new_translation_job = await self.translation_job_repository.create(new_translation_job_data)
-        return new_translation_job
+        return self._to_public_translation_job(new_translation_job)
 
-    async def get_translation_job(self,translation_job_id: str) -> TranslationJob:
+    async def get_translation_job(self,translation_job_id: str,raise_exception:bool=True,to_public:bool=True) -> TranslationJob:
         translation_job = await self.translation_job_repository.get_by(field="id",value=translation_job_id,joins=None,unique=True)
         if not translation_job:
-            raise AppError(
-                title="get translation job endpoint",
-                http_status=HTTPStatus.NOT_FOUND
-            )
-        return translation_job
+            if raise_exception:
+                raise AppError(
+                    title="get translation job endpoint",
+                    http_status=HTTPStatus.NOT_FOUND
+                )
+        if to_public:
+            return self._to_public_translation_job(translation_job)
+        else:
+            return translation_job
+
 
     async def update_translation_job(self,current_user:User,translation_job_id: str, update_translation_job_data: TranslationJobUpdateSchema) -> None:
         update_translation_job_data.updated_by = current_user.id
@@ -64,4 +81,5 @@ class TranslationJobService(BaseService[TranslationJob]):
 
     async def get_many_translation_jobs(self,get_many_schema: GetManySchema) -> Tuple[List[TranslationJob],int]:
         translation_jobs,total = await self.translation_job_repository.get_many(**get_many_schema.model_dump())
-        return translation_jobs,total
+        public_translation_jobs = [self._to_public_translation_job(translation_job) for translation_job in translation_jobs]
+        return public_translation_jobs,total

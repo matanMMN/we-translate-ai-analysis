@@ -37,6 +37,8 @@ class BaseRepository(Generic[ModelType]):
                 attributes = {}
             else:
                 attributes.pop("id",None)
+                attributes.pop("created_at",None)
+                attributes.pop("updatd_at",None)
 
             """Creates the model instance."""
             if attributes is None:

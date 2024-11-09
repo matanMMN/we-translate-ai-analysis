@@ -45,3 +45,4 @@ pymongo
 python-multipart
 aiofiles
 boto3
+numpy

@@ -19,8 +19,8 @@ class UserController(BaseController[User]):
     async def create_user(self,current_user:User,user_create_schema:UserCreateSchema) -> User:
         return await self.user_service.create_user(user_create_schema)
 
-    async def get_user(self,user_id: str,raise_exception:bool=True) -> Optional[User]:
-        return await self.user_service.get_user(user_id,raise_exception)
+    async def get_user(self,user_id: str,raise_exception:bool=True,is_public:bool=True) -> Optional[User]:
+        return await self.user_service.get_user(user_id,raise_exception,is_public)
 
     @Transactional(propagation=Propagation.REQUIRED)
     async def update_user(self,current_user:User,user_id: str, user_update_schema:UserUpdateSchema) -> None:

@@ -1,4 +1,4 @@
-from pydantic import BaseModel as PydanticBaseModel, Field,ConfigDict, PrivateAttr,model_validator
+from pydantic import BaseModel as PydanticBaseModel, Field,ConfigDict, PrivateAttr,model_validator,StringConstraints
 from typing import Annotated, Any, ClassVar, Literal, Optional, Union,List,Dict,Type,Tuple
 from meditranslate.app.loggers import logger
 import datetime
@@ -29,6 +29,6 @@ class BaseSchema(PydanticBaseModel):
     def model_parametrized_name(cls, params: Tuple[Type[Any], ...]) -> str:
         return f'{params[0].__name__.title()}Schema'
 
-    id :Optional[str] = Field(None,title="",description="")
+    id :Annotated[Optional[str],StringConstraints()] = Field(None,title="",description="")
     created_at:Optional[datetime.datetime] = Field(None,title="",description="")
     updated_at:Optional[datetime.datetime] = Field(None,title="",description="")

@@ -6,8 +6,12 @@ from logging.config import fileConfig
 from globals import ROOT_DIR
 from meditranslate.app.configurations import config
 
+logging.getLogger("fastapi").setLevel(logging.CRITICAL)
+logging.getLogger("uvicorn").setLevel(logging.CRITICAL)
 logging.getLogger('pymongo').setLevel(logging.INFO)
 logging.getLogger('faker').setLevel(logging.INFO)
+
+
 
 def init_logger():
     DISABLE_EXISTING_LOGGERS = False

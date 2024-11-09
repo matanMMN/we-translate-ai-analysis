@@ -10,7 +10,7 @@ class BaseTranslationSchema(BaseSchema):
         extra="ignore",
         strict=False
     )
-    
+
     id : Annotated[
                     Optional[str],
                     StringConstraints(
@@ -90,6 +90,32 @@ class BaseTranslationSchema(BaseSchema):
                 ] = Field(..., title="translation meta data", description="Unique identifier for the user")
 
     meta : Optional[Dict[str,str]] = Field(None, title="translation meta data", description="Unique identifier for the user")
+
+    created_by: Annotated[
+                    Optional[str],
+                    StringConstraints(
+                        strip_whitespace=True,
+                        to_upper=None,
+                        to_lower=None,
+                        strict=None,
+                        max_length=None,
+                        min_length=None,
+                        pattern=None,
+                    ),
+                ] = Field(None, title="", description="")
+
+    updated_by: Annotated[
+                    Optional[str],
+                    StringConstraints(
+                        strip_whitespace=True,
+                        to_upper=None,
+                        to_lower=None,
+                        strict=None,
+                        max_length=None,
+                        min_length=None,
+                        pattern=None,
+                    ),
+                ] = Field(None, title="", description="")
 
 
 

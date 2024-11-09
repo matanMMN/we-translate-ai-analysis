@@ -9,6 +9,8 @@ from meditranslate.app.db.models import File
 from meditranslate.app.db.transaction import Transactional,Propagation
 from fastapi import UploadFile
 
+from meditranslate.src.users.user import User
+
 
 class FileController(BaseController[File]):
     def __init__(self, file_service:FileService) -> None:
@@ -16,8 +18,8 @@ class FileController(BaseController[File]):
         self.file_service:FileService = file_service
 
     @Transactional(propagation=Propagation.REQUIRED_NEW)
-    async def upload_file(self,file:UploadFile,file_create_schema:FileCreateSchema) -> File:
-        return await self.file_service.upload_file(file,file_create_schema)
+    async def upload_file(self,file:UploadFile,user:User) -> File:
+        return await self.file_service.upload_file(file,user)
 
     async def get_file(self,file_id: str) -> File:
         return await self.file_service.get_file(file_id)

@@ -92,7 +92,7 @@ class BaseTranslationJobSchema(BaseSchema):
                     ),
                 ] = Field(None, title="User ID", description="Unique identifier for the user")
 
-    priority : Optional[int]= Field(0, title="", description="",ge=0)
+    priority : Optional[int]= Field(0, title="priority", description="",ge=0)
 
     due_date : Optional[datetime] = Field(None, title="due date", description="")
 
@@ -107,11 +107,11 @@ class BaseTranslationJobSchema(BaseSchema):
                         min_length=None,
                         pattern=None,
                     ),
-    ] = Field(None, title="", description="Unique identifier for the user")
+    ] = Field(None, title="status", description="Unique identifier for the user")
 
-    data : Optional[dict] = Field(None, title="", description="Unique identifier for the user")
+    data : Optional[dict] = Field(None, title="data", description="Unique identifier for the user")
 
-    current_step_index : Optional[int] = Field(0, title="", description="",ge=0)
+    current_step_index : Optional[int] = Field(0, title="current_step_index", description="",ge=0)
 
     current_user_id : Annotated[
                     Optional[str],

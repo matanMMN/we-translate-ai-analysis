@@ -6,15 +6,13 @@ def get_license_info() -> dict:
         with open(license_file_path, "r") as file:
             license_text = file.read()
             license_info = {
-                "name": "MIT License",
-                "url": "https://opensource.org/licenses/MIT",
+                "name": "Private License",
                 "description": f"""{license_text}"""
             }
             return license_info
     except Exception as e:
         license_info = {
             "name": "Unknown License",
-            "url": "",
             "description": "License information not available"
         }
         return license_info

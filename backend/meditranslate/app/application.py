@@ -37,7 +37,7 @@ from meditranslate.app.info import get_contact_info,get_license_info,get_terms_o
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # startup
-    redis_connection = redis.from_url("redis://redis:6379/0", encoding="utf-8", decode_responses=True)
+    redis_connection = redis.from_url(config.REDIS_URL, encoding="utf-8", decode_responses=True)
     await FastAPILimiter.init(redis_connection)
     await init_db()
     yield

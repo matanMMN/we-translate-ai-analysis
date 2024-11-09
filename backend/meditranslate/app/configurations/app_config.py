@@ -15,6 +15,11 @@ class AppConfig(Config):
         strip_whitespace=True
     )] = Field(os.environ.get("APP_NAME","wetranslateai"))
 
+    BUCKET_NAME:Annotated[str,StringConstraints(
+        strip_whitespace=True
+    )] = Field(os.environ.get("BUCKET_NAME","APP_BUCKET"))
+
+
     JWT_EXPIRE_MINUTES: int = Field(os.environ.get("JWT_EXPIRE_MINUTES", 100),title="jwt expire",description="",gt=5)
     JWT_ALGORITHM: JWTAlgorithm = Field(JWTAlgorithm.HS256,title="jwt algo",description="",validate_default=True,repr=False)
 

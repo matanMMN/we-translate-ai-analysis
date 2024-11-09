@@ -37,7 +37,7 @@ class UserService(BaseService[User]):
         return public_user
 
 
-    async def get_user(self,user_id: str,raise_exception=True) -> Optional[User]:
+    async def get_user(self,user_id: str,raise_exception:bool=True,to_public:bool=True) -> Optional[User]:
         user = await self.user_repository.get_by(field="id",value=user_id,joins=None,unique=True)
         if user is None:
             if raise_exception:
@@ -48,8 +48,11 @@ class UserService(BaseService[User]):
                 )
             else:
                 return None
-        public_user = self._to_public(user)
-        return public_user
+        if to_public:
+            public_user = self._to_public(user)
+            return public_user
+        else:
+            return user
 
     async def update_user(self,user_id: str, user_update_data: UserUpdateSchema) -> None:
         update_user_data = user_update_data.model_dump()

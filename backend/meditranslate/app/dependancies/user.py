@@ -57,7 +57,7 @@ async def get_current_user(user_controller: Annotated[UserController,Depends(Fac
             detail=f"unauth",
         )
     logger.error(user_id)
-    user = await user_controller.get_user(user_id,raise_exception=False)
+    user = await user_controller.get_user(user_id,raise_exception=False,is_public=False)
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

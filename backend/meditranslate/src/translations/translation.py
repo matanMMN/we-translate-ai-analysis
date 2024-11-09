@@ -8,7 +8,7 @@ from meditranslate.app.db import Base
 
 class Translation(Base):
     __tablename__ = 'translations'
-    
+
 
     translation_job_id: Mapped[Optional[str]] = mapped_column(
         ForeignKey('translation_jobs.id', ondelete="SET NULL"), nullable=True
@@ -20,7 +20,6 @@ class Translation(Base):
     target_language: Mapped[str] = mapped_column(String(50), nullable=False)
 
     created_by: Mapped[Optional[str]] = mapped_column(ForeignKey('users.id', onupdate="CASCADE"),nullable=True,default=None)
-    updated_by: Mapped[Optional[str]] = mapped_column(ForeignKey('users.id', onupdate="CASCADE"),nullable=True,default=None)
 
     meta: Mapped[dict] = mapped_column(JSON,nullable=False,default={})
 
@@ -29,5 +28,4 @@ class Translation(Base):
         'TranslationJob', back_populates="translations", lazy='select'
     )
 
-    created_by_user: Mapped[Optional["User"]] = relationship('User', foreign_keys=[created_by])
-    updated_by_user: Mapped[Optional["User"]] = relationship('User', foreign_keys=[updated_by])
+    created_by_user: Mapped[Optional["User"]] = relationship('User', foreign_keys=[created_by], lazy='select', remote_side='User.id')

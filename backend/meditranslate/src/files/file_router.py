@@ -7,7 +7,6 @@ from meditranslate.app.dependancies.auth import AuthenticationRequired
 from meditranslate.app.dependancies.user import CurrentUserDep
 from typing import Any,List,Annotated,Optional
 from meditranslate.src.files.file_schemas import (
-    FileCreateSchema,
     GetManySchema,
     FilePointerResponseSchema,
     FilePointersResponseSchema,
@@ -42,25 +41,25 @@ async def get_file(
 async def upload_file(
     current_user: CurrentUserDep,
     file: Annotated[UploadFile, File(description="A file read as UploadFile")],
-    file_create_form_schema: Annotated[FileCreateSchema,Form(...,media_type="multipart/form-data")],
+    # file_create_form_schema: Annotated[FileCreateSchema,Form(...,media_type="multipart/form-data")], # TODO change this FORM is not working
     file_controller: FileController = Depends(Factory.get_file_controller),
 )-> FilePointerResponseSchema:
     """
     Upload File
     """
-    file = await file_controller.upload_file(file,file_create_form_schema)
+    file = await file_controller.upload_file(file,current_user)
     return FilePointerResponseSchema(
-        data=file.as_dict(),
+        data=file,
         status_code=201,
     )
 
-@file_router.get("/{file_id}" ,status_code=200)
+@file_router.get("/download/{file_id}" ,status_code=200, response_class=StreamingResponse)
 async def download_file(
     file_id: str,
     file_controller: FileController = Depends(Factory.get_file_controller)
 )-> StreamingResponse:
     """
-    Retrieve a file by their ID.
+    Download File
     """
 
     file_stream,filename = await file_controller.download_file(file_id)

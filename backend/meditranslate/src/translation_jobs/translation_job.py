@@ -43,15 +43,15 @@ class TranslationJob(Base):
 
     data: Mapped[dict]  = mapped_column(JSON,nullable=True,default=None)
 
-    current_user: Mapped[Optional["User"]] = relationship('User',  foreign_keys=[current_user_id])
+    current_user: Mapped[Optional["User"]] = relationship('User',  foreign_keys=[current_user_id], lazy='select', remote_side='User.id')
 
-    reference_file: Mapped[Optional["File"]] = relationship('File',foreign_keys=[reference_file_id])
-    source_file: Mapped[Optional["File"]] = relationship('File',foreign_keys=[source_file_id])
+    reference_file: Mapped[Optional["File"]] = relationship('File',foreign_keys=[reference_file_id], lazy='select', remote_side='File.id')
+    source_file: Mapped[Optional["File"]] = relationship('File',foreign_keys=[source_file_id] ,lazy='select', remote_side='File.id')
 
     translations: Mapped[List["Translation"]] = relationship('Translation', back_populates="translation_job", lazy='select')
 
-    created_by_user: Mapped[Optional["User"]] = relationship('User',  foreign_keys=[created_by])
-    updated_by_user: Mapped[Optional["User"]] = relationship('User',  foreign_keys=[updated_by])
-    approved_by_user: Mapped[Optional["User"]] = relationship('User',  foreign_keys=[approved_by])
-    archived_by_user: Mapped[Optional["User"]] = relationship('User',  foreign_keys=[archived_by])
-    deleted_by_user: Mapped[Optional["User"]] = relationship('User',  foreign_keys=[deleted_by])
+    created_by_user: Mapped[Optional["User"]] = relationship('User',  foreign_keys=[created_by], lazy='select', remote_side='User.id')
+    updated_by_user: Mapped[Optional["User"]] = relationship('User',  foreign_keys=[updated_by], lazy='select', remote_side='User.id')
+    approved_by_user: Mapped[Optional["User"]] = relationship('User',  foreign_keys=[approved_by], lazy='select', remote_side='User.id')
+    archived_by_user: Mapped[Optional["User"]] = relationship('User',  foreign_keys=[archived_by], lazy='select', remote_side='User.id')
+    deleted_by_user: Mapped[Optional["User"]] = relationship('User',  foreign_keys=[deleted_by], lazy='select', remote_side='User.id')

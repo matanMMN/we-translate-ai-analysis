@@ -12,7 +12,7 @@ def get_extension_from_filename(filename: str) -> str:
     split = filename.rsplit('.', 1)  # Split on the last dot only
     if len(split) == 2:
         return split[1]  # Return the part after the last dot
-    return ''  # No extension found
+    return None  # No extension found
 
 def get_name_from_filename(filename: str) -> str:
     """
@@ -49,15 +49,15 @@ def generate_unique_filename(filename: str, user_id: str) -> str:
     # Get file extension and normalize the filename
     ext = get_extension_from_filename(filename)
     normal_filename = normalize_filename(get_name_from_filename(filename))
-    
+
     # Ensure there's an extension
     file_extension = f".{ext}" if ext else ".tmp"
-    
+
     # Generate a UUID and timestamp for uniqueness
     unique_id = uuid.uuid4()
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-    
+
     # Construct the unique filename
     unique_filename = f"{normal_filename}_{user_id}_{timestamp}_{unique_id}{file_extension}"
-    
+
     return unique_filename
