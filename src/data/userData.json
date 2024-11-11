@@ -1,0 +1,632 @@
+[
+  {
+    "id": "278c5371-6333-44a5-b1e6-f3e29fea2638",
+    "clientId": "d059af78-fff9-45da-ad6c-8e5d9e45e89b",
+    "name": "test",
+    "description": "testtesttesttest",
+    "sourceLanguage": "en",
+    "destinationLanguage": "he",
+    "status": "Planned",
+    "priority": "Normal",
+    "currentStepIndex": 1,
+    "comments": [
+      "Initial project setup"
+    ],
+    "members": [
+      {
+        "id": "1",
+        "name": "Aviram Shabtay",
+        "avatar": "/assets/user1avatar.svg"
+      }
+    ],
+    "activities": [
+      {
+        "id": "1",
+        "user": {
+          "id": "1",
+          "name": "Aviram Shabtay",
+          "avatar": "/assets/user1avatar.svg"
+        },
+        "action": "started the project",
+        "timestamp": "2024-11-11T11:07:22.025Z"
+      }
+    ],
+    "dueDate": "2025-01-10",
+    "createdBy": {
+      "id": "1",
+      "name": "Aviram Shabtay",
+      "avatar": "/assets/user1avatar.svg"
+    },
+    "currentUser": {
+      "id": "1",
+      "name": "Aviram Shabtay",
+      "avatar": "/assets/user1avatar.svg"
+    },
+    "updatedAt": "2024-11-11T11:07:22.025Z",
+    "updatedBy": {
+      "id": "1",
+      "name": "Aviram Shabtay",
+      "avatar": "/assets/user1avatar.svg"
+    },
+    "createdAt": "2024-11-11T11:07:22.025Z"
+  },
+  {
+    "id": "41fc1eff-e7df-4cf5-8363-004fcfb4dc70",
+    "clientId": "532284af-d9d1-4d7d-81c5-9f9c00c0e52d",
+    "name": "test",
+    "description": "testtesttesttest",
+    "sourceLanguage": "he",
+    "destinationLanguage": "en",
+    "status": "Planned",
+    "priority": "Normal",
+    "currentStepIndex": 1,
+    "comments": [
+      "Initial project setup"
+    ],
+    "members": [
+      {
+        "id": "1",
+        "name": "Aviram Shabtay",
+        "avatar": "/assets/user1avatar.svg"
+      }
+    ],
+    "activities": [
+      {
+        "id": "1",
+        "user": {
+          "id": "1",
+          "name": "Aviram Shabtay",
+          "avatar": "/assets/user1avatar.svg"
+        },
+        "action": "started the project",
+        "timestamp": "2024-11-11T11:05:55.498Z"
+      }
+    ],
+    "dueDate": "2025-01-10",
+    "createdBy": {
+      "id": "1",
+      "name": "Aviram Shabtay",
+      "avatar": "/assets/user1avatar.svg"
+    },
+    "currentUser": {
+      "id": "1",
+      "name": "Aviram Shabtay",
+      "avatar": "/assets/user1avatar.svg"
+    },
+    "updatedAt": "2024-11-11T11:05:55.498Z",
+    "updatedBy": {
+      "id": "1",
+      "name": "Aviram Shabtay",
+      "avatar": "/assets/user1avatar.svg"
+    },
+    "createdAt": "2024-11-11T11:05:55.498Z"
+  },
+  {
+    "id": "3973d9e6-397e-474c-85ba-478761f0120a",
+    "clientId": "279613d1-729b-4e0c-b582-90993712c30c",
+    "name": "test",
+    "description": "testtesttesttest",
+    "sourceLanguage": "en",
+    "destinationLanguage": "he",
+    "status": "Planned",
+    "priority": "Normal",
+    "currentStepIndex": 1,
+    "comments": [
+      "Initial project setup"
+    ],
+    "members": [
+      {
+        "id": "1",
+        "name": "Aviram Shabtay",
+        "avatar": "/assets/user1avatar.svg"
+      }
+    ],
+    "activities": [
+      {
+        "id": "1",
+        "user": {
+          "id": "1",
+          "name": "Aviram Shabtay",
+          "avatar": "/assets/user1avatar.svg"
+        },
+        "action": "started the project",
+        "timestamp": "2024-11-11T11:03:42.609Z"
+      }
+    ],
+    "dueDate": "2025-01-10",
+    "createdBy": {
+      "id": "1",
+      "name": "Aviram Shabtay",
+      "avatar": "/assets/user1avatar.svg"
+    },
+    "currentUser": {
+      "id": "1",
+      "name": "Aviram Shabtay",
+      "avatar": "/assets/user1avatar.svg"
+    },
+    "updatedAt": "2024-11-11T11:03:42.609Z",
+    "updatedBy": {
+      "id": "1",
+      "name": "Aviram Shabtay",
+      "avatar": "/assets/user1avatar.svg"
+    },
+    "createdAt": "2024-11-11T11:03:42.609Z"
+  },
+  {
+    "id": "49e8bff6-55c6-4a42-b8fb-5ce0c946ed3a",
+    "clientId": "5fa28c66-4646-45fd-ac60-746e3e3a7da8",
+    "name": "test",
+    "description": "testtesttesttest",
+    "sourceLanguage": "en",
+    "destinationLanguage": "he",
+    "status": "Planned",
+    "priority": "Normal",
+    "currentStepIndex": 1,
+    "comments": [
+      "Initial project setup"
+    ],
+    "members": [
+      {
+        "id": "1",
+        "name": "Aviram Shabtay",
+        "avatar": "/assets/user1avatar.svg"
+      }
+    ],
+    "activities": [
+      {
+        "id": "1",
+        "user": {
+          "id": "1",
+          "name": "Aviram Shabtay",
+          "avatar": "/assets/user1avatar.svg"
+        },
+        "action": "started the project",
+        "timestamp": "2024-11-11T11:02:57.305Z"
+      }
+    ],
+    "dueDate": "2025-01-10",
+    "createdBy": {
+      "id": "1",
+      "name": "Aviram Shabtay",
+      "avatar": "/assets/user1avatar.svg"
+    },
+    "currentUser": {
+      "id": "1",
+      "name": "Aviram Shabtay",
+      "avatar": "/assets/user1avatar.svg"
+    },
+    "updatedAt": "2024-11-11T11:02:57.305Z",
+    "updatedBy": {
+      "id": "1",
+      "name": "Aviram Shabtay",
+      "avatar": "/assets/user1avatar.svg"
+    },
+    "createdAt": "2024-11-11T11:02:57.305Z"
+  },
+  {
+    "id": "2cedb6bb-ce7b-442e-8b82-d48f51e35cb2",
+    "clientId": "ad0b8ebe-2dc5-40ee-b47f-c4bd2b40ebb1",
+    "name": "test",
+    "description": "testtesttesttest",
+    "sourceLanguage": "en",
+    "destinationLanguage": "he",
+    "status": "Planned",
+    "priority": "Normal",
+    "currentStepIndex": 1,
+    "comments": [
+      "Initial project setup"
+    ],
+    "members": [
+      {
+        "id": "1",
+        "name": "Aviram Shabtay",
+        "avatar": "/assets/user1avatar.svg"
+      }
+    ],
+    "activities": [
+      {
+        "id": "1",
+        "user": {
+          "id": "1",
+          "name": "Aviram Shabtay",
+          "avatar": "/assets/user1avatar.svg"
+        },
+        "action": "started the project",
+        "timestamp": "2024-11-11T11:00:39.917Z"
+      }
+    ],
+    "dueDate": "2025-01-10",
+    "createdBy": {
+      "id": "1",
+      "name": "Aviram Shabtay",
+      "avatar": "/assets/user1avatar.svg"
+    },
+    "currentUser": {
+      "id": "1",
+      "name": "Aviram Shabtay",
+      "avatar": "/assets/user1avatar.svg"
+    },
+    "updatedAt": "2024-11-11T11:00:39.917Z",
+    "updatedBy": {
+      "id": "1",
+      "name": "Aviram Shabtay",
+      "avatar": "/assets/user1avatar.svg"
+    },
+    "createdAt": "2024-11-11T11:00:39.917Z"
+  },
+  {
+    "id": "356b1848-71f5-43d6-8ea9-b332fde76410",
+    "clientId": "fbcd3048-fb8f-49c3-9d50-1d961400c6f9",
+    "name": "test",
+    "description": "testtesttesttest",
+    "sourceLanguage": "en",
+    "destinationLanguage": "he",
+    "status": "Planned",
+    "priority": "Normal",
+    "currentStepIndex": 1,
+    "comments": [
+      "Initial project setup"
+    ],
+    "members": [
+      {
+        "id": "1",
+        "name": "Aviram Shabtay",
+        "avatar": "/assets/user1avatar.svg"
+      }
+    ],
+    "activities": [
+      {
+        "id": "1",
+        "user": {
+          "id": "1",
+          "name": "Aviram Shabtay",
+          "avatar": "/assets/user1avatar.svg"
+        },
+        "action": "started the project",
+        "timestamp": "2024-11-11T11:00:16.507Z"
+      }
+    ],
+    "dueDate": "2025-01-10",
+    "createdBy": {
+      "id": "1",
+      "name": "Aviram Shabtay",
+      "avatar": "/assets/user1avatar.svg"
+    },
+    "currentUser": {
+      "id": "1",
+      "name": "Aviram Shabtay",
+      "avatar": "/assets/user1avatar.svg"
+    },
+    "updatedAt": "2024-11-11T11:00:16.507Z",
+    "updatedBy": {
+      "id": "1",
+      "name": "Aviram Shabtay",
+      "avatar": "/assets/user1avatar.svg"
+    },
+    "createdAt": "2024-11-11T11:00:16.507Z"
+  },
+  {
+    "id": "b9fe2cfd-7b14-44d8-83aa-5dbaf98d2b40",
+    "clientId": "6502c994-b89b-4f1a-b573-b61d52d47123",
+    "name": "test",
+    "description": "testtesttesttest",
+    "sourceLanguage": "en",
+    "destinationLanguage": "he",
+    "status": "Planned",
+    "priority": "Normal",
+    "currentStepIndex": 1,
+    "comments": [
+      "Initial project setup"
+    ],
+    "members": [
+      {
+        "id": "1",
+        "name": "Aviram Shabtay",
+        "avatar": "/assets/user1avatar.svg"
+      }
+    ],
+    "activities": [
+      {
+        "id": "1",
+        "user": {
+          "id": "1",
+          "name": "Aviram Shabtay",
+          "avatar": "/assets/user1avatar.svg"
+        },
+        "action": "started the project",
+        "timestamp": "2024-11-11T10:59:57.977Z"
+      }
+    ],
+    "dueDate": "2025-01-10",
+    "createdBy": {
+      "id": "1",
+      "name": "Aviram Shabtay",
+      "avatar": "/assets/user1avatar.svg"
+    },
+    "currentUser": {
+      "id": "1",
+      "name": "Aviram Shabtay",
+      "avatar": "/assets/user1avatar.svg"
+    },
+    "updatedAt": "2024-11-11T10:59:57.977Z",
+    "updatedBy": {
+      "id": "1",
+      "name": "Aviram Shabtay",
+      "avatar": "/assets/user1avatar.svg"
+    },
+    "createdAt": "2024-11-11T10:59:57.977Z"
+  },
+  {
+    "id": 1,
+    "clientId": 1,
+    "sourceFileId": 1,
+    "destFileId": 2,
+    "reference_file_id": 10,
+    "name": "Fostimon",
+    "description": "The translation of the Fostimon medicine for injection.",
+    "sourceLanguage": "Hebrew",
+    "destinationLanguage": "English",
+    "priority": "High",
+    "status": "Planned",
+    "currentStepIndex": 2,
+    "comments": [
+      "Initial setup",
+      "Translation started"
+    ],
+    "members": [
+      {
+        "id": "1",
+        "name": "Aviram Shabtay",
+        "avatar": "/assets/user1avatar.svg"
+      },
+      {
+        "id": "2",
+        "name": "Emma K.",
+        "avatar": "/assets/user2avatar.svg"
+      }
+    ],
+    "activities": [
+      {
+        "id": "1",
+        "user": {
+          "id": "1",
+          "name": "Aviram Shabtay",
+          "avatar": "/assets/user1avatar.svg"
+        },
+        "action": "deleted the word \"slovent\"",
+        "timestamp": "2 days ago"
+      },
+      {
+        "id": "2",
+        "user": {
+          "id": "2",
+          "name": "Emma K.",
+          "avatar": "/assets/user2avatar.svg"
+        },
+        "action": "changed the name of the project",
+        "timestamp": "3 days ago"
+      },
+      {
+        "id": "3",
+        "user": {
+          "id": "1",
+          "name": "Aviram Shabtay",
+          "avatar": "/assets/user1avatar.svg"
+        },
+        "action": "started the project",
+        "timestamp": "4 days ago"
+      }
+    ],
+    "dueDate": "12/31/2024",
+    "currentUser": "Miri hazan",
+    "createdAt": "10/28/2024",
+    "createdBy": "Miri hazan",
+    "updatedAt": "10/29/2024",
+    "updatedBy": "Miri hazan"
+  },
+  {
+    "id": 2,
+    "clientId": 2,
+    "sourceFileId": 3,
+    "destFileId": 4,
+    "reference_file_id": 10,
+    "name": "Fluoxetine",
+    "description": "The translation of the Fostimon medicine for injection.",
+    "sourceLanguage": "English",
+    "destinationLanguage": "Hebrew",
+    "priority": "Critical",
+    "status": "Completed",
+    "currentStepIndex": 1,
+    "comments": [
+      "Initial setup",
+      "Translation started"
+    ],
+    "members": [
+      {
+        "id": "1",
+        "name": "Aviram Shabtay",
+        "avatar": "/assets/user1avatar.svg"
+      },
+      {
+        "id": "2",
+        "name": "Emma K.",
+        "avatar": "/assets/user2avatar.svg"
+      }
+    ],
+    "activities": [
+      {
+        "id": "1",
+        "user": {
+          "id": "1",
+          "name": "Aviram Shabtay",
+          "avatar": "/assets/user1avatar.svg"
+        },
+        "action": "deleted the word \"slovent\"",
+        "timestamp": "2 days ago"
+      },
+      {
+        "id": "2",
+        "user": {
+          "id": "2",
+          "name": "Emma K.",
+          "avatar": "/assets/user2avatar.svg"
+        },
+        "action": "changed the name of the project",
+        "timestamp": "3 days ago"
+      },
+      {
+        "id": "3",
+        "user": {
+          "id": "1",
+          "name": "Aviram Shabtay",
+          "avatar": "/assets/user1avatar.svg"
+        },
+        "action": "started the project",
+        "timestamp": "4 days ago"
+      }
+    ],
+    "dueDate": "11/30/2024",
+    "currentUser": "Miri hazan",
+    "createdAt": "10/28/2024",
+    "createdBy": "Miri hazan",
+    "updatedAt": "10/29/2024",
+    "updatedBy": "Miri hazan"
+  },
+  {
+    "id": 3,
+    "clientId": 3,
+    "sourceFileId": 5,
+    "destFileId": 6,
+    "reference_file_id": 10,
+    "name": "Finasteride",
+    "description": "The translation of the Fostimon medicine for injection.",
+    "sourceLanguage": "English",
+    "destinationLanguage": "Hebrew",
+    "priority": "Low",
+    "status": "On Hold",
+    "currentStepIndex": 3,
+    "comments": [
+      "Initial setup",
+      "Translation started",
+      "Review in progress"
+    ],
+    "members": [
+      {
+        "id": "1",
+        "name": "Aviram Shabtay",
+        "avatar": "/assets/user1avatar.svg"
+      },
+      {
+        "id": "2",
+        "name": "Emma K.",
+        "avatar": "/assets/user2avatar.svg"
+      }
+    ],
+    "activities": [
+      {
+        "id": "1",
+        "user": {
+          "id": "1",
+          "name": "Aviram Shabtay",
+          "avatar": "/assets/user1avatar.svg"
+        },
+        "action": "deleted the word \"slovent\"",
+        "timestamp": "2 days ago"
+      },
+      {
+        "id": "2",
+        "user": {
+          "id": "2",
+          "name": "Emma K.",
+          "avatar": "/assets/user2avatar.svg"
+        },
+        "action": "changed the name of the project",
+        "timestamp": "3 days ago"
+      },
+      {
+        "id": "3",
+        "user": {
+          "id": "1",
+          "name": "Aviram Shabtay",
+          "avatar": "/assets/user1avatar.svg"
+        },
+        "action": "started the project",
+        "timestamp": "4 days ago"
+      }
+    ],
+    "dueDate": "10/31/2024",
+    "currentUser": "Miri hazan",
+    "createdAt": "10/28/2024",
+    "createdBy": "Miri hazan",
+    "updatedAt": "10/29/2024",
+    "updatedBy": "Miri hazan"
+  },
+  {
+    "id": 4,
+    "clientId": 4,
+    "sourceFileId": 7,
+    "destFileId": 8,
+    "reference_file_id": 10,
+    "name": "Fluconazole",
+    "description": "The translation of the Fostimon medicine for injection.",
+    "sourceLanguage": "English",
+    "destinationLanguage": "Hebrew",
+    "priority": "Normal",
+    "status": "In Progress",
+    "currentStepIndex": 0,
+    "comments": [
+      "Initial setup",
+      "Translation started"
+    ],
+    "members": [
+      {
+        "id": "1",
+        "name": "Aviram Shabtay",
+        "avatar": "/assets/user1avatar.svg"
+      },
+      {
+        "id": "2",
+        "name": "Emma K.",
+        "avatar": "/assets/user2avatar.svg"
+      }
+    ],
+    "activities": [
+      {
+        "id": "1",
+        "user": {
+          "id": "1",
+          "name": "Aviram Shabtay",
+          "avatar": "/assets/user1avatar.svg"
+        },
+        "action": "deleted the word \"slovent\"",
+        "timestamp": "2 days ago"
+      },
+      {
+        "id": "2",
+        "user": {
+          "id": "2",
+          "name": "Emma K.",
+          "avatar": "/assets/user2avatar.svg"
+        },
+        "action": "changed the name of the project",
+        "timestamp": "3 days ago"
+      },
+      {
+        "id": "3",
+        "user": {
+          "id": "1",
+          "name": "Aviram Shabtay",
+          "avatar": "/assets/user1avatar.svg"
+        },
+        "action": "started the project",
+        "timestamp": "4 days ago"
+      }
+    ],
+    "dueDate": "12/15/2024",
+    "currentUser": "Miri hazan",
+    "createdAt": "10/28/2024",
+    "createdBy": "Miri hazan",
+    "updatedAt": "10/29/2024",
+    "updatedBy": "Miri hazan"
+  }
+]
