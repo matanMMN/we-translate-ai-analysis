@@ -10,7 +10,7 @@ import {revalidatePath} from "next/cache";
 export const fetchProjects = async (): Promise<Project[]> => {
     try {
         const projects = await import('@/data/userData.json');
-        return projects.default.map((project: Project) => ({
+        return projects.default.map((project) => ({
             ...project,
             dueDate: project.dueDate ? new Date(project.dueDate).toLocaleDateString("en") : undefined,
             createdAt: project.createdAt ? new Date(project.createdAt).toLocaleDateString("en") : undefined,

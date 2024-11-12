@@ -1,27 +1,22 @@
 "use client"
 
-import {useEffect, useState} from 'react'
-import {useRouter} from 'next/navigation'
-import {useDispatch, useSelector} from 'react-redux'
-import {useForm, UseFormReturn} from "react-hook-form"
-import {zodResolver} from "@hookform/resolvers/zod"
-import * as z from "zod"
-import {toast} from 'sonner'
-import React from 'react'
-
-import {setSessionSlice, selectSession} from '@/store/slices/sessionSlice'
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card"
-import {Button} from "@/components/ui/button"
-import {CustomProjectFormField} from './ProjectFormField'
-import {ProjectForm} from './ProjectForm'
-import UploadFileModal from './UploadFileModal'
-import {Project, User} from "@/lib/userData";
-import {AlertCircle} from "lucide-react"
-import {cn} from "@/lib/utils"
-import {getUser} from "@/lib/AuthGuard";
+import {useCallback, useMemo, useState} from 'react';
+import {useForm} from 'react-hook-form';
+import {zodResolver} from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import {ProjectForm} from './ProjectForm';
+import FormField from './FormField';
+import {Button} from '@/components/ui/button';
+import {useRouter} from 'next/navigation';
+import {toast} from 'sonner';
 import {saveNewProject} from '@/actions/getUserProjects';
+import {createNewProject} from '@/lib/projectFactory';
+import {useSession} from 'next-auth/react';
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import UploadFileModal from "@/components/newProjectForm/UploadFileModal";
+import {AlertCircle} from "lucide-react";
+import {cn} from "@/lib/utils";
 
-// Enhanced form schema with stricter validation
 const formSchema = z.object({
     name: z.string()
         .min(3, {message: "Name must be at least 3 characters"})
@@ -32,7 +27,7 @@ const formSchema = z.object({
     description: z.string()
         .min(10, {message: "Description must be at least 10 characters"})
         .max(500, {message: "Description must be less than 500 characters"}),
-    industry: z.enum(["Cosmetics", "Leaflets", "Medical Devices"], {
+    industry: z.enum(["Cosmetics", "Leaflets", "Medical_Devices"], {
         required_error: "Please select an industry",
     }),
     sourceLanguage: z.enum(["en", "he"], {
@@ -46,52 +41,44 @@ const formSchema = z.object({
     (data) => data.sourceLanguage !== data.destinationLanguage,
     {
         message: "Target language must be different from source language",
-        path: ["destinationLanguage"], // This will show the error on the destinationLanguage field
+        path: ["destinationLanguage"],
     }
 );
 
-type FormData = z.infer<typeof formSchema>
+type FormData = z.infer<typeof formSchema>;
 
 const industryOptions = [
     {value: "Cosmetics", label: "Cosmetics"},
     {value: "Leaflets", label: "Leaflets"},
-    {value: "Medical Devices", label: "Medical Devices"}
-]
+    {value: "Medical_Devices", label: "Medical Devices"}
+];
 
-const sourceLanguageOptions = [
-    {value: "en", label: "English"},
-    {value: "he", label: "Hebrew"}
-]
-
-const targetLanguageOptions = [
+const languageOptions = [
     {value: "en", label: "English"},
     {value: "he", label: "Hebrew"},
     {value: "ar", label: "Arabic"}
-]
+];
+
+type FormFieldConfig = {
+    name: keyof FormData;
+    label: string;
+    type: 'input' | 'textarea' | 'select';
+    placeholder?: string;
+    options?: Array<{ value: string; label: string }>;
+    required?: boolean;
+};
 
 export default function NewProjectForm() {
-    const router = useRouter()
-    const dispatch = useDispatch()
-    const sessionState = useSelector(selectSession)
-    const {userData} = sessionState.userSession || {}
+    const router = useRouter();
+    const {data: session} = useSession();
+    const currentUser = session?.userData
+    const [showUploadModal, setShowUploadModal] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
-    const [showUploadModal, setShowUploadModal] = useState(false)
-    console.log(sessionState)
-    useEffect(() => {
-        const prepareSession = async () => {
-            dispatch(setSessionSlice({
-                projectId: "",
-                userSession: await getUser(),
-                project: "" as unknown as Project
-            }))
-        }
-        prepareSession()
-    }, [dispatch])
-
 
     const form = useForm<FormData>({
         resolver: zodResolver(formSchema),
+        mode: 'onChange',
         defaultValues: {
             name: '',
             description: '',
@@ -100,18 +87,48 @@ export default function NewProjectForm() {
             destinationLanguage: undefined,
             referenceFile: ''
         },
-        mode: 'onTouched', // Enable real-time validation
-    })
+    });
 
-    // Watch for language changes to validate the combination
-    const sourceLanguage = form.watch('sourceLanguage')
-    const destinationLanguage = form.watch('destinationLanguage')
+    const formFields: FormFieldConfig[] = useMemo<FormFieldConfig[]>(() => [
+        {
+            name: 'name',
+            label: 'Project Name',
+            type: 'input' as const,
+            placeholder: 'Enter project name',
+            required: true,
+        },
+        {
+            name: 'description',
+            label: 'Description',
+            type: 'textarea' as const,
+            placeholder: 'Enter project description',
+            required: true,
+        },
+        {
+            name: 'industry',
+            label: 'Industry',
+            type: 'select' as const,
+            options: industryOptions,
+            required: true,
+        },
+    ], []);
 
-    useEffect(() => {
-        if (sourceLanguage && destinationLanguage) {
-            form.trigger('destinationLanguage')
-        }
-    }, [sourceLanguage, destinationLanguage, form])
+    const languageFields: FormFieldConfig[] = useMemo<FormFieldConfig[]>(() => [
+        {
+            name: 'sourceLanguage',
+            label: 'Source Language',
+            type: 'select' as const,
+            options: languageOptions.filter(lang => lang.value !== 'ar'),
+            required: true,
+        },
+        {
+            name: 'destinationLanguage',
+            label: 'Target Language',
+            type: 'select' as const,
+            options: languageOptions,
+            required: true,
+        },
+    ], [])
 
     const handleUpload = (files: File[]) => {
         if (files.length > 0) {
@@ -121,25 +138,8 @@ export default function NewProjectForm() {
         }
     }
 
-    const handleSubmit = async (data: FormData) => {
-        // Check if form has any errors
-        const isValid = await form.trigger();
-        if (!isValid) {
-            // Show toast with all validation errors
-            toast.error(
-                <div className="space-y-2">
-                    <div className="font-semibold">Please fix the following errors:</div>
-                    <ul className="list-disc pl-4">
-                        {Object.entries(form.formState.errors).map(([field, error]) => (
-                            <li key={field} className="capitalize">
-                                {field.replace(/([A-Z])/g, ' $1').toLowerCase()}: {error.message}
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            );
-            return;
-        }
+    const onSubmit = useCallback(async (data: FormData) => {
+
         if (!selectedFile) {
             toast.error('Please select a reference file');
             return;
@@ -148,87 +148,31 @@ export default function NewProjectForm() {
         setIsSubmitting(true);
 
         try {
-            // Create new project object
-
-            const user = {
-                id: userData!.id,
-                name: userData?.first_name + ' ' + userData?.last_name,
-                avatar: "/assets/user1avatar.svg"
+            if (!currentUser) {
+                throw new Error('User not found');
             }
 
-            const newProject: Project = {
-                id: crypto.randomUUID(),
-                clientId: crypto.randomUUID(),
-                //      "sourceFileId": 1,
-                //     "destFileId": 2,
-                //     "reference_file_id": 10,
-                name: data.name,
-                description: data.description,
-                sourceLanguage: data.sourceLanguage,
-                destinationLanguage: data.destinationLanguage,
-                status: 'Planned',
-                priority: 'Normal',
-                currentStepIndex: 1,
-                comments: ['Initial project setup'],
-                members: [
-                    user
-                ],
-                activities: [
-                    {
-                        id: userData!.id,
-                        user,
-                        action: "started the project",
-                        timestamp: new Date().toISOString()
-                    }
-                ],
-                dueDate: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                createdBy: user as unknown as User,
-                currentUser: user as unknown as User,
-                updatedAt: new Date().toISOString(),
-                updatedBy: user as unknown as User,
-                createdAt: new Date().toISOString(),
-                // Add other required Project fields here
-            };
+            const newProject = await createNewProject({
+                ...data,
+                currentUser
+            });
 
-            // Save to JSON file
-            const saved = await saveNewProject(newProject);
+            const isSaved = await saveNewProject(newProject);
 
-            if (!saved) {
-                throw new Error('Failed to save project');
-            }
-
-            // Update Redux state
-            // const currentProjects = sessionState.userSession?.userData?.allProjects || [];
-            // dispatch(setSessionSlice({
-            //     ...sessionState,
-            //     userSession: {
-            //         ...sessionState.userSession!,
-            //         userData: {
-            //             ...sessionState.userSession!.userData as User,
-            //             allProjects: [newProject, ...currentProjects]
-            //         }
-            //     }
-            // }));
-
-            if (saved) {
+            if (isSaved) {
                 toast.success('Project created successfully');
-
-                // Close the modal first by navigating back
                 router.back();
-
-                // Then navigate to the new project after a brief delay
                 setTimeout(() => {
                     router.push(`/${newProject.id}/details`);
                 }, 100);
             }
-
         } catch (error) {
             console.error('Failed to create project:', error);
             toast.error('Failed to create project');
         } finally {
             setIsSubmitting(false);
         }
-    }
+    }, [selectedFile, currentUser, router]);
 
     return (
         <Card className="w-full max-w-md">
@@ -237,58 +181,21 @@ export default function NewProjectForm() {
             </CardHeader>
             <CardContent>
                 <ProjectForm {...form}>
-                    <form
-                        onSubmit={form.handleSubmit(handleSubmit)}
-                        className="space-y-4"
-                    >
-                        <CustomProjectFormField
-                            form={form as unknown as UseFormReturn}
-                            name="name"
-                            label="Project Name"
-                            placeholder="Enter project name"
-                            type="input"
-                            required
-                        />
-
-                        <CustomProjectFormField
-                            form={form as unknown as UseFormReturn}
-                            name="description"
-                            label="Description"
-                            placeholder="Enter project description"
-                            type="textarea"
-                            required
-                        />
-
-                        <CustomProjectFormField
-                            form={form as unknown as UseFormReturn}
-                            name="industry"
-                            label="Industry"
-                            placeholder="Select industry"
-                            type="select"
-                            options={industryOptions}
-                            required
-                        />
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                        {formFields.map((field: FormFieldConfig) => (
+                            <FormField
+                                key={field.name}
+                                {...field}
+                            />
+                        ))}
 
                         <div className="grid grid-cols-2 gap-4">
-                            <CustomProjectFormField
-                                form={form as unknown as UseFormReturn}
-                                name="sourceLanguage"
-                                label="Source Language"
-                                placeholder="Select source"
-                                type="select"
-                                options={sourceLanguageOptions}
-                                required
-                            />
-
-                            <CustomProjectFormField
-                                form={form as unknown as UseFormReturn}
-                                name="destinationLanguage"
-                                label="Target Language"
-                                placeholder="Select target"
-                                type="select"
-                                options={targetLanguageOptions}
-                                required
-                            />
+                            {languageFields.map((field: FormFieldConfig) => (
+                                <FormField
+                                    key={field.name}
+                                    {...field}
+                                />
+                            ))}
                         </div>
 
                         <div className="space-y-2">
@@ -318,6 +225,7 @@ export default function NewProjectForm() {
                             )}
                         </div>
 
+
                         <Button
                             type="submit"
                             className="w-full bg-[#1D3B34] hover:bg-[#1D3B34]/90 text-white"
@@ -337,6 +245,6 @@ export default function NewProjectForm() {
                 />
             )}
         </Card>
-    )
+    );
 }
 

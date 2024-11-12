@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-    Container,
     Typography,
     Divider,
 } from '@mui/material';
@@ -13,7 +12,7 @@ import LanguageSettings from "@/components/settings/Language";
 export default function Settings() {
 
     return (
-        <Container maxWidth="md" className="p-14">
+        <div className="container h-dvh max-h-[calc(100%-180px)] px-14 overflow-y-auto flex flex-col">
             <Typography variant="h3" gutterBottom>Settings</Typography>
             <Divider/>
             <AccountSettings/>
@@ -21,7 +20,7 @@ export default function Settings() {
             <LanguageSettings/>
             <Privacy/>
             <Accessibility/>
-        </Container>
+        </div>
     );
 };
 

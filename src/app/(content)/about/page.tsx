@@ -1,10 +1,10 @@
 import React from 'react';
-import {Typography, Container} from '@mui/material';
+import {Typography} from '@mui/material';
 
 
 export default function AboutPage() {
     return (
-        <Container maxWidth="md" className="p-14">
+        <div className="container h-dvh max-h-[calc(100%-180px)] px-14 overflow-y-auto flex flex-col">
             <Typography variant="h3" gutterBottom>About Kalimera AI</Typography>
             <Typography variant="body1" paragraph className="pb-10 whitespace-pre-line">
                 {`Kalimera AI is a leading software company specializing in translation and machine translation solutions for businesses. 
@@ -19,7 +19,7 @@ export default function AboutPage() {
             <Typography variant="body1">
                 {`Our team is composed of experts in artificial intelligence, linguistics, and software development, all committed to pushing the boundaries of what's possible in the field of translation technology.`}
             </Typography>
-        </Container>
+        </div>
     )
 }
 

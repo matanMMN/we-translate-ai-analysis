@@ -1,14 +1,14 @@
 'use client'
 
 import * as React from 'react'
-import { FileIcon, AlertCircle, CheckCircle2, Upload } from 'lucide-react'
-import { useDropzone } from 'react-dropzone'
-import { toast } from 'sonner'
+import {FileIcon, AlertCircle, CheckCircle2, Upload} from 'lucide-react'
+import {useDropzone} from 'react-dropzone'
+import {toast} from 'sonner'
 
-import { cn } from '@/lib/utils'
-import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { validateFile, formatFileSize, MAX_FILE_SIZE } from '@/lib/fileUtils'
+import {cn} from '@/lib/utils'
+import {Button} from '@/components/ui/button'
+import {Dialog, DialogContent, DialogHeader, DialogTitle} from '@/components/ui/dialog'
+import {validateFile, formatFileSize, MAX_FILE_SIZE} from '@/lib/fileUtils'
 
 interface UploadModalProps {
     open: boolean
@@ -22,32 +22,32 @@ interface FileStatus {
     error?: string
 }
 
-export default function UploadFileModal({ open, onClose, onUpload }: UploadModalProps) {
+export default function UploadFileModal({open, onClose, onUpload}: UploadModalProps) {
     const [fileStatus, setFileStatus] = React.useState<FileStatus | null>(null)
 
     const handleDrop = React.useCallback(async (acceptedFiles: File[]) => {
         if (acceptedFiles.length === 0) return
 
         const file = acceptedFiles[0] // Only handle single file
-        
+
         // Show initial validation state
-        setFileStatus({ file, status: 'validating' })
+        setFileStatus({file, status: 'validating'})
 
         // Simulate validation delay for UX
-        await new Promise(resolve => setTimeout(resolve, 500))
+        await new Promise(resolve => setTimeout(resolve, 1500))
 
         const validation = validateFile(file)
         if (!validation.valid) {
-            setFileStatus({ file, status: 'invalid', error: validation.error })
+            setFileStatus({file, status: 'invalid', error: validation.error})
             toast.error(validation.error)
             return
         }
 
-        setFileStatus({ file, status: 'valid' })
+        setFileStatus({file, status: 'valid'})
         toast.success('File ready for upload')
     }, [])
 
-    const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    const {getRootProps, getInputProps, isDragActive} = useDropzone({
         onDrop: handleDrop,
         accept: {
             'application/pdf': ['.pdf'],
@@ -76,7 +76,7 @@ export default function UploadFileModal({ open, onClose, onUpload }: UploadModal
             <DialogContent className="sm:max-w-[450px]">
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
-                        <Upload className="w-5 h-5" />
+                        <Upload className="w-5 h-5"/>
                         Upload Reference File
                     </DialogTitle>
                 </DialogHeader>
@@ -96,14 +96,14 @@ export default function UploadFileModal({ open, onClose, onUpload }: UploadModal
                         )}
                     >
                         <input {...getInputProps()} />
-                        
+
                         <div className="flex flex-col items-center gap-2 px-4">
                             {!fileStatus ? (
                                 <>
-                                    <FileIcon className="w-8 h-8 text-gray-400" />
+                                    <FileIcon className="w-8 h-8 text-gray-400"/>
                                     <p className="text-sm text-center text-muted-foreground">
-                                        {isDragActive 
-                                            ? "Drop your file here" 
+                                        {isDragActive
+                                            ? "Drop your file here"
                                             : "Drag and drop your file here, or click to browse"}
                                     </p>
                                 </>
@@ -111,7 +111,7 @@ export default function UploadFileModal({ open, onClose, onUpload }: UploadModal
                                 <div className="w-full">
                                     <div className="flex items-center justify-between mb-2">
                                         <div className="flex items-center gap-2">
-                                            <FileIcon className="w-5 h-5 text-gray-400" />
+                                            <FileIcon className="w-5 h-5 text-gray-400"/>
                                             <span className="text-sm font-medium truncate max-w-[200px]">
                                                 {fileStatus.file.name}
                                             </span>
@@ -122,10 +122,10 @@ export default function UploadFileModal({ open, onClose, onUpload }: UploadModal
                                             </div>
                                         )}
                                         {fileStatus.status === 'valid' && (
-                                            <CheckCircle2 className="w-5 h-5 text-green-500" />
+                                            <CheckCircle2 className="w-5 h-5 text-green-500"/>
                                         )}
                                         {fileStatus.status === 'invalid' && (
-                                            <AlertCircle className="w-5 h-5 text-red-500" />
+                                            <AlertCircle className="w-5 h-5 text-red-500"/>
                                         )}
                                     </div>
                                     <div className="text-xs text-muted-foreground">

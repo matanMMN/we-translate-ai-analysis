@@ -3,20 +3,20 @@ import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/c
 import {Badge} from "@/components/ui/badge";
 import {cn} from "@/lib/utils";
 import {getPriorityColor, getStatusColor} from "@/lib/functions";
-import {DropdownMenu} from "@/components/ui/dropdown-menu";
+import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
 import {Button} from "@/components/ui/button";
-import {ChevronDown, ChevronUp, Edit2, Search} from "lucide-react";
+import {ChevronDown, ChevronUp, Edit2, Search, MoreVertical, Trash2} from "lucide-react";
 import {AnimatePresence, motion} from "framer-motion";
 import {useEffect, useMemo, useRef, useState} from "react";
 import {useVirtualizer} from "@tanstack/react-virtual";
 import {useDebounce} from "use-debounce";
 import {Input} from "@/components/ui/input";
-import Link from "next/link";
 import {useSession} from "next-auth/react";
 import LoadingLogoGif from "@/components/LoadingLogoGif";
 import {Project} from "@/lib/userData";
 import {useRouter} from "next/navigation";
-
+import { toast } from 'sonner';
+import { deleteProject } from '@/actions/deleteProject';
 
 // export interface Project {
 //     id: string
@@ -34,7 +34,7 @@ export type SortConfig = {
 export default function ProjectTable({projects}: { projects: Project[] }) {
 
 
-    const {data: session, status} = useSession()
+    const {status} = useSession()
     const router = useRouter()
     console.log(projects)
     const [sortConfig, setSortConfig] = useState<SortConfig>({key: null, direction: 'asc'})
@@ -117,6 +117,22 @@ export default function ProjectTable({projects}: { projects: Project[] }) {
             </TableHead>
         )
     }
+
+    const handleDeleteProject = async (projectId: string) => {
+        try {
+            // Add your delete project action here
+            const response = await deleteProject(projectId);
+            if (response) {
+                toast.success('Project deleted successfully');
+                // Optionally refresh the projects list or remove from current list
+                router.refresh();
+            }
+        } catch (error) {
+            console.error('Failed to delete project:', error);
+            toast.error('Failed to delete project');
+        }
+    };
+
     return status === 'loading' ? <LoadingLogoGif/> : (
         <>
             <motion.header
@@ -182,7 +198,7 @@ export default function ProjectTable({projects}: { projects: Project[] }) {
                                     <SortableHeader column="priority" width="30%"/>
                                     <SortableHeader column="status" width="30%"/>
                                     <TableHead style={{width: '10%'}}
-                                               className="text-lg font-semibold">Actions</TableHead>
+                                               className="text-lg">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody style={{
@@ -226,12 +242,28 @@ export default function ProjectTable({projects}: { projects: Project[] }) {
                                             <TableCell style={{width: '10%'}}
                                                        className="py-6 text-start w-full max-w-[30%]">
                                                 <DropdownMenu>
-                                                    <Link href={`/${project.id}/details`}>
-                                                        <Button variant="ghost" size="icon"
-                                                                className="hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full w-12 h-12">
-                                                            <Edit2 className="w-6 h-6"/>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <Button 
+                                                            variant="ghost" 
+                                                            size="icon"
+                                                            className="hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full w-8 h-8"
+                                                        >
+                                                            <MoreVertical className="w-4 h-4" />
                                                         </Button>
-                                                    </Link>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent align="end" className="w-[160px]">
+                                                        <DropdownMenuItem onClick={() => router.push(`/${project.id}/details`)}>
+                                                            <Edit2 className="mr-2 h-4 w-4" />
+                                                            View Project
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem
+                                                            className="text-red-600 focus:text-red-600"
+                                                            onClick={() => handleDeleteProject(project.id as string)}
+                                                        >
+                                                            <Trash2 className="mr-2 h-4 w-4" />
+                                                            Delete Project
+                                                        </DropdownMenuItem>
+                                                    </DropdownMenuContent>
                                                 </DropdownMenu>
                                             </TableCell>
                                         </TableRow>

@@ -3,7 +3,7 @@ import {Typography, Container, List, ListItem} from '@mui/material';
 
 export default function HelpPage() {
     return (
-        <Container maxWidth="md" className="p-14">
+        <div className="container h-dvh max-h-[calc(100%-180px)] px-14 overflow-y-auto flex flex-col">
             <Typography variant="h3" gutterBottom>Help Center</Typography>
             <Typography variant="body1" paragraph className="whitespace-pre-line pb-10">
                 {`Welcome to the Kalimera AI Help Center. 
@@ -22,7 +22,7 @@ export default function HelpPage() {
                 href="mailto:support@kalimera.ai">support@kalimera.ai</Link>. We're here to help you with any issues or
                 questions you may have.`}
             </Typography>
-        </Container>
+        </div>
     )
 }
 
