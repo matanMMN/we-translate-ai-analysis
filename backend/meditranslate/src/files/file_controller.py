@@ -2,7 +2,6 @@ from typing import Any, List,Tuple
 from meditranslate.app.shared.base_controller import BaseController
 from meditranslate.src.files.file_service import FileService
 from meditranslate.src.files.file_schemas import (
-    FileCreateSchema,
     GetManySchema
 )
 from meditranslate.app.db.models import File
@@ -18,8 +17,8 @@ class FileController(BaseController[File]):
         self.file_service:FileService = file_service
 
     @Transactional(propagation=Propagation.REQUIRED_NEW)
-    async def upload_file(self,file:UploadFile,user:User) -> File:
-        return await self.file_service.upload_file(file,user)
+    async def upload_file(self,current_user:User,file:UploadFile) -> File:
+        return await self.file_service.upload_file(current_user,file)
 
     async def get_file(self,file_id: str) -> File:
         return await self.file_service.get_file(file_id)

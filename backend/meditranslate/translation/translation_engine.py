@@ -5,14 +5,15 @@ from meditranslate.app.configurations import config
 from meditranslate.app.errors import AppError,ErrorSeverity,HTTPStatus,ErrorType
 
 class TranslationEngine:
-
-    def __init__(self):
-        pass
-
     async def translate(self,translation_input:TranslationInput) -> TranslationOutput:
         try:
-            translation_output = await self._translate()
-            return TranslationOutput()
+            translation_output = TranslationOutput(
+                output_text="output text",
+                translation_metadata={
+                    "service":"none"
+                }
+            )
+            return translation_output
         except Exception as e:
             raise AppError(
                 error=e,
@@ -25,7 +26,3 @@ class TranslationEngine:
                 operable=False,
                 error_type=ErrorType.TRANSLATION_ERROR,
             )
-
-    async def _translate(self):
-        pass
-

@@ -14,13 +14,13 @@ class TranslationJob(Base):
     )
 
     title: Mapped[str] = mapped_column(String, nullable=False)
-    description: Mapped[str] = mapped_column(String, nullable=False, default="")
+    description: Mapped[str] = mapped_column(String, nullable=True, default="")
     source_language: Mapped[str] = mapped_column(String, nullable=False)
     target_language: Mapped[str] = mapped_column(String, nullable=False)
     priority: Mapped[int] = mapped_column(Integer, nullable=False,default=0)
     due_date: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True),nullable=True,default=None,server_default=None)
 
-    status: Mapped[Optional[str]] = mapped_column(String, nullable=False)
+    status: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     current_step_index: Mapped[int] = mapped_column(Integer, default=0)
 
     reference_file_id: Mapped[Optional[str]] = mapped_column(ForeignKey('files.id'),nullable=True)
@@ -41,7 +41,7 @@ class TranslationJob(Base):
     deleted_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True),nullable=True, default=None)
     deleted_by: Mapped[Optional[str]] = mapped_column(ForeignKey('users.id', onupdate="CASCADE"),nullable=True,default=None)
 
-    data: Mapped[dict]  = mapped_column(JSON,nullable=True,default=None)
+    data: Mapped[dict]  = mapped_column(JSON,nullable=False,default=dict)
 
     current_user: Mapped[Optional["User"]] = relationship('User',  foreign_keys=[current_user_id], lazy='select', remote_side='User.id')
 
@@ -55,3 +55,4 @@ class TranslationJob(Base):
     approved_by_user: Mapped[Optional["User"]] = relationship('User',  foreign_keys=[approved_by], lazy='select', remote_side='User.id')
     archived_by_user: Mapped[Optional["User"]] = relationship('User',  foreign_keys=[archived_by], lazy='select', remote_side='User.id')
     deleted_by_user: Mapped[Optional["User"]] = relationship('User',  foreign_keys=[deleted_by], lazy='select', remote_side='User.id')
+

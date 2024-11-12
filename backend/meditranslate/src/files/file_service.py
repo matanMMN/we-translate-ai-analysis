@@ -1,3 +1,4 @@
+from io import BytesIO
 from typing import Any,Dict,List,Optional,Tuple
 from meditranslate.app.storage.base_storage_service import BaseStorageService
 from meditranslate.src.files.file_repository import FileRepository
@@ -6,10 +7,12 @@ from meditranslate.app.shared.base_service import BaseService
 from meditranslate.src.users.user import User
 from meditranslate.utils.files.file_format_type import FileFormatType
 from meditranslate.utils.files.file_size_unit import FileSizeUnit
+from meditranslate.utils.files.formats.file_format_handler import FileFormatHandler
+from meditranslate.utils.language.utils import get_language_from_text
 from meditranslate.utils.security.password import hash_password
 from meditranslate.app.errors import AppError,ErrorSeverity,ErrorType,HTTPStatus
 from meditranslate.src.files.file_schemas import (
-    FileCreateSchema,
+    FilePointerCreateSchema,
     GetManySchema
 )
 from tempfile import SpooledTemporaryFile
@@ -26,11 +29,10 @@ class FileService(BaseService[File]):
 
     def _to_public_file_pointer(self,file:File):
         public_file = file.as_dict()
-        public_file.pop("file_path")
-        public_file.pop("file_url")
-        public_file.pop("file_storage_provider")
-        public_file.pop("file_metadata")
-        public_file['name'] = file.original_file_name
+        # if file.upload_by is not None:
+        #     public_file["upload_by_user"] = file.upload_by_user.full_name
+        if file.original_file_name is not None:
+            public_file['file_name'] = file.original_file_name
         return public_file
 
     async def download_file(self,file_id:str):
@@ -48,13 +50,26 @@ class FileService(BaseService[File]):
         """)
         return file_stream, file.original_file_name
 
-    async def upload_file(self,file:UploadFile,user:User) -> File:
+    def _is_valid_input_file(self,file_content:str):
+        return True
+
+    async def upload_file(self,current_user:User,file:UploadFile) -> File:
         file_data= await file.read()
+        file_stream = BytesIO(file_data)
         original_file_name = file.filename
         content_type = file.content_type
         extension = FileFormatType.TXT
         split = original_file_name.rsplit('.', 1)  # Split on the last dot only
         file_path = f"{original_file_name}{str(uuid4())}"
+        file_stream.seek(0)
+        file_content = FileFormatHandler().extract_text(extension,file_stream)
+        file_language = get_language_from_text(file_content)
+        if file_language is None or not self._is_valid_input_file(file_content):
+            raise AppError(
+                title="invalid file",
+                user_message="invalid user input file content",
+                http_status=HTTPStatus.NOT_ACCEPTABLE
+            )
 
         logger.debug(f"""\n
             File Name: {original_file_name}
@@ -97,7 +112,7 @@ class FileService(BaseService[File]):
                 http_status=HTTPStatus.INTERNAL_SERVER_ERROR
             ) from e
 
-        file_create_schema = FileCreateSchema(
+        file_create_schema = FilePointerCreateSchema(
             file_path = file_path,
             file_url = self.storage_service.base_url,
             file_storage_provider = self.storage_service.storage_provider.value,
@@ -106,14 +121,15 @@ class FileService(BaseService[File]):
             file_name = file.filename,
             file_format_type = extension,
             file_size = len(file_data),
-            uploaded_by = user.id,
-            file_size_unit="bytes"
+            upload_by = current_user.id,
+            file_size_unit="bytes",
+            file_language=file_language
         )
         file_pointer = await self.create_file(file_create_schema)
         public_file_pointer = self._to_public_file_pointer(file=file_pointer)
         return public_file_pointer
 
-    async def create_file(self,file_create_schema: FileCreateSchema) -> File:
+    async def create_file(self,file_create_schema: FilePointerCreateSchema) -> File:
         new_file_data = file_create_schema.model_dump()
         new_file = await self.file_repository.create(new_file_data)
         return new_file

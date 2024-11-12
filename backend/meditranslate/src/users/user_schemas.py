@@ -1,125 +1,49 @@
-from meditranslate.app.shared.schemas import BaseResponseSchema, BaseSchema,GetManySchema
+from meditranslate.app.shared.schemas import BaseResponseSchema, BaseSchema,GetManySchema,ObjectIdSchema,UserFullNamesModificationSchema, UserIdentifiersModificationSchema,ModificationTimestampSchema,NameStr,UserNameStr,PassWordStr
 from typing import List,Optional,Dict,Any,Literal,Union
 from datetime import datetime,date
 from pydantic import BaseModel, HttpUrl,constr,field_validator,Field,EmailStr,StringConstraints,ConfigDict
 import re
 from typing_extensions import Annotated
 
-
-class BaseUserSchema(BaseSchema):
-    model_config:ConfigDict=ConfigDict(
-        extra="ignore",
-        strict=False
-    )
-    id : Annotated[
-                    Optional[str],
-                    StringConstraints(
-                        strip_whitespace=True,
-                        to_upper=None,
-                        to_lower=None,
-                        strict=None,
-                        max_length=None,
-                        min_length=None,
-                        pattern=None,
-                    ),
-                ] = Field(None, title="User ID", description="Unique identifier for the user")
-    email : Annotated[
-                    Optional[EmailStr],
-                    StringConstraints(
-                        strip_whitespace=True,
-                        to_upper=None,
-                        to_lower=None,
-                        strict=None,
-                        max_length=None,
-                        min_length=None,
-                        pattern=None,
-                    ),
-                ] = Field(None, title="Email", description="User email address")
-    username : Annotated[
-                    Optional[str],
-                    StringConstraints(
-                        strip_whitespace=True,
-                        to_upper=None,
-                        to_lower=None,
-                        strict=None,
-                        max_length=None,
-                        min_length=None,
-                        pattern=None,
-                    ),
-                ] = Field(None, title="Username", description="User's username")
-
-
-    password : Annotated[
-                    Optional[str],
-                    StringConstraints(
-                        strip_whitespace=True,
-                        to_upper=None,
-                        to_lower=None,
-                        strict=None,
-                        max_length=None,
-                        min_length=None,
-                        # pattern=r'^\+?[1-9]\d{1,14}$',
-                    ),
-                ] = Field(None, title="Password", description="Password",repr=False)
-
-
-    first_name : Annotated[
-                    Optional[str],
-                    StringConstraints(
-                        strip_whitespace=True,
-                        to_upper=None,
-                        to_lower=None,
-                        strict=None,
-                        max_length=None,
-                        min_length=None,
-                        pattern=None,
-                    ),
-                ] = Field(None, title="First Name", description="User's first name")
-
-    last_name : Annotated[
-                    Optional[str],
-                    StringConstraints(
-                        strip_whitespace=True,
-                        to_upper=None,
-                        to_lower=None,
-                        strict=None,
-                        max_length=None,
-                        min_length=None,
-                        pattern=None,
-                    ),
-                ] = Field(None, title="Last Name", description="User's last name")
-
-
-    # user roles
-    # roles : Optional[List[str]] = Field([], title="Roles", description="List of roles assigned to the user")
-    # # roles : Optional[List[str]] = Field(None, title="Roles", description="List of roles assigned to the user")
-
-    # additional_fields: Optional[Dict[str, Any]] = Field(None, title="Additional Fields", description="Any additional user data")
-    # avatar: Optional[bytes] = Field(None, title="avatar", description="Any additional user data")
-    # avatar_url:  Optional[str] = Field(None, title="avatar_url", description="Any additional user data")
-
+class PublicUserSchema(ObjectIdSchema,UserFullNamesModificationSchema,ModificationTimestampSchema):
+    email: EmailStr = Field(..., title="Email", description="User email address")
+    first_name: Optional[NameStr] = Field(None, title="First Name", description="User's first name")
+    last_name : Optional[NameStr]= Field(None, title="Last Name", description="User's last name")
     last_login: Optional[date] = Field(None, title="last_login", description="Any additional user data")
-    # is_disabled: Optional[bool] = Field(None, title="is_disabled", description="Any additional user data")
-    # is_deleted: Optional[bool] = Field(None, title="is_deleted", description="Any additional user data")
 
-    # # roles: Optional[List[Any]] = Field(None, title="roles", description="Any additional user data")
+class UserSchema(ObjectIdSchema,UserFullNamesModificationSchema,ModificationTimestampSchema,UserIdentifiersModificationSchema):
+    email : EmailStr = Field(None, title="Email", description="User email address")
+    username : UserNameStr = Field(None, title="Username", description="User's username")
+    first_name : Optional[NameStr] = Field(None, title="First Name", description="User's first name")
+    last_name : Optional[NameStr] = Field(None, title="Last Name", description="User's last name")
+    last_login: Optional[date] = Field(None, title="last_login", description="Any additional user data")
 
-    created_by: Optional[str]  = Field(None, title="created_by", description="Any additional user data")
-    updated_by: Optional[str]  = Field(None, title="updated_by", description="Any additional user data")
+class UserCreateSchema(BaseSchema):
+    email :EmailStr = Field(..., title="Email", description="User email address")
+    username : UserNameStr = Field(..., title="Username", description="User's username")
+    password : PassWordStr = Field(..., title="Password", description="Password",repr=False)
+    first_name : NameStr = Field(None, title="First Name", description="User's first name")
+    last_name : NameStr = Field(None, title="LaBaseUserSchema,Creast Name", description="User's last name")
 
-
-class UserCreateSchema(BaseUserSchema):
-    pass
-
-class UserUpdateSchema(BaseUserSchema):
-    pass
-
+class UserUpdateSchema(BaseSchema):
+    email : Optional[EmailStr] = Field(None, title="Email", description="User email address")
+    username : Optional[UserNameStr]= Field(None, title="Username", description="User's username")
+    password : Optional[PassWordStr] = Field(None, title="Password", description="Password",repr=False)
+    first_name : Optional[NameStr] = Field(None, title="First Name", description="User's first name")
+    last_name : Optional[NameStr] = Field(None, title="First Name", description="User's Last name")
 
 class UserResponseSchema(BaseResponseSchema):
-    data: BaseUserSchema
+    data: UserSchema
 
 class UsersResponseSchema(BaseResponseSchema):
-    data: List[BaseUserSchema]
+    data: List[UserSchema]
+
+class PublicUserResponseSchema(BaseResponseSchema):
+    data: PublicUserSchema
+
+class PublicUsersResponseSchema(BaseResponseSchema):
+    data: List[PublicUserSchema]
+
 
 
 

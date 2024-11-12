@@ -30,7 +30,7 @@ def get_session_context() -> str:
     :return: The current session context as a string.
     """
     session_id = session_context.get()
-    logger.debug(f"GET_SESSION_CONTEXT {session_id}")
+    # logger.debug(f"GET_SESSION_CONTEXT {session_id}")
     return session_id
 
 
@@ -42,7 +42,7 @@ def set_session_context(session_id: str) -> Token:
     :param session_id: Unique identifier for the session context.
     :return: A `Token` that can be used to reset the session context.
     """
-    logger.debug(f"SET_SESSION_CONTEXT {session_id}")
+    # logger.debug(f"SET_SESSION_CONTEXT {session_id}")
     return session_context.set(session_id)
 
 
@@ -55,7 +55,7 @@ def reset_session_context(context: Token) -> None:
     """
 
     session_context.reset(context)
-    logger.debug(f"RESET_SESSION_CONTEXT {context}")
+    # logger.debug(f"RESET_SESSION_CONTEXT {context}")
 
 
 # Create two separate database engines: one for write operations and another for read operations.

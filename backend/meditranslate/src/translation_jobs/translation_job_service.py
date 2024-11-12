@@ -9,7 +9,9 @@ from meditranslate.src.translation_jobs.translation_job_schemas import (
     TranslationJobUpdateSchema,
     GetManySchema
 )
+from meditranslate.app.loggers import logger
 from datetime import datetime
+import json
 
 class TranslationJobService(BaseService[TranslationJob]):
     def __init__(self, translation_job_repository: TranslationJobRepository):
@@ -18,24 +20,27 @@ class TranslationJobService(BaseService[TranslationJob]):
 
     def _to_public_translation_job(self,translation_job:TranslationJob) -> dict:
         public_translation_job = translation_job.as_dict()
+        # if translation_job.data is not None:
+        #     public_translation_job["data"] = json.loads(translation_job.data)
+        # if translation_job.created_by_user is not None:
+        #     public_translation_job["created_by_user"] = translation_job.created_by_user.full_name
+        # if translation_job.updated_by_user is not None:
+        #     public_translation_job["updated_by_user"] = translation_job.updated_by_user.full_name
+        # if translation_job.current_user is not None:
+        #     public_translation_job["current_user"] = translation_job.current_user.full_name
+        logger.debug(public_translation_job)
         return public_translation_job
 
     async def create_translation_job(self,current_user:User,translation_job_create_schema:TranslationJobCreateSchema) -> TranslationJob:
-        translation_job_create_schema.created_by = current_user.id
-        translation_job_create_schema.updated_by = current_user.id
         new_translation_job_data = translation_job_create_schema.model_dump()
-        new_translation_job_data.pop("approved_at")
-        new_translation_job_data.pop("approved_by")
-        new_translation_job_data.pop("archived_at")
-        new_translation_job_data.pop("archived_by")
-        new_translation_job_data.pop("deleted_at")
-        new_translation_job_data.pop("deleted_by")
-        new_translation_job_data.pop("current_user_id")
-        new_translation_job_data.pop("data")
+        new_translation_job_data['created_by'] = current_user.id
+        new_translation_job_data['updated_by'] = current_user.id
+        new_translation_job_data['data'] = {}
         new_translation_job = await self.translation_job_repository.create(new_translation_job_data)
         return self._to_public_translation_job(new_translation_job)
 
     async def get_translation_job(self,translation_job_id: str,raise_exception:bool=True,to_public:bool=True) -> TranslationJob:
+        # translation_job = await self.translation_job_repository.get_by(field="id",value=translation_job_id,joins=['created_by_user', 'updated_by_user', 'current_user'],unique=True)
         translation_job = await self.translation_job_repository.get_by(field="id",value=translation_job_id,joins=None,unique=True)
         if not translation_job:
             if raise_exception:
@@ -50,16 +55,17 @@ class TranslationJobService(BaseService[TranslationJob]):
 
 
     async def update_translation_job(self,current_user:User,translation_job_id: str, update_translation_job_data: TranslationJobUpdateSchema) -> None:
-        update_translation_job_data.updated_by = current_user.id
-        update_translation_job_data = update_translation_job_data.model_dump()
-        update_translation_job_data.pop("id",None)
+        _update_translation_job_data = update_translation_job_data.model_dump()
+        _update_translation_job_data['updated_by'] = current_user.id
         translation_job = await self.translation_job_repository.get_by("id",translation_job_id,unique=True)
         if not translation_job:
             raise AppError(
                 title="update translation job endpoint",
                 http_status=HTTPStatus.NOT_FOUND
             )
-        return await self.translation_job_repository.update(translation_job,update_translation_job_data)
+        _update_translation_job_data = {key: value for key, value in _update_translation_job_data.items() if value is not None}
+
+        return await self.translation_job_repository.update(translation_job,_update_translation_job_data)
 
 
     async def delete_translation_job(self,current_user:User,translation_job_id: str) -> None:
@@ -81,5 +87,8 @@ class TranslationJobService(BaseService[TranslationJob]):
 
     async def get_many_translation_jobs(self,get_many_schema: GetManySchema) -> Tuple[List[TranslationJob],int]:
         translation_jobs,total = await self.translation_job_repository.get_many(**get_many_schema.model_dump())
-        public_translation_jobs = [self._to_public_translation_job(translation_job) for translation_job in translation_jobs]
+        public_translation_jobs = []
+        for translation_job in translation_jobs:
+            public_translation_job = self._to_public_translation_job(translation_job)
+            public_translation_jobs.append(public_translation_job)
         return public_translation_jobs,total

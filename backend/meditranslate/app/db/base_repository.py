@@ -17,6 +17,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql.expression import select
 from meditranslate.app.loggers import logger
 
+from sqlalchemy.orm import aliased
+from sqlalchemy.orm import joinedload
+from sqlalchemy.orm.relationships import RelationshipProperty
 
 ModelType = TypeVar("ModelType", bound=Base)
 
@@ -32,7 +35,7 @@ class BaseRepository(Generic[ModelType]):
 
     async def create(self, attributes: dict[str, Any] = None) -> ModelType:
         try:
-            logger.info(attributes)
+            logger.debug(attributes)
             if attributes is None:
                 attributes = {}
             else:

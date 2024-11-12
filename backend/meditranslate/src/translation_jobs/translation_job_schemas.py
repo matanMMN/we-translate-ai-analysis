@@ -1,211 +1,195 @@
-from meditranslate.app.shared.schemas import BaseResponseSchema, BaseSchema,GetManySchema
+from meditranslate.app.shared.schemas import BaseResponseSchema, BaseSchema,GetManySchema,NameStr,FullNameStr,IdentifierStr,TranslationLanguagesSchema,UserIdentifiersModificationSchema,ObjectIdSchema,UserFullNamesModificationSchema,JsonStr
 from typing import List,Optional,Dict,Any,Literal,Union
 from datetime import datetime,date
-from pydantic import BaseModel, HttpUrl,constr,field_validator,Field,EmailStr,StringConstraints,ConfigDict
+from pydantic import BaseModel, HttpUrl,constr,field_validator,Field,EmailStr,StringConstraints,ConfigDict,Json
 import re
 from typing_extensions import Annotated
+import enum
 
+class TranslationJobStatus(enum.Enum):
+    INITIAL = "initial"
 
+TitleStr = Annotated[
+            str,
+            StringConstraints(
+                strip_whitespace=True,
+                max_length=50,
+                min_length=1
+                ),
+            ]
 
-
-
-class BaseTranslationJobSchema(BaseSchema):
-    model_config:ConfigDict=ConfigDict(
-        extra="ignore",
-        strict=False
-    )
-    title : Annotated[
-                    Optional[str],
+DescriptionStr = Annotated[
+                    str,
                     StringConstraints(
                         strip_whitespace=True,
-                        to_upper=None,
-                        to_lower=None,
-                        strict=None,
-                        max_length=None,
-                        min_length=None,
-                        pattern=None,
-                    ),
-                ] = Field(None, title="User ID", description="Unique identifier for the user")
+                        max_length=450,
+                    )
+                ]
 
-    description : Annotated[
-                    Optional[str],
+StatusStr = Annotated[
+                    str,
                     StringConstraints(
                         strip_whitespace=True,
-                        to_upper=None,
-                        to_lower=None,
-                        strict=None,
-                        max_length=None,
-                        min_length=None,
-                        pattern=None,
-                    ),
-                ] = Field(None, title="User ID", description="Unique identifier for the user")
+                        max_length=450,
+                    )
+                ]
 
-    source_file_id : Annotated[
-                    Optional[str],
-                    StringConstraints(
-                        strip_whitespace=True,
-                        to_upper=None,
-                        to_lower=None,
-                        strict=None,
-                        max_length=None,
-                        min_length=None,
-                        pattern=None,
-                    ),
-                ] = Field(None, title="source file id", description="")
 
-    reference_file_id : Annotated[
-                    Optional[str],
-                    StringConstraints(
-                        strip_whitespace=True,
-                        to_upper=None,
-                        to_lower=None,
-                        strict=None,
-                        max_length=None,
-                        min_length=None,
-                        pattern=None,
-                    ),
-                ] = Field(None, title="reference file id", description="")
-
-    source_language : Annotated[
-                    Optional[str],
-                    StringConstraints(
-                        strip_whitespace=True,
-                        to_upper=None,
-                        to_lower=None,
-                        strict=None,
-                        max_length=None,
-                        min_length=None,
-                        pattern=None,
-                    ),
-                ] = Field(None, title="User ID", description="Unique identifier for the user")
-
-    target_language : Annotated[
-                    Optional[str],
-                    StringConstraints(
-                        strip_whitespace=True,
-                        to_upper=None,
-                        to_lower=None,
-                        strict=None,
-                        max_length=None,
-                        min_length=None,
-                        pattern=None,
-                    ),
-                ] = Field(None, title="User ID", description="Unique identifier for the user")
-
-    priority : Optional[int]= Field(0, title="priority", description="",ge=0)
-
+class PublicTranslationJobSchema(ObjectIdSchema,UserFullNamesModificationSchema,TranslationLanguagesSchema):
+    title : TitleStr = Field(..., title="", description="")
+    description : DescriptionStr = Field(..., title="User ID", description="Unique identifier for the user")
+    source_file_id : Optional[IdentifierStr] = Field(None, title="source file id", description="")
+    reference_file_id: Optional[IdentifierStr] = Field(None, title="reference file id", description="")
+    priority : int = Field(..., title="priority", description="",ge=0)
     due_date : Optional[datetime] = Field(None, title="due date", description="")
+    status : StatusStr = Field(..., title="status", description="Unique identifier for the user")
+    data : dict = Field(..., title="data", description="Unique identifier for the user")
+    current_step_index : int = Field(..., title="current_step_index", description="",ge=0)
+    current_user_id : Optional[IdentifierStr] = Field(None, title="", description="")
+    current_user :Optional[Union[NameStr,FullNameStr]] = Field(None, title="current_user_ name", description="")
 
-    status : Annotated[
-                    Optional[str],
-                    StringConstraints(
-                        strip_whitespace=True,
-                        to_upper=None,
-                        to_lower=None,
-                        strict=None,
-                        max_length=None,
-                        min_length=None,
-                        pattern=None,
-                    ),
-    ] = Field(None, title="status", description="Unique identifier for the user")
+    # @validator("data", pre=True, always=True)
+    # def ensure_json(cls, v):
+    #     # If `data` is provided as a dictionary, dump it to JSON string
+    #     if isinstance(v, dict):
+    #         return json.dumps(v)
+    #     # If already a string, validate it is a JSON-encoded string
+    #     try:
+    #         json.loads(v)  # Validates it's a JSON string
+    #         return v
+    #     except json.JSONDecodeError:
+    #         raise ValueError("data must be a valid JSON string or dict")
 
-    data : Optional[dict] = Field(None, title="data", description="Unique identifier for the user")
+    # approved_at: Optional[datetime]= Field(None, title="", description="")
+    # approved_by : Annotated[
+    #                 Optional[str],
+    #                 StringConstraints(
+    #                     strip_whitespace=True,
+    #                     to_upper=None,
+    #                     to_lower=None,
+    #                     strict=None,
+    #                     max_length=None,
+    #                     min_length=None,
+    #                     pattern=None,
+    #                 ),
+    #             ] = Field(None, title="", description="")
+    # archived_at: Optional[datetime]= Field(None, title="", description="")
+    # archived_by : Annotated[
+    #                 Optional[str],
+    #                 StringConstraints(
+    #                     strip_whitespace=True,
+    #                     to_upper=None,
+    #                     to_lower=None,
+    #                     strict=None,
+    #                     max_length=None,
+    #                     min_length=None,
+    #                     pattern=None,
+    #                 ),
+    #             ] = Field(None, title="", description="")
+    # deleted_at: Optional[datetime]= Field(None, title="", description="")
+    # deleted_by : Annotated[
+    #                 Optional[str],
+    #                 StringConstraints(
+    #                     strip_whitespace=True,
+    #                     to_upper=None,
+    #                     to_lower=None,
+    #                     strict=None,
+    #                     max_length=None,
+    #                     min_length=None,
+    #                     pattern=None,
+    #                 ),
+    #             ] = Field(None, title="", description="")
 
+class TranslationJobSchema(ObjectIdSchema,UserIdentifiersModificationSchema,UserFullNamesModificationSchema,TranslationLanguagesSchema):
+    title : TitleStr = Field(..., title="", description="")
+    description : DescriptionStr = Field(..., title="User ID", description="Unique identifier for the user")
+    data : dict = Field(..., title="data", description="Unique identifier for the user")
+    source_file_id : Optional[IdentifierStr] = Field(None, title="source file id", description="")
+    reference_file_id: Optional[IdentifierStr] = Field(None, title="reference file id", description="")
+    priority : int = Field(..., title="priority", description="",ge=0)
+    due_date : Optional[datetime] = Field(None, title="due date", description="")
+    status : StatusStr = Field(..., title="status", description="Unique identifier for the user")
+    current_step_index : int = Field(..., title="current_step_index", description="",ge=0)
+    current_user_id : Optional[IdentifierStr] = Field(None, title="", description="")
+    current_user :Optional[Union[NameStr,FullNameStr]] = Field(None, title="current_user_ name", description="")
+    # approved_at: Optional[datetime]= Field(None, title="", description="")
+    # approved_by : Annotated[
+    #                 Optional[str],
+    #                 StringConstraints(
+    #                     strip_whitespace=True,
+    #                     to_upper=None,
+    #                     to_lower=None,
+    #                     strict=None,
+    #                     max_length=None,
+    #                     min_length=None,
+    #                     pattern=None,
+    #                 ),
+    #             ] = Field(None, title="", description="")
+    # archived_at: Optional[datetime]= Field(None, title="", description="")
+    # archived_by : Annotated[
+    #                 Optional[str],
+    #                 StringConstraints(
+    #                     strip_whitespace=True,
+    #                     to_upper=None,
+    #                     to_lower=None,
+    #                     strict=None,
+    #                     max_length=None,
+    #                     min_length=None,
+    #                     pattern=None,
+    #                 ),
+    #             ] = Field(None, title="", description="")
+    # deleted_at: Optional[datetime]= Field(None, title="", description="")
+    # deleted_by : Annotated[
+    #                 Optional[str],
+    #                 StringConstraints(
+    #                     strip_whitespace=True,
+    #                     to_upper=None,
+    #                     to_lower=None,
+    #                     strict=None,
+    #                     max_length=None,
+    #                     min_length=None,
+    #                     pattern=None,
+    #                 ),
+    #             ] = Field(None, title="", description="")
+
+class TranslationJobCreateSchema(TranslationLanguagesSchema):
+    title :TitleStr = Field(..., title="User ID", description="Unique identifier for the user")
+    description :Optional[DescriptionStr] = Field(None, title="User ID", description="Unique identifier for the user")
+    source_file_id :Optional[IdentifierStr] = Field(None, title="source file id", description="")
+    reference_file_id :Optional[IdentifierStr] = Field(None, title="source file id", description="")
+    priority : Optional[int]= Field(0, title="priority", description="",ge=0)
+    due_date : Optional[datetime] = Field(None, title="due date", description="")
+    status : Optional[StatusStr] = Field(TranslationJobStatus.INITIAL.value, title="status", description="")
+    data : Optional[dict] = Field(None, title="data", description="")
     current_step_index : Optional[int] = Field(0, title="current_step_index", description="",ge=0)
-
-    current_user_id : Annotated[
-                    Optional[str],
-                    StringConstraints(
-                        strip_whitespace=True,
-                        to_upper=None,
-                        to_lower=None,
-                        strict=None,
-                        max_length=None,
-                        min_length=None,
-                        pattern=None,
-                    ),
-                ] = Field(None, title="", description="")
-
-    approved_at: Optional[datetime]= Field(None, title="", description="")
-    approved_by : Annotated[
-                    Optional[str],
-                    StringConstraints(
-                        strip_whitespace=True,
-                        to_upper=None,
-                        to_lower=None,
-                        strict=None,
-                        max_length=None,
-                        min_length=None,
-                        pattern=None,
-                    ),
-                ] = Field(None, title="", description="")
-    archived_at: Optional[datetime]= Field(None, title="", description="")
-    archived_by : Annotated[
-                    Optional[str],
-                    StringConstraints(
-                        strip_whitespace=True,
-                        to_upper=None,
-                        to_lower=None,
-                        strict=None,
-                        max_length=None,
-                        min_length=None,
-                        pattern=None,
-                    ),
-                ] = Field(None, title="", description="")
-    deleted_at: Optional[datetime]= Field(None, title="", description="")
-    deleted_by : Annotated[
-                    Optional[str],
-                    StringConstraints(
-                        strip_whitespace=True,
-                        to_upper=None,
-                        to_lower=None,
-                        strict=None,
-                        max_length=None,
-                        min_length=None,
-                        pattern=None,
-                    ),
-                ] = Field(None, title="", description="")
-
-    created_by: Annotated[
-                    Optional[str],
-                    StringConstraints(
-                        strip_whitespace=True,
-                        to_upper=None,
-                        to_lower=None,
-                        strict=None,
-                        max_length=None,
-                        min_length=None,
-                        pattern=None,
-                    ),
-                ] = Field(None, title="", description="")
-
-    updated_by: Annotated[
-                    Optional[str],
-                    StringConstraints(
-                        strip_whitespace=True,
-                        to_upper=None,
-                        to_lower=None,
-                        strict=None,
-                        max_length=None,
-                        min_length=None,
-                        pattern=None,
-                    ),
-                ] = Field(None, title="", description="")
+    current_user_id :Optional[IdentifierStr] = Field(None, title="current_user_id", description="")
 
 
-class TranslationJobCreateSchema(BaseTranslationJobSchema):
-    pass
-
-class TranslationJobUpdateSchema(BaseTranslationJobSchema):
-    pass
+class TranslationJobUpdateSchema(BaseSchema):
+    title : Optional[TitleStr] = Field(None, title="", description="")
+    description : Optional[DescriptionStr] = Field(None, title="User ID", description="Unique identifier for the user")
+    source_file_id :Optional[IdentifierStr] = Field(None, title="source file id", description="")
+    reference_file_id :Optional[IdentifierStr] = Field(None, title="source file id", description="")
+    priority : Optional[int]= Field(0, title="priority", description="",ge=0)
+    due_date : Optional[datetime] = Field(None, title="due date", description="")
+    status : Optional[StatusStr] = Field(None, title="status", description="")
+    data : Optional[dict] = Field(None, title="data", description="Unique identifier for the user")
+    current_step_index : Optional[int] = Field(0, title="current_step_index", description="",ge=0)
+    current_user_id :Optional[IdentifierStr] = Field(None, title="current_user_id", description="")
 
 
 class TranslationJobResponseSchema(BaseResponseSchema):
-    data: BaseTranslationJobSchema
+    data: TranslationJobSchema
 
 class TranslationJobsResponseSchema(BaseResponseSchema):
-    data: List[BaseTranslationJobSchema]
+    data: List[TranslationJobSchema]
 
+
+class PublicTranslationJobResponseSchema(BaseResponseSchema):
+    data: PublicTranslationJobSchema
+
+class PublicTranslationJobsResponseSchema(BaseResponseSchema):
+    data: List[PublicTranslationJobSchema]
 
 
 

@@ -1,3 +1,4 @@
+from io import BytesIO
 from typing import Any,Dict,List,Optional,Tuple
 from meditranslate.src.translations.translation_repository import TranslationRepository
 from meditranslate.app.db.models import Translation
@@ -7,11 +8,17 @@ from meditranslate.app.db.models import Translation
 from meditranslate.src.translations.translation_schemas import (
     TranslationCreateSchema,
     GetManySchema,
-    TranslationTextSchema
+    TranslationSchema,
+    TranslationTextSchema,
+    TranslationFileSchema
 )
+from meditranslate.app.db import User,File
 from meditranslate.translation import TranslationEngine
 from meditranslate.translation.translation_input import TranslationInput
 from meditranslate.translation.translation_output import TranslationOutput
+from meditranslate.utils.files.file_format_type import FileFormatType
+from meditranslate.app.loggers import logger
+from meditranslate.utils.files.formats.file_format_handler import FileFormatHandler
 
 class TranslationService(BaseService[Translation]):
     def __init__(self, translation_repository: TranslationRepository,translation_engine:TranslationEngine):
@@ -21,14 +28,17 @@ class TranslationService(BaseService[Translation]):
 
     def _to_public_translation(self,translation:Translation) -> dict:
         public_translation = translation.as_dict()
+        if translation.created_by_user is not None:
+            public_translation["created_by_user"] = translation.created_by_user.full_name
+        if translation.translation_job is not None:
+            public_translation["translation_job"] = translation.translation_job.title
         return public_translation
 
-    async def create_translation(self,translation_create_schema:TranslationCreateSchema) -> Translation:
+    async def create_translation(self,current_user:User,translation_create_schema:TranslationCreateSchema) -> Translation:
         new_translation_data = translation_create_schema.model_dump()
+        new_translation_data["created_by"] = current_user.id
         new_translation = await self.translation_repository.create(new_translation_data)
-        return self._to_public_translation(new_translation)
-
-
+        return new_translation
 
     async def get_translation(self,translation_id: str,raise_exception:bool=True,to_public:bool=True) -> Translation:
         translation = await self.translation_repository.get_by(field="id",value=translation_id,joins=None,unique=True)
@@ -44,7 +54,7 @@ class TranslationService(BaseService[Translation]):
             else:
                 return translation
 
-    async def delete_translation(self,translation_id: str) -> None:
+    async def delete_translation(self,current_user:User,translation_id: str) -> None:
         translation = await self.translation_repository.get_by("id",translation_id,unique=True)
         if not translation:
             raise AppError(
@@ -59,19 +69,56 @@ class TranslationService(BaseService[Translation]):
         public_translations = [self._to_public_translation(translation) for translation in translations]
         return public_translations,total
 
-    def export_translations(self):
-        pass
 
-    async def translate_file(self):
-        pass
 
-    async def translate_text(self,translation_create_schema:TranslationCreateSchema):
-        input_text = translation_create_schema.input_text
-        translation_input = TranslationInput()
-        translation_output:TranslationOutput = await self.translation_engine.translate(translation_input)
-        created_translation = await self.create_translation(TranslationCreateSchema(
-        ))
-        response = TranslationTextSchema(
+    async def translate_file(self,current_user:User,file_pointer:dict,file_stream:BytesIO,translation_file_schema:TranslationFileSchema):
+        file_extension = file_pointer.get("file_format_type")
+        file_name = file_pointer.get("file_name")
+        try:
+            file_format_type = FileFormatType(file_extension)
+        except ValueError as e:
+            logger.error(f"error in file extention '{file_extension}' in translate file {str(e)}")
+            raise e
 
+        file_content = FileFormatHandler().extract_text(file_format=file_format_type,file_stream=file_stream)
+        input_text = file_content
+        translation_input = TranslationInput(input_text=input_text,config=None)
+        translation_output = await self.translation_engine.translate(translation_input)
+        created_translation = await self.create_translation(
+            current_user=current_user,
+            translation_create_schema=TranslationCreateSchema(
+                    source_language=translation_file_schema.source_language,
+                    target_language=translation_file_schema.target_language,
+                    input_text=input_text,
+                    translation_job_id=translation_file_schema.translation_job_id,
+                    translation_metadata=translation_output.translation_metadata,
+                    output_text=translation_output.output_text
+                )
         )
-        return response.model_dump()
+        if created_translation is None:
+            raise AppError(
+                title="failed to create translation",
+                http_status=HTTPStatus.INTERNAL_SERVER_ERROR
+            )
+        new_file_stream = FileFormatHandler().create_file(file_format=file_format_type,text=translation_output.output_text)
+        content_type = FileFormatHandler().get_content_type(file_format_type)
+        new_file_name = f"{file_name}_{translation_file_schema.source_language}_{translation_file_schema.target_language}"
+        return new_file_stream,new_file_name,content_type
+
+    async def translate_text(self,current_user:User,translation_text_schema:TranslationTextSchema):
+        translation_input = TranslationInput(input_text=translation_text_schema.input_text,config=None)
+        translation_output = await self.translation_engine.translate(translation_input)
+        created_translation = await self.create_translation(
+            current_user=current_user,
+            translation_create_schema=TranslationCreateSchema(
+                    source_language=translation_text_schema.source_language,
+                    target_language=translation_text_schema.target_language,
+                    input_text=translation_text_schema.input_text,
+                    translation_job_id=translation_text_schema.translation_job_id,
+                    translation_metadata=translation_output.translation_metadata,
+                    output_text=translation_output.output_text
+                )
+        )
+        return self._to_public_translation(created_translation)
+
+

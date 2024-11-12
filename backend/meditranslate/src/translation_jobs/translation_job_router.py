@@ -36,13 +36,19 @@ translation_job_router = APIRouter(
 )
 async def create_translation_job(
     current_user: CurrentUserDep,
-    translation_job_create_schema: Annotated[TranslationJobCreateSchema,Body()],
+    translation_job_create_schema: Annotated[TranslationJobCreateSchema,Body(example={
+            "title": "exampletitle",
+            "description": "example description",
+            "source_language":"hebrew",
+            "target_language": "english"
+        })],
     translation_job_controller: TranslationJobController = Depends(Factory.get_translation_job_controller)
 )-> TranslationJobResponseSchema:
     """
     Create a new translation_job.
     """
     translation_job = await translation_job_controller.create_translation_job(current_user,translation_job_create_schema)
+    logger.debug(translation_job)
     return TranslationJobResponseSchema(
         data=translation_job,
         status_code=201,
@@ -82,8 +88,9 @@ async def update_translation_job(
     """
     Update a translation_job's information.
     """
-    await translation_job_controller.update_translation_job(translation_job_id, translation_job_update_schema)
+    await translation_job_controller.update_translation_job(current_user,translation_job_id, translation_job_update_schema)
     updated_translation_job = await translation_job_controller.get_translation_job(translation_job_id)
+    logger.error(updated_translation_job)
     return TranslationJobResponseSchema(
         data=updated_translation_job,
         status_code=200,

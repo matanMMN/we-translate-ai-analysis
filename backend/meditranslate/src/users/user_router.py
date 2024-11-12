@@ -85,7 +85,7 @@ async def update_user(
     Update a user's information.
     """
 
-    await user_controller.update_user(user_id, user_update_schema)
+    await user_controller.update_user(current_user,user_id, user_update_schema)
     update_user = await user_controller.get_user(user_id=user_id)
     return UserResponseSchema(
         data=update_user,
@@ -105,7 +105,7 @@ async def delete_user(
     """
     Delete a user by their ID.
     """
-    await user_controller.delete_user(user_id)
+    await user_controller.delete_user(current_user,user_id)
 
 
 

@@ -1,24 +1,10 @@
-from meditranslate.app.shared.schemas import BaseResponseSchema, BaseSchema,GetManySchema
+from meditranslate.app.shared.schemas import BaseResponseSchema, BaseSchema,GetManySchema,ObjectIdSchema,UserFullNamesModificationSchema,UserIdentifiersModificationSchema,ModificationTimestampSchema,LanguageStr,IdentifierStr,NameStr,FullNameStr,FileFormatTypeStr
 from typing import List,Optional,Dict,Any,Literal,Union
-from datetime import datetime,date
-from pydantic import BaseModel, HttpUrl,constr,field_validator,Field,EmailStr,StringConstraints,ConfigDict
-import re
+from pydantic import Field,StringConstraints
 from typing_extensions import Annotated
 
-from meditranslate.utils.files.file_format_type import FileFormatType
-from fastapi import Form
-
-from meditranslate.utils.files.file_size_unit import FileSizeUnit
-
-
-class BaseFileSchema(BaseSchema):
-    model_config:ConfigDict=ConfigDict(
-        extra="ignore",
-        strict=False
-    )
-
-    id : Annotated[
-                    Optional[str],
+OriginalFileNameStr = Annotated[
+                    str,
                     StringConstraints(
                         strip_whitespace=True,
                         to_upper=None,
@@ -27,10 +13,10 @@ class BaseFileSchema(BaseSchema):
                         max_length=None,
                         min_length=None,
                         pattern=None,
-                    ),
-                ] = Field(None, title="User ID", description="Unique identifier for the user")
-    original_file_name : Annotated[
-                    Optional[str],
+                    )
+                ]
+FileNameStr = Annotated[
+                    str,
                     StringConstraints(
                         strip_whitespace=True,
                         to_upper=None,
@@ -39,10 +25,11 @@ class BaseFileSchema(BaseSchema):
                         max_length=None,
                         min_length=None,
                         pattern=None,
-                    ),
-                ] = Field(None, title="original_file_name ID", description="Unique identifier for the user")
-    file_name : Annotated[
-                    Optional[str],
+                    )
+                ]
+
+FileStorageProviderStr  = Annotated[
+                    str,
                     StringConstraints(
                         strip_whitespace=True,
                         to_upper=None,
@@ -51,15 +38,11 @@ class BaseFileSchema(BaseSchema):
                         max_length=None,
                         min_length=None,
                         pattern=None,
-                    ),
-                ] = Field(None, title="file_name ID", description="Unique identifier for the user")
+                    )
+                ]
 
-    file_size: Optional[int] = Field(None,title="file_size", description="")
-
-    file_size_unit: Optional[str] = Field(None,title="file_size", description="")
-
-    file_path : Annotated[
-                    Optional[str],
+FilePathStr  = Annotated[
+                    str,
                     StringConstraints(
                         strip_whitespace=True,
                         to_upper=None,
@@ -68,11 +51,11 @@ class BaseFileSchema(BaseSchema):
                         max_length=None,
                         min_length=None,
                         pattern=None,
-                    ),
-                ] = Field(None, title="file_path", description="file_id")
+                    )
+                ]
 
-    file_url : Annotated[
-                    Optional[str],
+FileUrlStr  = Annotated[
+                    str,
                     StringConstraints(
                         strip_whitespace=True,
                         to_upper=None,
@@ -81,63 +64,51 @@ class BaseFileSchema(BaseSchema):
                         max_length=None,
                         min_length=None,
                         pattern=None,
-                    ),
-                ] = Field(None, title="file_url", description="file_id")
+                    )
+                ]
 
-    file_storage_provider: Annotated[
-                    Optional[str],
-                    StringConstraints(
-                        strip_whitespace=True,
-                        to_upper=None,
-                        to_lower=None,
-                        strict=None,
-                        max_length=None,
-                        min_length=None,
-                        pattern=None,
-                    ),
-                ] = Field(None, title="file_url", description="file_id")
 
-    file_format_type: Annotated[
-        Optional[str],
-        StringConstraints(
-            strip_whitespace=True,
-            to_upper=None,
-            to_lower=None,
-            strict=None,
-            max_length=None,
-            min_length=None,
-            pattern=None
-        )
-    ] = Field(None,title="file_format_type", description="")
 
+class PublicFilePointerSchema(ObjectIdSchema,UserFullNamesModificationSchema,ModificationTimestampSchema):
+    file_name : FileNameStr = Field(..., title="file_name ID", description="Unique identifier for the user")
+    file_size : Union[float,int] = Field(...,title="file_size", description="")
+    file_format_type: FileFormatTypeStr = Field(...,title="file_format_type", description="")
+    file_language: LanguageStr  = Field(...,title="file_format_type", description="")
+    upload_by_user: Optional[Union[NameStr,FullNameStr]] = Field(None, title="uploader full name",description="full name of user")
+
+class FilePointerSchema(ObjectIdSchema,UserIdentifiersModificationSchema,UserFullNamesModificationSchema,ModificationTimestampSchema):
+    file_name : FileNameStr = Field(..., title="file_name ID", description="Unique identifier for the user")
+    file_size : Union[float,int] = Field(...,title="file_size", description="")
+    file_format_type: FileFormatTypeStr = Field(...,title="file_format_type", description="")
+    file_language: LanguageStr  = Field(...,title="file_format_type", description="")
+    upload_by: IdentifierStr = Field(..., title="uploadeer user id",description=" user upload.")
+    upload_by_user: Optional[Union[NameStr,FullNameStr]] = Field(None, title="uploader full name",description="full name of user")
+
+
+class FilePointerCreateSchema(BaseSchema):
+    original_file_name : OriginalFileNameStr  = Field(..., title="original_file_name ", description="")
+    file_name : FileNameStr = Field(..., title="file_name ID", description="Unique identifier for the user")
+    file_size : Union[float,int] = Field(...,title="file_size", description="")
+    file_path : FilePathStr = Field(..., title="file_path", description="file_id")
+    file_url : FileUrlStr = Field(..., title="file_url", description="file_id")
+    file_storage_provider: FileStorageProviderStr = Field(..., title="file_url", description="file_id")
+    file_format_type: FileFormatTypeStr = Field(...,title="file_format_type", description="")
     file_metadata: Optional[dict] = Field(None,title="file_metadata", description="")
 
-    uploaded_by: Annotated[
-                    Optional[str],
-                    StringConstraints(
-                        strip_whitespace=True,
-                        to_upper=None,
-                        to_lower=None,
-                        strict=None,
-                        max_length=None,
-                        min_length=None,
-                        pattern=None,
-                    ),
-    ] = Field(None, title="file_url", description="file_id")
+    file_language: LanguageStr  = Field(...,title="file_format_type", description="")
+    upload_by: IdentifierStr = Field(..., title="uploadeer user id",description=" user upload.")
 
-
-
-
-
-
-class FileCreateSchema(BaseFileSchema):
-    pass
 
 
 class FilePointerResponseSchema(BaseResponseSchema):
-    data: BaseFileSchema
+    data: FilePointerSchema
 
 class FilePointersResponseSchema(BaseResponseSchema):
-    data: List[BaseFileSchema]
+    data: List[FilePointerSchema]
 
+class PublicFilePointerResponseSchema(BaseResponseSchema):
+    data: PublicFilePointerSchema
+
+class PublicFilePointersResponseSchema(BaseResponseSchema):
+    data: List[PublicFilePointerSchema]
 

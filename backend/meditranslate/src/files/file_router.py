@@ -41,13 +41,12 @@ async def get_file(
 async def upload_file(
     current_user: CurrentUserDep,
     file: Annotated[UploadFile, File(description="A file read as UploadFile")],
-    # file_create_form_schema: Annotated[FileCreateSchema,Form(...,media_type="multipart/form-data")], # TODO change this FORM is not working
     file_controller: FileController = Depends(Factory.get_file_controller),
 )-> FilePointerResponseSchema:
     """
     Upload File
     """
-    file = await file_controller.upload_file(file,current_user)
+    file = await file_controller.upload_file(current_user,file)
     return FilePointerResponseSchema(
         data=file,
         status_code=201,

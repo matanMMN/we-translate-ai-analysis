@@ -46,17 +46,13 @@ async def get_current_user(user_controller: Annotated[UserController,Depends(Fac
     try:
         token_data:JWTPayload = JWTPayload(**payload)
         data = JWTData(**token_data.data)
-        logger.error(data)
         user_id = data.user_id
-        logger.error("user_id")
-        logger.error(user_id)
     except Exception as e:
         logger.error(f"exception in parsing jwt data after successful decoding {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"unauth",
         )
-    logger.error(user_id)
     user = await user_controller.get_user(user_id,raise_exception=False,is_public=False)
     if user is None:
         raise HTTPException(

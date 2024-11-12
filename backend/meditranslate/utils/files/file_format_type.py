@@ -1,14 +1,6 @@
 from enum import Enum
 
 
-class FileFormatType(str, Enum):
-    TXT = "txt"
-    PDF = "pdf"
-    PNG = "png"
-    JPG = "jpg"
-    JPEG = "jpeg"
-    GIF = "gif"
-
 class FileFormatType(str,Enum):
     PDF = "pdf"
     DOCX = "docx"
@@ -16,3 +8,7 @@ class FileFormatType(str,Enum):
     HTML = "html"
     MD = "md"
     TXT = "txt"
+    PNG = "png"
+    JPG = "jpg"
+    JPEG = "jpeg"
+    GIF = "gif"

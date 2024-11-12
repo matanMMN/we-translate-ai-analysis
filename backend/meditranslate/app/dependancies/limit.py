@@ -15,6 +15,7 @@ def rate_limiter_dependency(
     callback: Any = None
 ):
     # Check if pytest is imported
+    # Issue Pytest with fast-api-limiter
     if "pytest" in sys.modules:
         return Depends(empty_dependency("fastapi limmiter"))
 

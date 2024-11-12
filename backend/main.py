@@ -30,7 +30,7 @@ def log_env():
             "python version:":PYTHON_VERSION,
             "current dir":ROOT_DIR,
             "env": config.ENVIRONMENT,
-            "env_data":{key: value for key, value in os.environ.items()}
+            # "env_data":{key: value for key, value in os.environ.items()}
         }
         logger.info(f"""\n\nENVIRONMENT LOG\n{json.dumps(envrioment_log,indent=2)}""")
 
@@ -41,8 +41,7 @@ def log_app(_app:FastAPI):
             "host":config.APP_HOST,
             "port":config.APP_PORT,
             "docs":_app.docs_url,
-            "license": app.license_info
-
+            # "license": app.license_info
         }
         logger.info(f"""\n\nAPPLICATION LOG\n{json.dumps(app_log,indent=2)}""")
 

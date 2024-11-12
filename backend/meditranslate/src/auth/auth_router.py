@@ -27,7 +27,13 @@ auth_router = APIRouter(
 
 )
 async def register_user(
-    user_create_schema: Annotated[RegisterUserSchema,Body()],
+    user_create_schema: Annotated[RegisterUserSchema,Body(example={
+            "email" : "string@string.com",
+            "username": "string",
+            "password" : "string",
+            "first_name":"example",
+            "last_name":"example"
+        })],
     auth_controller: AuthController = Depends(Factory.get_auth_controller)
 )-> UserResponseSchema:
     """

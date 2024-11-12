@@ -33,8 +33,13 @@ class User(Base):
     @property
     def full_name(self)-> Optional[str]:
         if self.first_name and self.last_name:
-            return f"{self.first_name} {self.last_name}"
-        return None
+            return f"{self.first_name.capitalize()} {self.last_name.capitalize()}"
+        elif self.first_name:
+            return f"{self.first_name.capitalize()}"
+        elif self.last_name:
+            return f"{self.last_name.capitalize()}"
+        else:
+            return None
 
     def __repr__(self):
         return f"<User(id={self.id}, username={self.username}, email={self.email})>"

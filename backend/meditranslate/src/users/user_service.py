@@ -19,7 +19,11 @@ class UserService(BaseService[User]):
 
     def _to_public(self,user:User) -> dict:
         public_user = user.as_dict()
-        public_user.pop("hashed_password")
+        public_user.pop("hashed_password",None)
+        if user.created_by_user is not None:
+            public_user['created_by_user'] = user.created_by_user.full_name
+        if user.created_by_user is not None:
+            public_user['updated_by_user'] = user.updated_by_user.full_name
         return public_user
 
 
@@ -27,10 +31,11 @@ class UserService(BaseService[User]):
         user = await self.user_repository.get_by(field="username",value=username,joins=None,unique=True)
         return user
 
-    async def create_user(self,user_create_schema: UserCreateSchema) -> User:
-
+    async def create_user(self,current_user:User,user_create_schema: UserCreateSchema) -> User:
         new_user_data = user_create_schema.model_dump()
         password = new_user_data.pop("password",None)
+        new_user_data['created_by'] = current_user.id
+        new_user_data['updated_by'] = current_user.id
         new_user_data['hashed_password'] = hash_password(password)
         new_user = await self.user_repository.create(new_user_data)
         public_user = self._to_public(new_user)
@@ -54,21 +59,27 @@ class UserService(BaseService[User]):
         else:
             return user
 
-    async def update_user(self,user_id: str, user_update_data: UserUpdateSchema) -> None:
-        update_user_data = user_update_data.model_dump()
-        password = update_user_data.pop("password",None)
-        update_user_data.pop("id",None)
+    async def update_user(self,current_user:User,user_id: str, user_update_data: UserUpdateSchema) -> None:
+        _update_user_data = user_update_data.model_dump()
+
+        password = _update_user_data.pop("password",None)
+        _update_user_data.pop("id",None)
+
+
         if password is not None:
-            update_user_data['hashed_password'] = hash_password(password)
+            _update_user_data['hashed_password'] = hash_password(password)
         user = await self.user_repository.get_by("id",user_id,unique=True)
         if not user:
             raise AppError(
                 title="update user endpoint",
                 http_status=HTTPStatus.NOT_FOUND,
             )
-        return await self.user_repository.update(user,update_user_data)
 
-    async def delete_user(self,user_id: str) -> None:
+        _update_user_data['updated_by'] = current_user.id
+        _update_user_data = {key: value for key, value in _update_user_data.items() if value is not None}
+        return await self.user_repository.update(user,_update_user_data)
+
+    async def delete_user(self,current_user:User,user_id: str) -> None:
         user = await self.user_repository.get_by("id",user_id,unique=True)
         if not user:
             raise AppError(

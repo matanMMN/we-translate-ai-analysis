@@ -1,57 +1,27 @@
-from meditranslate.app.shared.schemas import BaseResponseSchema, BaseSchema,GetManySchema
+from meditranslate.app.shared.schemas import BaseResponseSchema, BaseSchema,GetManySchema,UserNameStr,PassWordStr,NameStr
 from typing import List,Optional,Dict,Any,Literal,Union
 from datetime import datetime,date
 from pydantic import BaseModel, EmailStr, Field,StringConstraints
 from typing_extensions import Annotated
 
-class LoginSchema(BaseSchema):
-    username:Annotated[str,StringConstraints()]
-    password:Annotated[str,StringConstraints()]
+AccessTokenStr = Annotated[str,StringConstraints()]
+TokenTypeStr =  Annotated[str,StringConstraints()] #Literal['Bearer']
 
-class TokenSchema(BaseModel):
-    access_token:str
-    token_type:str
+class LoginSchema(BaseSchema):
+    username:UserNameStr = Field(..., title="Email", description="User email address")
+    password:PassWordStr = Field(..., title="Email", description="User email address")
+
+class TokenSchema(BaseSchema):
+    access_token:AccessTokenStr = Field(..., title="Email", description="User email address")
+    token_type:TokenTypeStr = Field(..., title="Email", description="User email address")
+
+class RegisterUserSchema(BaseSchema):
+    email : EmailStr = Field(..., title="Email", description="User email address")
+    username :UserNameStr = Field(..., title="Username", description="User's username")
+    password : PassWordStr = Field(..., title="Password", description="Password")
+    first_name : Optional[NameStr] = Field(None, title="firstname", description="")
+    last_name : Optional[NameStr] = Field(None, title="lastname", description="")
+
 
 class TokenResponseSchema(BaseResponseSchema):
     data:TokenSchema
-
-
-class RegisterUserSchema(BaseModel):
-    email : Annotated[
-                    Optional[EmailStr],
-                    StringConstraints(
-                        strip_whitespace=True,
-                        to_upper=None,
-                        to_lower=None,
-                        strict=None,
-                        max_length=None,
-                        min_length=None,
-                        pattern=None,
-                    ),
-                ] = Field(None, title="Email", description="User email address")
-
-    username : Annotated[
-                    Optional[str],
-                    StringConstraints(
-                        strip_whitespace=True,
-                        to_upper=None,
-                        to_lower=None,
-                        strict=None,
-                        max_length=None,
-                        min_length=None,
-                        pattern=None,
-                    ),
-                ] = Field(None, title="Username", description="User's username")
-
-    password : Annotated[
-                    Optional[str],
-                    StringConstraints(
-                        strip_whitespace=True,
-                        to_upper=None,
-                        to_lower=None,
-                        strict=None,
-                        max_length=None,
-                        min_length=None,
-                        # pattern=r'^\+?[1-9]\d{1,14}$',
-                    ),
-                ] = Field(None, title="Password", description="Password")
