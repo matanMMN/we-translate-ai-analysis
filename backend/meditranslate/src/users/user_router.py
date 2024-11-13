@@ -72,7 +72,7 @@ async def get_user(
 
 
 @user_router.get(
-    "/me",
+    "/me/",
     response_model=UserResponseSchema,
     status_code=200,
 )
@@ -83,7 +83,8 @@ async def get_user_me(
     """
     Retrieve a user by their ID.
     """
-    user = await user_controller.get_user(current_user.id)
+    logger.info(current_user)
+    user = await user_controller.get_user(user_id=current_user.id,raise_exception=True,is_public=True)
     return UserResponseSchema(
         data=user,
         status_code=200,

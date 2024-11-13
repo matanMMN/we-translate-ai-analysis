@@ -13,6 +13,7 @@ from .auth_schemas import (
     TokenResponseSchema,
     RegisterUserSchema
 )
+from meditranslate.app.loggers import logger
 
 
 auth_router = APIRouter(
@@ -40,6 +41,7 @@ async def register_user(
     Create a new user.
     """
     new_user = await auth_controller.register_user(user_create_schema)
+    logger.debug(new_user)
     return UserResponseSchema(
         data=new_user,
         status_code=201

@@ -11,6 +11,7 @@ from meditranslate.src.users.user_schemas import (
     GetManySchema,
     UserUpdateSchema
 )
+from meditranslate.app.loggers import logger
 
 class UserService(BaseService[User]):
     def __init__(self, user_repository: UserRepository):
@@ -43,7 +44,7 @@ class UserService(BaseService[User]):
 
 
     async def get_user(self,user_id: str,raise_exception:bool=True,to_public:bool=True) -> Optional[User]:
-        user = await self.user_repository.get_by(field="id",value=user_id,joins=None,unique=True)
+        user = await self.user_repository.get_by(field="id",value=user_id,unique=True)
         if user is None:
             if raise_exception:
                 raise AppError(
