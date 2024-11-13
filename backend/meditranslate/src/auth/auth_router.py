@@ -49,7 +49,7 @@ async def register_user(
 @auth_router.post(
     "/token",
     response_model=TokenSchema,
-    status_code=200
+    status_code=200,
 )
 async def login(
     form_schema:Annotated[OAuth2PasswordRequestForm, Depends()],
@@ -67,4 +67,4 @@ async def login(
     login_schema = LoginSchema(username=form_schema.username,password=form_schema.password)
     access_token = await auth_controller.login(login_schema)
 
-    return TokenSchema(access_token=access_token,token_type="bearer").model_dump()
+    return TokenSchema(access_token=access_token,token_type="bearer")

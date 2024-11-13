@@ -47,7 +47,7 @@ services:
 
     networks:
       - backend_network
-      - monitoring_network_network
+      - monitoring_network
 
     command: sleep infinity
 
@@ -73,8 +73,8 @@ services:
       - "6379:6379"
     # environment:
     #   - REDIS_PASSWORD=my_redis_password
-    volumes:
-      - redis_data:/var/lib/redis/data
+    # volumes:
+    #   - redis_data:/var/lib/redis/data
     # command: ["redis-server", "--requirepass", "my_redis_password"]
     networks:
       - backend_network
@@ -93,8 +93,8 @@ services:
       - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
       - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
 
-    volumes:
-      - "rabbitmq_data:/bitnami"
+    # volumes:
+    #   - "rabbitmq_data:/bitnami"
     networks:
       - backend_network
 
@@ -201,95 +201,95 @@ services:
   #     - backend_network
   #     - monitoring_network
 
-  celery_worker:
-    restart: always  # Ensure Celery restarts if it crashes
-    container_name: celery-worker
-    stop_signal: SIGTERM
-    build:
-      context: ..
-      dockerfile: ./.docker/Dockerfile.base
-      args:
-        BASE_IMAGE: ${BASE_IMAGE}
-        PROJECT_ROOT: ..
-        DOCKER_ROOT: code
-        ENVIRONMENT: ${ENVIRONMENT}
-        USER: docker
-        USER_ID: 1234
-        GROUP_ID: 1234
-        GROUP: customgroup
-        ECHO: true
-        ECHO_SLEEP_SECONDS: 2
-        COPY_FILES: false
+  # celery_worker:
+  #   restart: always  # Ensure Celery restarts if it crashes
+  #   container_name: celery-worker
+  #   stop_signal: SIGTERM
+  #   build:
+  #     context: ..
+  #     dockerfile: ./.docker/Dockerfile.base
+  #     args:
+  #       BASE_IMAGE: ${BASE_IMAGE}
+  #       PROJECT_ROOT: ..
+  #       DOCKER_ROOT: code
+  #       ENVIRONMENT: ${ENVIRONMENT}
+  #       USER: docker
+  #       USER_ID: 1234
+  #       GROUP_ID: 1234
+  #       GROUP: customgroup
+  #       ECHO: true
+  #       ECHO_SLEEP_SECONDS: 2
+  #       COPY_FILES: false
 
-    environment:
-      - PYTHONUNBUFFERED=1
-      - PYTHONDONTWRITEBYTECODE=1
-      - RUN_IN_DOCKER=True
-      - DATABASE_URL=${DATABASE_URL}    # PostgreSQL
-      - CELERY_BACKEND_URL=${CELERY_BACKEND_URL}  # Redis
-      - CELERY_BROKER_URL=${CELERY_BROKER_URL}  # RabbitMQ
-      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
-      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
-      - ENVIRONMENT=${ENVIRONMENT}
-      - APP_HOST=${APP_HOST}
-      - APP_PORT=${APP_PORT}
-      - APP_DEBUG_PORT=${APP_DEBUG_PORT}
-      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-      - AWS_ENDPOINT_URL=${AWS_ENDPOINT_URL}
-      - BUCKET_NAME=${BUCKET_NAME}
-      - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
-      - AWS_REGION_NAME=${AWS_REGION_NAME}
-    depends_on:
-      - postgresql
-      - redis
-      - rabbitmq
-      - localstack
-      - backend
-    env_file:
-      - ../environments/.env.${ENVIRONMENT}
-    networks:
-      - backend_network
+  #   environment:
+  #     - PYTHONUNBUFFERED=1
+  #     - PYTHONDONTWRITEBYTECODE=1
+  #     - RUN_IN_DOCKER=True
+  #     - DATABASE_URL=${DATABASE_URL}    # PostgreSQL
+  #     - CELERY_BACKEND_URL=${CELERY_BACKEND_URL}  # Redis
+  #     - CELERY_BROKER_URL=${CELERY_BROKER_URL}  # RabbitMQ
+  #     - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+  #     - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
+  #     - ENVIRONMENT=${ENVIRONMENT}
+  #     - APP_HOST=${APP_HOST}
+  #     - APP_PORT=${APP_PORT}
+  #     - APP_DEBUG_PORT=${APP_DEBUG_PORT}
+  #     - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+  #     - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+  #     - AWS_ENDPOINT_URL=${AWS_ENDPOINT_URL}
+  #     - BUCKET_NAME=${BUCKET_NAME}
+  #     - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
+  #     - AWS_REGION_NAME=${AWS_REGION_NAME}
+  #   depends_on:
+  #     - postgresql
+  #     - redis
+  #     - rabbitmq
+  #     - localstack
+  #     - backend
+  #   env_file:
+  #     - ../environments/.env.${ENVIRONMENT}
+  #   networks:
+  #     - backend_network
 
-  celery_beat:
-    build:
-      context: .
-      dockerfile: ./compose/local/fastapi/Dockerfile
-    image: fastapi_celery_example_celery_beat
-    command: /start-celerybeat
-    volumes:
-      - .:/app
-    env_file:
-      - .env/.dev-sample
-    depends_on:
-      - redis
-      - db
+  # celery_beat:
+  #   build:
+  #     context: .
+  #     dockerfile: ./compose/local/fastapi/Dockerfile
+  #   image: fastapi_celery_example_celery_beat
+  #   command: /start-celerybeat
+  #   volumes:
+  #     - .:/app
+  #   env_file:
+  #     - .env/.dev-sample
+  #   depends_on:
+  #     - redis
+  #     - db
 
-  flower:
-    build:
-      context: .
-      dockerfile: ./compose/local/fastapi/Dockerfile
-    image: fastapi_celery_example_celery_flower
-    command: /start-flower
-    volumes:
-      - .:/app
-    env_file:
-      - .env/.dev-sample
-    ports:
-      - 5557:5555
-    depends_on:
-      - redis
-      - db
+  # flower:
+  #   build:
+  #     context: .
+  #     dockerfile: ./compose/local/fastapi/Dockerfile
+  #   image: fastapi_celery_example_celery_flower
+  #   command: /start-flower
+  #   volumes:
+  #     - .:/app
+  #   env_file:
+  #     - .env/.dev-sample
+  #   ports:
+  #     - 5557:5555
+  #   depends_on:
+  #     - redis
+  #     - db
 
 volumes:
   mongo_data:
   redis_data:
   pg_data:
-  rabbitmq_data:
+  # rabbitmq_data:
 
 networks:
   backend_network:
     driver: bridge
   monitoring_network:
-    name: backend-monitoring-network
+    name: monitoring_network
     driver: bridge
