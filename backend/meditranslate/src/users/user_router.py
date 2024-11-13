@@ -70,6 +70,27 @@ async def get_user(
     )
 
 
+
+@user_router.get(
+    "/me",
+    response_model=UserResponseSchema,
+    status_code=200,
+)
+async def get_user_me(
+    current_user: CurrentUserDep,
+    user_controller: UserController = Depends(Factory.get_user_controller)
+)-> UserResponseSchema:
+    """
+    Retrieve a user by their ID.
+    """
+    user = await user_controller.get_user(current_user.id)
+    return UserResponseSchema(
+        data=user,
+        status_code=200,
+        message="Retrieved User Successfully"
+    )
+
+
 @user_router.put(
     "/{user_id}",
     response_model=UserResponseSchema,

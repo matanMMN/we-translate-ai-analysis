@@ -20,7 +20,7 @@ class AppConfig(Config):
     )] = Field(os.environ.get("BUCKET_NAME","APP_BUCKET"))
 
 
-    JWT_EXPIRE_MINUTES: int = Field(os.environ.get("JWT_EXPIRE_MINUTES", 100),title="jwt expire",description="",gt=5)
+    JWT_EXPIRE_MINUTES: int = Field(os.environ.get("JWT_EXPIRE_MINUTES", 60 * 24 * 30),title="jwt expire",description="",gt=5)
     JWT_ALGORITHM: JWTAlgorithm = Field(JWTAlgorithm.HS256,title="jwt algo",description="",validate_default=True,repr=False)
 
     APP_DESCRIPTION:Annotated[str,StringConstraints(

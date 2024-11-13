@@ -15,6 +15,8 @@ from meditranslate.app.loggers import logger
 
 from fastapi import Depends
 from meditranslate.src.translations.translation_controller import TranslationController
+from meditranslate.src.users.user import User
+from meditranslate.app.worker.tasks.translate_file import translation_file_task
 
 translation_router = APIRouter(
     tags=["translations"],
@@ -80,4 +82,17 @@ async def translation_file(
     await translation_controller.translate_file(current_user,file_id,translation_file_schema)
 
 
-
+@translation_router.post(
+    path="/file/{file_id}/",
+    status_code=200
+)
+async def translation_file_with_worker(
+    current_user: CurrentUserDep,
+    file_id:str,
+    translation_file_schema: Annotated[TranslationFileSchema,Body()],
+    translation_controller: TranslationController = Depends(Factory.get_translation_controller)
+):
+    """
+    Create a new translation.
+    """
+    translation_file_task(current_user,file_id,translation_file_schema,translation_controller)
