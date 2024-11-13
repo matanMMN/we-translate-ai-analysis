@@ -54,12 +54,10 @@ class TranslationFileSchema(BaseSchema):
     source_language : Optional[LanguageStr]= Field(..., title="source_language", description="")
     target_language : Optional[LanguageStr] = Field(..., title="target_language", description="")
     target_file_format : Optional[FileFormatTypeStr] = Field(None, title="target_file_format", description="")
-    translation_metadata : Optional[Dict[str,str]] = Field(None, title="translation meta data", description="Unique identifier for the user")
 
 class TranslationTextSchema(TranslationLanguagesSchema):
     translation_job_id : Optional[IdentifierStr] = Field(None, title="translation_job_id", description="")
     input_text : InputTextStr= Field(..., title="input text", description="")
-    translation_metadata : Optional[Dict[str,str]] = Field(None, title="translation meta data", description="Unique identifier for the user")
 
 class TranslationOutputResponseSchema(BaseResponseSchema):
     data: OutputTextStr

@@ -1,4 +1,4 @@
-from meditranslate.app.shared.schemas import BaseResponseSchema, BaseSchema,GetManySchema,NameStr,FullNameStr,IdentifierStr,TranslationLanguagesSchema,UserIdentifiersModificationSchema,ObjectIdSchema,UserFullNamesModificationSchema,JsonStr
+from meditranslate.app.shared.schemas import BaseResponseSchema, BaseSchema,GetManySchema,NameStr,FullNameStr,IdentifierStr,TranslationLanguagesSchema,UserIdentifiersModificationSchema,ModificationTimestampSchema,ObjectIdSchema,UserFullNamesModificationSchema,JsonStr
 from typing import List,Optional,Dict,Any,Literal,Union
 from datetime import datetime,date
 from pydantic import BaseModel, HttpUrl,constr,field_validator,Field,EmailStr,StringConstraints,ConfigDict,Json
@@ -35,7 +35,7 @@ StatusStr = Annotated[
                 ]
 
 
-class PublicTranslationJobSchema(ObjectIdSchema,UserFullNamesModificationSchema,TranslationLanguagesSchema):
+class PublicTranslationJobSchema(ObjectIdSchema,UserFullNamesModificationSchema,TranslationLanguagesSchema,ModificationTimestampSchema):
     title : TitleStr = Field(..., title="", description="")
     description : DescriptionStr = Field(..., title="User ID", description="Unique identifier for the user")
     source_file_id : Optional[IdentifierStr] = Field(None, title="source file id", description="")
@@ -100,7 +100,7 @@ class PublicTranslationJobSchema(ObjectIdSchema,UserFullNamesModificationSchema,
     #                 ),
     #             ] = Field(None, title="", description="")
 
-class TranslationJobSchema(ObjectIdSchema,UserIdentifiersModificationSchema,UserFullNamesModificationSchema,TranslationLanguagesSchema):
+class TranslationJobSchema(ObjectIdSchema,UserIdentifiersModificationSchema,UserFullNamesModificationSchema,TranslationLanguagesSchema,ModificationTimestampSchema):
     title : TitleStr = Field(..., title="", description="")
     description : DescriptionStr = Field(..., title="User ID", description="Unique identifier for the user")
     data : dict = Field(..., title="data", description="Unique identifier for the user")

@@ -28,10 +28,10 @@ class TranslationService(BaseService[Translation]):
 
     def _to_public_translation(self,translation:Translation) -> dict:
         public_translation = translation.as_dict()
-        if translation.created_by_user is not None:
-            public_translation["created_by_user"] = translation.created_by_user.full_name
-        if translation.translation_job is not None:
-            public_translation["translation_job"] = translation.translation_job.title
+        # if translation.created_by_user is not None:
+        #     public_translation["created_by_user"] = translation.created_by_user.full_name
+        # if translation.translation_job is not None:
+        #     public_translation["translation_job"] = translation.translation_job.title
         return public_translation
 
     async def create_translation(self,current_user:User,translation_create_schema:TranslationCreateSchema) -> Translation:
