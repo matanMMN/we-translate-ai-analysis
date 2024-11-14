@@ -50,3 +50,5 @@ numpy
 
 
 pypandoc_binary
+pdfplumber
+python-docx

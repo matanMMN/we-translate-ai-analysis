@@ -1,9 +1,15 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from meditranslate.app.db import TranslationJob,User
+    
 from typing import Dict, Optional, TYPE_CHECKING
 from uuid import uuid4
 from sqlalchemy import Double, String, Text, DateTime, ForeignKey, UUID,JSON
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 from meditranslate.app.db import Base
+
 
 # Import models only for type checking to avoid circular imports
 # if TYPE_CHECKING:

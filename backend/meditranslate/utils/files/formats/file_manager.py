@@ -8,6 +8,3 @@ class FileManager:
 
     def create_file(self, text: str) -> BytesIO:
         raise NotImplementedError
-
-    def get_content_type(self) -> str:
-        raise NotImplementedError

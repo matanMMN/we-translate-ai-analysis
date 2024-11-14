@@ -27,6 +27,10 @@ class FileController(BaseController[File]):
     async def delete_file(self,file_id: str):
         return await self.file_service.delete_file(file_id)
 
+    @Transactional(propagation=Propagation.REQUIRED)
+    async def update_file(self,current_user:User,file_id: str,file:UploadFile):
+        return await self.file_service.update_file(current_user,file_id,file)
+
     async def get_many_files(self,files_get_many_schema:GetManySchema) -> Tuple[List[File],int]:
         return await self.file_service.get_many_files(files_get_many_schema)
 

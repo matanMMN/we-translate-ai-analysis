@@ -40,14 +40,7 @@ class TranslationController(BaseController[Translation]):
     @Transactional(propagation=Propagation.REQUIRED_NEW)
     async def translate_file(self,current_user:User,file_id:str,translation_file_schema:TranslationFileSchema):
         file = await self.file_service.get_file(file_id=file_id)
-        file_storage_stream, _ = await self.file_service.download_file(file_id)
-        file_stream = BytesIO()
-        while True:
-            chunk = file_storage_stream.read(1024)
-            if not chunk:
-                break
-            file_stream.write(chunk)
-        file_stream.seek(0)
+        file_stream, _ = await self.file_service.download_file_sync(file_id)
         translated_file_stream, new_file_name, content_type = await self.translation_service.translate_file(
             current_user,
             file,

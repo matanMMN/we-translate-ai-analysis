@@ -1,6 +1,6 @@
 services:
   backend:
-    container_name: wetranslate-testing
+    container_name: ${APP_CONTAINER_NAME}-testing
     build:
       context: ..
       dockerfile: ./.docker/Dockerfile.base
@@ -12,52 +12,17 @@ services:
     - "8000:8000"
     volumes:
       - ..:/code
+      - /code/meditranslate/later
+    command: ["python" , "-m", "pytest"]
     # command: ["pytest", "tests/test_runner.py"]
-    command: ["sleep", "infinity"]
+    # command: ["sleep", "infinity"]
     # command: ["sleep", "infinity"]
 
     # command: ["pytest", "tests/test_api_client.py"]
     # networks:
     #   - backend_network
 
-  # jmeter:
-  #   container_name: apache-jmeter
-  #   image: justb4/jmeter
-  #   volumes:
-  #     - ../services/jmeter/jmeter_data/test_plan.jmx:/test_plan.jmx
-  #     - ../services/jmeter/jmeter_data/results:/results
-  #   entrypoint: >
-  #     sh -c "jmeter -n -t /test_plan.jmx -l /results/results.jtl -e -o /results/reports"
-  #   networks:
-  #     - jmeter_network
 
-  # jenkins:
-  #   image: jenkins/jenkins:lts
-  #   container_name: jenkins-server
-  #   privileged: true
-  #   user: root
-  #   ports:
-  #     - "8080:8080"
-  #     - "50000:50000"
-  #   volumes:
-  #     - ../services/jenkins/jenkins_home:/var/jenkins_home
-  #     - /var/run/docker.sock:/var/run/docker.sock
+  # locust:
 
-  
-# volumes:
-#   jmeter_data:
-#     driver: local
-#     driver_opts:
-#       o: bind
-#       type: none
-#       device: ../services/jmeter/jmeter_data
 
-#   jenkins_home:
-#       driver: local
-#       driver_opts:
-#         o: bind
-#         type: none
-#         device: ../services/jenkins/jenkins_home
-
-# networks:
-#   backend_network:

@@ -14,5 +14,5 @@ pytest-dotenv
 faker
 # Additional Testing Tools
 httpx
-
+requests
 anyio

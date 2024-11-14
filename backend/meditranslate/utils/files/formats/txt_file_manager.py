@@ -11,6 +11,3 @@ class TxtFileManager(FileManager):
         file_content = text.encode('utf-8')
         file_stream = BytesIO(file_content)
         return file_stream
-
-    def get_content_type(self) -> str:
-        return "text/plain"

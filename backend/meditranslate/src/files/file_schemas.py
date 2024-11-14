@@ -99,6 +99,20 @@ class FilePointerCreateSchema(BaseSchema):
     upload_by: IdentifierStr = Field(..., title="uploadeer user id",description=" user upload.")
 
 
+class FilePointerUpdateSchema(BaseSchema):
+    original_file_name : OriginalFileNameStr  = Field(..., title="original_file_name ", description="")
+    file_name : FileNameStr = Field(..., title="file_name ID", description="Unique identifier for the user")
+    file_size : Union[float,int] = Field(...,title="file_size", description="")
+    file_path : FilePathStr = Field(..., title="file_path", description="file_id")
+    file_url : FileUrlStr = Field(..., title="file_url", description="file_id")
+    file_storage_provider: FileStorageProviderStr = Field(..., title="file_url", description="file_id")
+    file_format_type: FileFormatTypeStr = Field(...,title="file_format_type", description="")
+    file_metadata: Optional[dict] = Field(None,title="file_metadata", description="")
+
+    file_language: LanguageStr  = Field(...,title="file_format_type", description="")
+    upload_by: IdentifierStr = Field(..., title="uploadeer user id",description=" user upload.")
+    # updated_by: IdentifierStr = Field(..., title="uploadeer user id",description=" user upload.")
+
 
 class FilePointerResponseSchema(BaseResponseSchema):
     data: FilePointerSchema

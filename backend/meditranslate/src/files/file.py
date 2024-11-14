@@ -1,3 +1,8 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from meditranslate.app.db import User
+
 from meditranslate.app.db import Base
 from sqlalchemy import String, Boolean, DateTime,LargeBinary,JSON,Enum,Float,ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column,relationship

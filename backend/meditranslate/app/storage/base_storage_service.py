@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from io import BytesIO
 
 from fastapi import UploadFile
 
@@ -23,6 +24,10 @@ class BaseStorageService:
 
     def delete_file(self, file_path:str):
         """Deletes a file from the storage service."""
+        raise NotImplementedError
+
+    def download_file_sync(self,file_path:str) -> BytesIO:
+        """Downloads sync a file until complete from the storage service."""
         raise NotImplementedError
 
     def get_file(self, file_path:str):

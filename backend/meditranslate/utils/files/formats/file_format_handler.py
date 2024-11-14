@@ -1,4 +1,5 @@
 from io import BytesIO
+from meditranslate.utils.files.file_content_type import FileContentType
 from meditranslate.utils.files.file_format_type import FileFormatType
 from meditranslate.utils.files.formats.doc_file_manager import DocFileManager
 from meditranslate.utils.files.formats.docx_file_manager import DocxFileManager
@@ -16,6 +17,19 @@ class FileFormatHandler:
             FileFormatType.DOC: DocFileManager(),
             FileFormatType.HTML: HtmlFileManager()
         }
+        self.FORMAT_TO_MIME = {
+            FileFormatType.PDF: FileContentType.PDF.value,
+            FileFormatType.DOCX: FileContentType.DOCX.value,
+            FileFormatType.DOC: FileContentType.DOC.value,
+            FileFormatType.HTML: FileContentType.HTML.value,
+            FileFormatType.MD: FileContentType.MD.value,
+            FileFormatType.TXT: FileContentType.TXT.value,
+            FileFormatType.PNG: FileContentType.PNG.value,
+            FileFormatType.JPG: FileContentType.JPG.value,
+            FileFormatType.JPEG: FileContentType.JPEG.value,
+            FileFormatType.GIF: FileContentType.GIF.value
+        }
+
 
     def get_handler(self, file_format: FileFormatType) -> FileManager:
         """Return the appropriate handler based on file format type."""
@@ -37,6 +51,9 @@ class FileFormatHandler:
 
 
     def get_content_type(self,file_format:FileFormatType) -> str:
-        handler = self.get_handler(file_format)
-        return handler.get_content_type()
+        return self.FORMAT_TO_MIME.get(file_format, "application/octet-stream")
+    #     handler = self.get_handler(file_format)
+    #     return handler.get_content_type()
+
+    # def get_mime_type(self,file_format: FileFormatType) -> str:
 

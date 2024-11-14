@@ -1,3 +1,8 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from meditranslate.app.db import File,User,Translation
+
 from typing import Optional, TYPE_CHECKING,List
 from uuid import uuid4
 from sqlalchemy import Integer, String, Text, DateTime, ForeignKey, JSON, UUID,UniqueConstraint

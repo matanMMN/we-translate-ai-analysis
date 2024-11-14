@@ -1,8 +1,14 @@
+from enum import Enum
 
-# def get_content_type(self, file_extension: str) -> str:
-#     """Returns content type based on file extension."""
-#     return {
-#         "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-#         "pdf": "application/pdf",
-#         # Add other content types as needed
-#     }.get(file_extension, "application/octet-stream")
+
+class FileContentType(Enum):
+    PDF = "application/pdf"
+    DOCX = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    DOC = "application/msword"
+    HTML = "text/html"
+    MD = "text/markdown"
+    TXT = "text/plain"
+    PNG = "image/png"
+    JPG = "image/jpeg"
+    JPEG = "image/jpeg"
+    GIF = "image/gif"

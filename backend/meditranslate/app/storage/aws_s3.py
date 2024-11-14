@@ -1,3 +1,4 @@
+from io import BytesIO
 import os
 import boto3
 from botocore.client import Config
@@ -82,7 +83,8 @@ class AWSStorageService(BaseStorageService):
             return None
 
     def create_file_path(self,file_path:str) -> str:
-        return f"s3://{self.bucket_name}/{file_path}",
+        # return f"s3://{self.bucket_name}/{file_path}"
+        return file_path
 
 
     def upload_file(self, file: UploadFile, file_path: str):
@@ -99,15 +101,19 @@ class AWSStorageService(BaseStorageService):
 
     def get_file(self,file_path:str):
         try:
-            file_data = self.s3_resource.Object(self.bucket_name, file_path)
+            file_data = self.s3_resource.meta.client.head_object(Bucket=self.bucket_name, Key=file_path)
             return file_data
         except ClientError as e:
-            logger.error(f"Error getting '{file_path}' file:  {e}")
-            raise Exception(f"Failed to getting file: {e}")
+            if e.response["Error"]["Code"] == "404":
+                logger.error(f"File does not exisits '{file_path}' file:  {e}")
+            else:
+                raise e
+        return None
 
     def download_file(self, file_path:str):
+        file_obj  = self.get_file(file_path)
         try:
-            file_obj  = self.get_file(file_path)
+
             file_stream = file_obj.get()['Body']
             # file_stream = file_obj['Body']
             return file_stream
@@ -115,7 +121,21 @@ class AWSStorageService(BaseStorageService):
             logger.error(f"Error downloading '{file_path}' file:  {e}")
             raise Exception(f"Failed to getting file: {e}")
 
+    def download_file_sync(self,file_path:str) -> BytesIO:
+        file_stream = self.download_file(file_path)
+        complete_file_io = BytesIO()
+        while True:
+            chunk = file_stream.read(1024)
+            if not chunk:
+                break
+            complete_file_io.write(chunk)
+        complete_file_io.seek(0)
+        return complete_file_io
+
     def delete_file(self, file_path:str):
+        file_obj = self.get_file(file_path)
+        if file_obj is None:
+            raise Exception("file cannot be deleted , it does not exists")
         try:
             file_obj = self.s3_resource.Object(self.bucket_name, file_path)
             file_obj.delete()  # Delete the file from S3

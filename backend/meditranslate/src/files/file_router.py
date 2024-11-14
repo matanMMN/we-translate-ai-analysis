@@ -36,6 +36,20 @@ async def get_file(
         status_code=200,
     )
 
+@file_router.put("/{file_id}", response_model=FilePointerResponseSchema,status_code=200)
+async def update_file(
+    current_user: CurrentUserDep,
+    file_id: str,
+    file: Annotated[UploadFile, File(description="A file read as UploadFile")],
+    file_controller: FileController = Depends(Factory.get_file_controller)
+
+)-> FilePointerResponseSchema:
+    await file_controller.update_file(current_user,file_id,file)
+    updated_file = await file_controller.get_file(file_id)
+    return FilePointerResponseSchema(
+        data=updated_file,
+        status_code=200,
+    )
 
 @file_router.post("/upload/", response_model=FilePointerResponseSchema,status_code=201)
 async def upload_file(
