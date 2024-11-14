@@ -1,12 +1,13 @@
 'use server'
 
 import {revalidatePath} from 'next/cache'
-import path from 'path'
 import {getTextExtractor} from "office-text-extractor";
 import Anthropic from '@anthropic-ai/sdk';
 import {Document, Packer, Paragraph, TextRun} from 'docx';
 import JSZip from 'jszip';
 import {XMLSerializer, DOMParser} from '@xmldom/xmldom';
+import {Session} from "next-auth";
+import path from "path";
 
 interface TranslationResponse {
     success: boolean
@@ -223,51 +224,101 @@ async function translateWithLLM(text: string) {
         const endIndex = rawText.indexOf(endTag);
         return rawText.substring(startIndex, endIndex).trim();
     } else {
-        throw new Error(`Translation failed. Raw output: ${rawText}`);
+        // throw new Error(`Translation failed. Raw output: ${rawText}`);
+        throw new Error(`Translation failed.\nMake sure the source and target languages are accurate.`);
     }
 }
 
-export async function translateFile(formData: FormData): Promise<TranslationResponse> {
-    const file = formData.get('file') as File;
-    const targetLanguage = formData.get('targetLanguage') as string;
-    const projectId = formData.get('projectId') as string;
+export async function translateFile(formData: FormData, detectedLanguage: string, targetLanguage: string, projectId: string, session: Session): Promise<TranslationResponse> {
 
-    if (!file || !targetLanguage || !projectId) {
+    if (!formData || !detectedLanguage || !targetLanguage || !projectId) {
         return {success: false, error: 'Missing required fields'}
     }
 
+    const fileCopy = formData.get('file') as File;
+    const fileExt = path.extname(fileCopy.name).toLowerCase()
+    const type = determineType(fileExt)
+
+    // First send file and attach it to the project
+    // #1 Send file to back
+    const srcFileRes = await fetch('http://localhost:8000/files/upload/', {
+        headers: {
+            'Authorization': `Bearer ${session.accessToken}`,
+        },
+        method: 'POST',
+        body: formData
+    });
+    const srcFileData = await srcFileRes.json();
+
+    if (srcFileData.status_code !== 201)
+        return {success: false, error: 'Failed to process the file'}
+
+    // #2 Inject src file ID into project
+    const updateProject = await fetch(`http://localhost:8000/jobs/${projectId}/`, {
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.accessToken}`,
+            'accept': 'application/json'
+        },
+        method: 'PUT',
+        body: JSON.stringify({
+            source_file_id: srcFileData.data.id
+        })
+    })
+
+    const isUpdateSuccess = await updateProject.json()
+
+    if (isUpdateSuccess.status_code !== 200)
+        return {success: false, error: 'Failed to process the file'}
+
+    // #3 Translate the file - CURRENTLY DOESNT WORK
+    // const translationRes = await fetch(`http://localhost:8000/translations/file/${srcFileData.data.id}`, {
+    //     headers: {
+    //         'Content-Type': 'application/json',
+    //         'Authorization': `Bearer ${session.accessToken}`,
+    //         'accept': 'application/json'
+    //     },
+    //     method: 'POST',
+    //     body: JSON.stringify({
+    //         translation_job_id: isUpdateSuccess.data.id,
+    //         source_language: detectedLanguage,
+    //         target_language: targetLanguage,
+    //         target_file_format: fileExt
+    //     })
+    // })
+    //
+    // const isTranslationSuccess = await translationRes.json()
+    //
+    // if (isTranslationSuccess.status_code !== 200)
+    //     return {success: false, error: 'Failed to process the file'}
+
     try {
-        const fileExt = path.extname(file.name).toLowerCase()
-        const type = determineType(fileExt)
-        let content: string;
-        let buffer: Buffer;
-        const mockFileId = `${projectId}-translated-${Date.now()}`;
+        // let buffer: Buffer;
 
-        // Extract text content based on file type (keeping original decode logic)
-        switch (type) {
-            case 'application/pdf':
-                const pdfBlob = await decodePdfFile(file);
-                content = await pdfBlob.text();
-                break;
-            case 'text/plain':
-                const txtBlob = await decodeTxtFile(file);
-                content = await txtBlob.text();
-                break;
-            default:
-                buffer = Buffer.from(await file.arrayBuffer());
-                const docxContent = await extractDocxContentPreservingStructure(buffer);
-                content = docxContent.text;
-                const translatedContent = await translateWithLLM(content);
-                const newDocxBuffer = await createDocxWithPreservedStructure(buffer, translatedContent);
-                console.log(translatedContent)
-                return {
-                    success: true,
-                    fileId: mockFileId,
-                    mockBlob: newDocxBuffer.toString('base64'),
-                    blobType: type
-                };
+        // switch (type) {
+        // case 'application/pdf':
+        //     const pdfBlob = await decodePdfFile(fileCopy);
+        //     content = await pdfBlob.text();
+        //     break;
+        // case 'text/plain':
+        const txtBlob = await decodeTxtFile(fileCopy);
+        const content = await txtBlob.text();
+        // break;
+        // default:
+        //     buffer = Buffer.from(await file.arrayBuffer());
+        //     const docxContent = await extractDocxContentPreservingStructure(buffer);
+        //     content = docxContent.text;
+        //     const translatedContent = await translateWithLLM(content);
+        //     const newDocxBuffer = await createDocxWithPreservedStructure(buffer, translatedContent);
+        //     console.log(translatedContent)
+        //     return {
+        //         success: true,
+        //         fileId: mockFileId,
+        //         mockBlob: newDocxBuffer.toString('base64'),
+        //         blobType: type
+        //     };
 
-        }
+        // }
 
 
         const translatedContent = await translateWithLLM(content);
@@ -284,12 +335,13 @@ export async function translateFile(formData: FormData): Promise<TranslationResp
 
         return {
             success: true,
-            fileId: mockFileId,
+            fileId: srcFileData.data.id,
             mockBlob: encodedString,
             blobType: type
         };
 
-    } catch (error) {
+    } catch
+        (error) {
         console.error('Translation error:', error)
         return {
             success: false,

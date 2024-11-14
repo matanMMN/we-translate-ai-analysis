@@ -24,9 +24,9 @@ export default function Editor({
                                    dialogRef
                                }: EditorConfig) {
 
-    const session = useAppSelector(selectSession)
-    const {userSession, projectId} = session;
-    const {name: headerTitle} = session.project as Project
+    const project = useAppSelector(selectSession)
+    const {userSession, projectId} = project;
+    const {title: headerTitle} = project.project as Project
     const dispatch = useAppDispatch();
     const router = useRouter();
     const isInitialized = useRef(false);

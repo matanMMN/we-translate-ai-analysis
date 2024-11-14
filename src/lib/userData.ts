@@ -266,9 +266,9 @@ export interface Project {
     destFileId?: number | string;
     description: string,
     reference_file_id?: number | string;
-    name: string;
-    sourceLanguage: string;
-    destinationLanguage: string;
+    title: string;
+    source_language: string;
+    target_language: string;
     priority: number | string;
     status?: string;
     currentStepIndex?: number;

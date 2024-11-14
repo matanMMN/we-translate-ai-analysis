@@ -1,5 +1,4 @@
 import {DefaultSession} from "next-auth";
-import {User} from "@/lib/userData";
 
 declare module "next-auth" {
     interface Session {
@@ -9,6 +8,16 @@ declare module "next-auth" {
             email: string;
         } & DefaultSession["user"];
         userData?: User | undefined;
-        accessToken?: string
+        accessToken?: string | undefined;
+        tokenType?: string | undefined;
+        userId?: string | undefined
+    }
+
+    interface User {
+        name: string;
+        email: string;
+        tokenType: string;
+        accessToken: string;
+        userId?: string | undefined
     }
 }

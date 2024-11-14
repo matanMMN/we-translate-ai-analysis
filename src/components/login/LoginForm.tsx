@@ -45,7 +45,12 @@ export default function LoginForm(): ReactNode {
 
     const onSubmit = async (data: FormData) => {
         const {email, password} = data;
-        const res: SignInResponse | undefined = await signIn('credentials', {email, password, redirect: false, callbackUrl: '/'});
+        const res: SignInResponse | undefined = await signIn('credentials', {
+            email,
+            password,
+            redirect: false,
+            callbackUrl: '/'
+        });
         if (res?.ok)
             router.replace('/')
         else
@@ -58,7 +63,7 @@ export default function LoginForm(): ReactNode {
             <form onSubmit={form.handleSubmit(onSubmit)} className={"w-full"}>
                 <EmailInput form={form}/>
                 <PasswordInput form={form}/>
-                {error || ""}
+                <div className="flex font-bold text-red-500">{error || ""}</div>
                 <Grid container justifyContent="space-between">
                     <FormControlLabel control={<Checkbox value="remember" color="primary"/>}
                                       label="Remember me"/>

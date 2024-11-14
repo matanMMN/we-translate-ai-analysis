@@ -9,31 +9,44 @@ import {revalidatePath} from "next/cache";
 
 export const fetchProjects = async (): Promise<Project[]> => {
     try {
-        const projects = await import('@/data/userData.json');
-        return projects.default.map((project) => ({
-            ...project,
-            dueDate: project.dueDate ? new Date(project.dueDate).toLocaleDateString("en") : undefined,
-            createdAt: project.createdAt ? new Date(project.createdAt).toLocaleDateString("en") : undefined,
-            updatedAt: project.updatedAt ? new Date(project.updatedAt).toLocaleDateString("en") : undefined,
+        const user = await getUser();
+        const res = await fetch(`http://localhost:8000/jobs?offset=0&sort_order=asc"}`, {
+            headers: {
+                'accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${user?.accessToken}`
+            }
+        })
 
-        }))
+        const projects = await res.json();
+        // const projects = await import('@/data/userData.json');
+        // return projects.default.map((project) => ({
+        //     ...project,
+        //     dueDate: project.dueDate ? new Date(project.dueDate).toLocaleDateString("en") : undefined,
+        //     createdAt: project.createdAt ? new Date(project.createdAt).toLocaleDateString("en") : undefined,
+        //     updatedAt: project.updatedAt ? new Date(project.updatedAt).toLocaleDateString("en") : undefined,
+        //
+        // }))
+        if (projects.status_code === 200)
+            return projects.data;
+        else throw new Error("Failed to fetch user projects")
     } catch (error) {
         console.error('Error fetching projects:', error);
         return []
     }
 }
+//
+// export async function getUserProjects() {
+//     const user = await getUser();
+//     return user?.userData?.allProjects
+//
+// }
 
-export async function getUserProjects() {
-    const user = await getUser();
-    return user?.userData?.allProjects
-
-}
-
-
-export async function getUserProject(projectId: string) {
-    const user = await getUser();
-    return user?.userData?.allProjects?.find((p: Project) => p.id == projectId)
-}
+//
+// export async function getUserProject(projectId: string) {
+//     const user = await getUser();
+//     return user?.userData?.allProjects?.find((p: Project) => p.id == projectId)
+// }
 
 export const saveNewProject = async (project: Project): Promise<boolean> => {
     try {
@@ -59,28 +72,45 @@ export const saveNewProject = async (project: Project): Promise<boolean> => {
 
 export const fetchProjectById = async (projectId: string): Promise<Project | null> => {
     try {
-        // Get the path to the JSON file
-        const filePath = path.join(process.cwd(), 'src', 'data', 'userData.json');
-
-        // Read projects file
-        const fileContent = await fs.readFile(filePath, 'utf-8');
-        const projects: Project[] = JSON.parse(fileContent);
-
-        // Find the specific project
-        const project = projects.find(p => p.id.toString() === projectId.toString());
-
-        if (!project) {
-            console.log(`Project with ID ${projectId} not found`);
-            return null;
-        }
-
-        // Format dates if they exist
-        return {
-            ...project,
-            createdAt: project.createdAt ? new Date(project.createdAt).toLocaleDateString("en") : undefined,
-            updatedAt: project.updatedAt ? new Date(project.updatedAt).toLocaleDateString("en") : undefined,
-            dueDate: project.dueDate ? new Date(project.dueDate).toLocaleDateString("en") : undefined,
-        };
+        const user = await getUser();
+        const res = await fetch(`http://localhost:8000/jobs/${projectId}`, {
+            headers: {
+                'accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${user?.accessToken}`
+            }
+        })
+        const project = await res.json();
+        if (project.status_code === 200)
+            return {
+                ...project.data,
+                dueDate: project.data.dueDate ? new Date(project.data.dueDate).toLocaleDateString("en") : new Date(Date.now()).toLocaleDateString("en"),
+                createdAt: project.data.createdAt ? new Date(project.data.createdAt).toLocaleDateString("en") : new Date(Date.now()).toLocaleDateString("en"),
+                updatedAt: project.data.updatedAt ? new Date(project.data.updatedAt).toLocaleDateString("en") : new Date(Date.now()).toLocaleDateString("en"),
+            }
+        else throw new Error("Failed to fetch project")
+        // // Get the path to the JSON file
+        // const filePath = path.join(process.cwd(), 'src', 'data', 'userData.json');
+        //
+        // // Read projects file
+        // const fileContent = await fs.readFile(filePath, 'utf-8');
+        // const projects: Project[] = JSON.parse(fileContent);
+        //
+        // // Find the specific project
+        // const project = projects.find(p => p.id.toString() === projectId.toString());
+        //
+        // if (!project) {
+        //     console.log(`Project with ID ${projectId} not found`);
+        //     return null;
+        // }
+        //
+        // // Format dates if they exist
+        // return {
+        //     ...project,
+        //     createdAt: project.createdAt ? new Date(project.createdAt).toLocaleDateString("en") : undefined,
+        //     updatedAt: project.updatedAt ? new Date(project.updatedAt).toLocaleDateString("en") : undefined,
+        //     dueDate: project.dueDate ? new Date(project.dueDate).toLocaleDateString("en") : undefined,
+        // };
 
     } catch (error) {
         console.error('Error fetching project:', error);

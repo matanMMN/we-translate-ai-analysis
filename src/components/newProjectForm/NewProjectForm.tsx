@@ -9,7 +9,6 @@ import FormField from './FormField';
 import {Button} from '@/components/ui/button';
 import {useRouter} from 'next/navigation';
 import {toast} from 'sonner';
-import {saveNewProject} from '@/actions/getUserProjects';
 import {createNewProject} from '@/lib/projectFactory';
 import {useSession} from 'next-auth/react';
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
@@ -18,7 +17,7 @@ import {AlertCircle} from "lucide-react";
 import {cn} from "@/lib/utils";
 
 const formSchema = z.object({
-    name: z.string()
+    title: z.string()
         .min(3, {message: "Name must be at least 3 characters"})
         .max(50, {message: "Name must be less than 50 characters"})
         .regex(/^[a-zA-Z0-9\s-]+$/, {
@@ -36,7 +35,7 @@ const formSchema = z.object({
     destinationLanguage: z.enum(["en", "he", "ar"], {
         required_error: "Please select a target language",
     }),
-    referenceFile: z.string().min(1, {message: "Reference file is required"}),
+    referenceFile: z.instanceof(File, {message: "Reference file is required"}),
 }).refine(
     (data) => data.sourceLanguage !== data.destinationLanguage,
     {
@@ -71,7 +70,6 @@ type FormFieldConfig = {
 export default function NewProjectForm() {
     const router = useRouter();
     const {data: session} = useSession();
-    const currentUser = session?.userData
     const [showUploadModal, setShowUploadModal] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
@@ -80,18 +78,18 @@ export default function NewProjectForm() {
         resolver: zodResolver(formSchema),
         mode: 'onChange',
         defaultValues: {
-            name: '',
+            title: '',
             description: '',
             industry: undefined,
             sourceLanguage: undefined,
             destinationLanguage: undefined,
-            referenceFile: ''
+            referenceFile: undefined
         },
     });
 
     const formFields: FormFieldConfig[] = useMemo<FormFieldConfig[]>(() => [
         {
-            name: 'name',
+            name: 'title',
             label: 'Project Name',
             type: 'input' as const,
             placeholder: 'Enter project name',
@@ -133,7 +131,7 @@ export default function NewProjectForm() {
     const handleUpload = (files: File[]) => {
         if (files.length > 0) {
             setSelectedFile(files[0])
-            form.setValue('referenceFile', files[0].name)
+            form.setValue('referenceFile', files[0])
             setShowUploadModal(false)
         }
     }
@@ -148,18 +146,17 @@ export default function NewProjectForm() {
         setIsSubmitting(true);
 
         try {
-            if (!currentUser) {
+            if (!session) {
                 throw new Error('User not found');
             }
-
             const newProject = await createNewProject({
                 ...data,
-                currentUser
+                accessToken: session.accessToken
             });
 
-            const isSaved = await saveNewProject(newProject);
+            // const isSaved = await saveNewProject(newProject);
 
-            if (isSaved) {
+            if (newProject) {
                 toast.success('Project created successfully');
                 router.back();
                 setTimeout(() => {
@@ -168,11 +165,11 @@ export default function NewProjectForm() {
             }
         } catch (error) {
             console.error('Failed to create project:', error);
-            toast.error('Failed to create project');
+            toast.error(`${error}`);
         } finally {
             setIsSubmitting(false);
         }
-    }, [selectedFile, currentUser, router]);
+    }, [selectedFile, session, router]);
 
     return (
         <Card className="w-full max-w-md">

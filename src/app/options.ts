@@ -1,7 +1,5 @@
-import {NextAuthOptions, Session} from "next-auth";
+import {NextAuthOptions} from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import ApiClient from "@/lib/ApiClient";
-import {user, User} from "@/lib/userData";
 import {encode as defaultEncode, JWTEncodeParams} from "next-auth/jwt";
 
 
@@ -26,21 +24,57 @@ export const authOptions: NextAuthOptions = {
                         return null;
                     const {email, password} = credentials;
 
-                    if (!email || !password || email !== "admin" || password !== "admin") {
+                    if (!email || !password) {// || email !== "admin" || password !== "admin") {
                         throw new Error('Invalid credentials');
                     }
 
-                    const res: User = await ApiClient.login(email, password);
+                    // const res: User = await ApiClient.login(email, password);
+                    console.log(email, password)
+                    const data = await fetch('http://localhost:8000/auth/token', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'accept': 'application/json',
+                        },
+                        body: new URLSearchParams({
+                            grant_type: 'password',
+                            username: email,
+                            password: password,
+                            scope: '',
+                            client_id: 'string',
+                            client_secret: 'string'
+                        })
+                    })
+                    const res = await data.json()
 
-                    if (!res) {
+                    if (!res.access_token) {
                         throw new Error('User not found');
                     }
+                    console.log("Res", res)
+                    const userRes = await fetch(`http://localhost:8000/users/me/`, { // default user
+                        headers: {
+                            'accept': 'application/json',
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${res.access_token}`
+                        }
+                    })
+                    const user = await userRes.json()
+                    console.log(user)
+                    if (user.status_code !== 200)
+                        throw new Error("User not found")
 
                     return {
-                        userId: res.id,
-                        name: res.first_name,
-                        email: res.email,
-                    } as unknown as User;
+                        name: (user.data.first_name + " " + user.data.last_name) || "Null Null",
+                        email: user.data.email || "null@email.com",
+                        userId: user.data.id,
+                        accessToken: res.access_token,
+                        tokenType: res.token_type,
+                    } as any
+                    // return {
+                    //     userId: res.id,
+                    //     name: res.first_name,
+                    //     email: res.email,
+                    // } as unknown as User;
 
                 } catch (e) {
                     throw e;
@@ -52,20 +86,49 @@ export const authOptions: NextAuthOptions = {
         signIn: '/login',
     },
     callbacks: {
-        async session(props: { session: Session; }) {
-            const {session} = props;
+        async session({session, token}) {
 
-            session.accessToken = user.accessToken
-            session.userData = {...user} as unknown as User
+            if (token) {
+                session.accessToken = token.access_token as string;
+                session.tokenType = token.token_type as string;
+                session.userId = token.userId as string
+            }
+
+            const userRes = await fetch(`http://localhost:8000/users/me/`, { // default user
+                headers: {
+                    'accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token.access_token}`
+                }
+            });
+            const user: { status_code: number, data: { first_name: string, last_name: string } } = await userRes.json();
+
+            if (user.status_code !== 200) {
+                throw new Error("User not found");
+            }
+
+            if (user.data.first_name && user.data.last_name) {
+                const newName = user.data.first_name + " " + user.data.last_name
+                if (session.user.name !== newName)
+                    session.user.name = newName;
+            }
 
             return session;
-        },
+        }
+        ,
+        async jwt({token, user}) {
+            if (user) {
+                token.access_token = user.accessToken;
+                token.token_type = user.tokenType;
+                token.userId = user.userId
+            }
+
+            return token;
+        }
     },
     jwt: {
         encode: async (params: JWTEncodeParams) => {
-            if (!params.token?.credentials)
-                return defaultEncode(params);
-            return defaultEncode(params)
+            return defaultEncode(params);
         }
     },
 }

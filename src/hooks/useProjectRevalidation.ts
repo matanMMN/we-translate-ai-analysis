@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectSession, setSessionSlice } from '@/store/slices/sessionSlice';
-import { getUserProject } from '@/actions/getUserProjects';
+import {fetchProjectById} from '@/actions/getUserProjects';
 import { cacheProject } from '@/store/slices/projectCacheSlice';
 
 export const useProjectRevalidation = (projectId: string) => {
@@ -10,7 +10,7 @@ export const useProjectRevalidation = (projectId: string) => {
 
     const revalidateProject = useCallback(async () => {
         try {
-            const freshProject = await getUserProject(projectId);
+            const freshProject = await fetchProjectById(projectId);
             if (freshProject) {
                 dispatch(setSessionSlice({ ...session, project: freshProject }));
                 dispatch(cacheProject({ projectId, project: freshProject }));

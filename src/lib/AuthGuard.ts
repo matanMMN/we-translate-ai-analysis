@@ -49,6 +49,10 @@ export const verifySession = async () => {
 //     }
 // }
 
+export const getSession = async () => {
+    return await getServerSession(authOptions)
+}
+
 export const getUser = async () => {
 
 

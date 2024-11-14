@@ -1,6 +1,6 @@
 'use client'
 
-import {useState, useEffect} from 'react'
+import {useState} from 'react'
 import {toast} from 'sonner'
 import {FileText, XCircle} from 'lucide-react'
 import {Button} from '@/components/ui/button'
@@ -11,8 +11,10 @@ import {detectFileLanguage} from '@/actions/detectLanguage'
 import {translateFile} from '@/actions/translateFile'
 import {useAppDispatch} from '@/hooks/useAppDispatch'
 import {useAppSelector} from '@/hooks/useAppSelector'
-import {setTranslatedFile, selectProjectId, initializeProject} from '@/store/slices/projectSlice'
+import {setTranslatedFile} from '@/store/slices/projectSlice'
 import {useRouter} from 'next/navigation'
+import {useSession} from "next-auth/react";
+import {selectSession} from "@/store/slices/sessionSlice";
 
 const ACCEPTED_FILE_TYPES = {
     'application/pdf': ['.pdf'],
@@ -25,8 +27,9 @@ type TranslationState = 'idle' | 'uploading' | 'translating' | 'completed' | 'er
 
 export default function TranslateFile() {
     const dispatch = useAppDispatch()
+    const {data: session} = useSession()
     const router = useRouter()
-    const projectId = useAppSelector(selectProjectId)
+    const {projectId} = useAppSelector(selectSession)
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
     const [detectedLanguage, setDetectedLanguage] = useState<string | null>(null)
     const [targetLanguage, setTargetLanguage] = useState('')
@@ -34,18 +37,10 @@ export default function TranslateFile() {
     const [showConfirmDialog, setShowConfirmDialog] = useState(false)
     const [error, setError] = useState<string | null>(null)
 
-    // Initialize project if needed
-    useEffect(() => {
-        if (!projectId) {
-            // For development, use a mock project ID
-            dispatch(initializeProject({id: 'mock-project-1'}))
-        }
-    }, [projectId, dispatch])
 
     const handleFileSelect = async (file: File) => {
         try {
             setSelectedFile(file)
-            console.log(file)
             const formData = new FormData()
             formData.append('file', file)
             const language = await detectFileLanguage(formData)
@@ -58,7 +53,8 @@ export default function TranslateFile() {
     }
 
     const handleTranslate = async () => {
-        if (!selectedFile || !targetLanguage || !projectId) {
+
+        if (!selectedFile || !detectedLanguage || !targetLanguage || !projectId) {
             toast.error('Missing required data')
             return
         }
@@ -70,10 +66,9 @@ export default function TranslateFile() {
         try {
             const formData = new FormData()
             formData.append('file', selectedFile)
-            formData.append('targetLanguage', targetLanguage)
-            formData.append('projectId', projectId)
 
-            const response = await translateFile(formData)
+
+            const response = await translateFile(formData, detectedLanguage, targetLanguage, projectId, session!)
 
             if (response.success) {// && response.docxHash && response.fileId) {
                 // Save to localStorage if we have mock content

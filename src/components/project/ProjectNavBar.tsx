@@ -27,7 +27,7 @@ export default function ProjectNavBar({project}: { project: Project }) {
                 <div className="container py-4">
                     <div className="flex flex-wrap items-center gap-2 mb-4">
                         <FileText className="h-5 w-5"/>
-                        <h1 className="text-xl font-semibold">{project.name}</h1>
+                        <h1 className="text-xl font-semibold">{project.title}</h1>
                     </div>
 
                     <nav className="flex space-x-2">

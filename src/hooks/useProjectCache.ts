@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {RootState} from "@/store/store.types";
 import { cacheProject, removeFromCache } from '@/store/slices/projectCacheSlice';
-import { getUserProject } from '@/actions/getUserProjects';
+import {fetchProjectById} from '@/actions/getUserProjects';
 
 export const useProjectCache = () => {
     const dispatch = useDispatch();
@@ -22,7 +22,7 @@ export const useProjectCache = () => {
         }
 
         // Fetch fresh data if not cached or expired
-        const freshProject = await getUserProject(projectId);
+        const freshProject = await fetchProjectById(projectId);
         if (freshProject) {
             dispatch(cacheProject({ projectId, project: freshProject }));
         }

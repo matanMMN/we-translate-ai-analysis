@@ -2,7 +2,7 @@
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
 import {Badge} from "@/components/ui/badge";
 import {cn} from "@/lib/utils";
-import {getPriorityColor, getStatusColor} from "@/lib/functions";
+import {getPriority, getPriorityColor, getStatusColor} from "@/lib/functions";
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
 import {Button} from "@/components/ui/button";
 import {ChevronDown, ChevronUp, Edit2, Search, MoreVertical, Trash2} from "lucide-react";
@@ -15,8 +15,8 @@ import {useSession} from "next-auth/react";
 import LoadingLogoGif from "@/components/LoadingLogoGif";
 import {Project} from "@/lib/userData";
 import {useRouter} from "next/navigation";
-import { toast } from 'sonner';
-import { deleteProject } from '@/actions/deleteProject';
+import {toast} from 'sonner';
+import {deleteProject} from '@/actions/deleteProject';
 
 // export interface Project {
 //     id: string
@@ -34,9 +34,8 @@ export type SortConfig = {
 export default function ProjectTable({projects}: { projects: Project[] }) {
 
 
-    const {status} = useSession()
+    const {data: session, status} = useSession()
     const router = useRouter()
-    console.log(projects)
     const [sortConfig, setSortConfig] = useState<SortConfig>({key: null, direction: 'asc'})
     const parentRef = useRef<HTMLDivElement>(null)
     const [searchQuery, setSearchQuery] = useState('')
@@ -47,7 +46,7 @@ export default function ProjectTable({projects}: { projects: Project[] }) {
     useEffect(() => {
         if (debouncedQuery) {
             const results = projects?.filter(project =>
-                project.name.toLowerCase().includes(debouncedQuery.toLowerCase())
+                project.title.toLowerCase().includes(debouncedQuery.toLowerCase())
             )
             setSearchResults(results ?? [])
             setShowResults(true)
@@ -121,7 +120,7 @@ export default function ProjectTable({projects}: { projects: Project[] }) {
     const handleDeleteProject = async (projectId: string) => {
         try {
             // Add your delete project action here
-            const response = await deleteProject(projectId);
+            const response = await deleteProject(projectId, session?.accessToken as string);
             if (response) {
                 toast.success('Project deleted successfully');
                 // Optionally refresh the projects list or remove from current list
@@ -159,19 +158,19 @@ export default function ProjectTable({projects}: { projects: Project[] }) {
                             >
                                 {searchResults.map((result) => (
                                     <motion.div
-                                        key={result.name}
+                                        key={result.title}
                                         initial={{opacity: 0}}
                                         animate={{opacity: 1}}
                                         exit={{opacity: 0}}
                                         className="px-4 py-2 transition-all duration-250 hover:bg-gray-300 cursor-pointer bg-[#98A7A3]"
                                         onClick={() => {
-                                            setSearchQuery(result.name)
+                                            setSearchQuery(result.title)
                                             setShowResults(false)
                                         }}
                                     >
-                                        <span className="font-normal">{result.name.slice(0, searchQuery.length)}</span>
+                                        <span className="font-normal">{result.title.slice(0, searchQuery.length)}</span>
                                         <span
-                                            className="text-white font-normal">{result.name.slice(searchQuery.length)}</span>
+                                            className="text-white font-normal">{result.title.slice(searchQuery.length)}</span>
                                     </motion.div>
                                 ))}
                             </motion.div>
@@ -194,11 +193,12 @@ export default function ProjectTable({projects}: { projects: Project[] }) {
                             <TableHeader className="sticky top-0 bg-gray-50 dark:bg-gray-900 z-10">
                                 <TableRow
                                     className="hover:bg-transparent">
-                                    <SortableHeader column={`${'project Name' as "name"}`} width="30%"/>
+                                    <SortableHeader column={`${'project Name' as "title"}`} width="30%"/>
                                     <SortableHeader column="priority" width="30%"/>
                                     <SortableHeader column="status" width="30%"/>
-                                    <TableHead style={{width: '10%'}}
-                                               className="text-lg">Actions</TableHead>
+                                    <TableHead style={{width: '10%'}}>
+                                        <span className={"text-2xl"}>Actions</span>
+                                    </TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody style={{
@@ -224,13 +224,13 @@ export default function ProjectTable({projects}: { projects: Project[] }) {
                                         >
 
                                             <TableCell onClick={() => router.push(`/${project.id}/details`)}
-                                                       className="text-lg hover:cursor-pointer max-w-[30%] w-full text-start">{project.name}</TableCell>
+                                                       className="text-lg hover:cursor-pointer max-w-[30%] w-full text-start">{project.title}</TableCell>
 
                                             <TableCell style={{width: '30%'}}
                                                        className="py-6 text-start w-full max-w-[30%]">
                                                 <Badge variant="secondary"
                                                        className={cn('text-base font-medium px-4 py-2 ', getPriorityColor(project.priority))}>
-                                                    {project.priority}
+                                                    {getPriority(project.priority)}
                                                 </Badge>
                                             </TableCell>
                                             <TableCell style={{width: '30%'}}
@@ -243,24 +243,25 @@ export default function ProjectTable({projects}: { projects: Project[] }) {
                                                        className="py-6 text-start w-full max-w-[30%]">
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger asChild>
-                                                        <Button 
-                                                            variant="ghost" 
+                                                        <Button
+                                                            variant="ghost"
                                                             size="icon"
                                                             className="hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full w-8 h-8"
                                                         >
-                                                            <MoreVertical className="w-4 h-4" />
+                                                            <MoreVertical className="w-4 h-4"/>
                                                         </Button>
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="end" className="w-[160px]">
-                                                        <DropdownMenuItem onClick={() => router.push(`/${project.id}/details`)}>
-                                                            <Edit2 className="mr-2 h-4 w-4" />
+                                                        <DropdownMenuItem
+                                                            onClick={() => router.push(`/${project.id}/details`)}>
+                                                            <Edit2 className="mr-2 h-4 w-4"/>
                                                             View Project
                                                         </DropdownMenuItem>
                                                         <DropdownMenuItem
                                                             className="text-red-600 focus:text-red-600"
                                                             onClick={() => handleDeleteProject(project.id as string)}
                                                         >
-                                                            <Trash2 className="mr-2 h-4 w-4" />
+                                                            <Trash2 className="mr-2 h-4 w-4"/>
                                                             Delete Project
                                                         </DropdownMenuItem>
                                                     </DropdownMenuContent>

@@ -21,8 +21,7 @@ export const handleFileLoad = async (
     if (!container.current) return;
 
     // Set current user
-    container.current.documentEditor.currentUser =
-        `${userSession?.userData?.first_name} ${userSession?.userData?.last_name}`;
+    container.current.documentEditor.currentUser = userSession?.user?.name as string
 
     try {
         const state = store.getState();
@@ -30,8 +29,11 @@ export const handleFileLoad = async (
         const currentFile = selectCurrentFile(state);
 
         // Check localStorage first
-        const savedContent = localStorage.getItem(`editorContent-${projectId}`);
-        const lastSaveTime = localStorage.getItem(`lastSaveTime-${projectId}`);
+        const savedContent = localStorage.getItem(`editorContent-${projectId}`
+        );
+        const lastSaveTime = localStorage.getItem(
+            `lastSaveTime-${projectId}`
+        );
 
         // If we have a lastModified timestamp from the backend/translation
         if (currentFile.lastModified) {
@@ -109,12 +111,15 @@ async function handlePdfContent(
     container: RefObject<DocumentEditorContainerComponent>,
     fileBlob: Blob
 ) {
-    container.current?.documentEditor.open(`data:application/pdf;base64,${fileBlob}`);
+    container.current?.documentEditor.open(
+        `data:application/pdf;base64,${fileBlob}`
+    );
     //
     // const pdfData = await fileBlob.arrayBuffer();
     // const pdfjsLib = await import('pdfjs-dist');
     // pdfjsLib.GlobalWorkerOptions.workerSrc =
-    //     `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+    //
+    //`cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
     //
     // const pdf = await pdfjsLib.getDocument({data: pdfData}).promise;
     // let textContent = '';
