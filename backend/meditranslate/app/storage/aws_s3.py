@@ -111,7 +111,10 @@ class AWSStorageService(BaseStorageService):
         return None
 
     def download_file(self, file_path:str):
-        file_obj  = self.get_file(file_path)
+        existing_file = self.get_file(file_path)
+        if not existing_file:
+            raise Exception("file should exsists")
+        file_obj = self.s3_resource.Object(self.bucket_name, file_path)
         try:
 
             file_stream = file_obj.get()['Body']
