@@ -40,7 +40,7 @@ class TranslationController(BaseController[Translation]):
     @Transactional(propagation=Propagation.REQUIRED_NEW)
     async def translate_file(self,current_user:User,file_id:str,translation_file_schema:TranslationFileSchema):
         file = await self.file_service.get_file(file_id=file_id)
-        file_stream, _ = await self.file_service.download_file_sync(file_id)
+        file_stream, _ ,_= await self.file_service.download_file_sync(file_id)
         translated_file_stream, new_file_name, content_type = await self.translation_service.translate_file(
             current_user,
             file,
@@ -52,6 +52,7 @@ class TranslationController(BaseController[Translation]):
             file=translated_file_stream,
             headers={
                 'Content-Type': content_type
+
             }
         )
         return await self.file_service.upload_file(current_user,upload_file)

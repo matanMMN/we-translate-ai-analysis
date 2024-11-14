@@ -75,12 +75,13 @@ async def download_file(
     Download File
     """
 
-    file_stream,filename = await file_controller.download_file(file_id)
+    file_stream,filename,mime_type = await file_controller.download_file(file_id)
     return StreamingResponse( # StreamingResponse more flexible and able to send any file size unlike FileResponse
         file_stream,
         media_type="application/octet-stream",
         headers={
-            "Content-Disposition":f"attachment; filename={filename}",
+            "Content-Disposition":f"attachment; filename*=UTF-8''{filename}",
+            "Content-Type": mime_type
         },
         status_code=200,
     )

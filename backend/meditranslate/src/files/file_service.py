@@ -68,12 +68,13 @@ class FileService(BaseService[File]):
                 http_status=HTTPStatus.NOT_FOUND
             )
         file_stream = self.storage_service.download_file(file_path=file.file_path)
-        content_preview = file_stream.read(100)
+        # content_preview = file_stream.read(100)
         logger.debug(f"""\n
             File Name: {file.original_file_name}
-            File preview Type": {content_preview}
+            File preview Type": content_preview
         """)
-        return file_stream, file.original_file_name
+        content_type = FileFormatHandler().get_content_type(FileFormatType(file.file_format_type))
+        return file_stream, file.original_file_name,content_type
 
     async def download_file_sync(self,file_id:str) -> BytesIO:
         file = await self.file_repository.get_by("id",file_id,unique=True)
@@ -83,7 +84,8 @@ class FileService(BaseService[File]):
                 http_status=HTTPStatus.NOT_FOUND
             )
         file_io = self.storage_service.download_file_sync(file_path=file.file_path)
-        return file_io, file.original_file_name
+        content_type = FileFormatHandler().get_content_type(FileFormatType(file.file_format_type))
+        return file_io, file.original_file_name,content_type
 
 
     def _is_valid_input_file(self,file_content:str):
