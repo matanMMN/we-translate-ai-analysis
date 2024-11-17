@@ -3,7 +3,7 @@
 import {createHash} from 'crypto';
 import path from "path";
 import fs from "fs/promises";
-import {Session} from "next-auth";
+import {getUser} from "@/lib/AuthGuard";
 
 interface EditorChangesResult {
     success: boolean;
@@ -18,13 +18,13 @@ export const handleEditorChanges = async (
     comments: string[],
     currentDocxHash: string | null,
     currentCommentsHash: string | null,
-    session: Session | null
 ): Promise<EditorChangesResult> => {
     try {
 
-        if (!session)
-            throw new Error('User is not authenticated')
-
+        const session = await getUser()
+        if (!session) {
+            return {success: false, error: 'Not authenticated'}
+        }
 
         // Convert blob to array buffer
         const arrayBuffer = await blob.arrayBuffer();

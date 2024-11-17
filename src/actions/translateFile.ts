@@ -203,7 +203,6 @@ async function translateWithLLM(text: string) {
     const anthropic = new Anthropic({
         apiKey: DEFAULT_SETTINGS.API_KEY,
     });
-    // console.log(text)
     const response: any = await anthropic.messages.create({
         model: DEFAULT_SETTINGS.MODEL,
         max_tokens: DEFAULT_SETTINGS.MAX_TOKENS,
@@ -322,12 +321,24 @@ export async function translateFile(formData: FormData, detectedLanguage: string
 
 
         const translatedContent = await translateWithLLM(content);
+        console.log(translatedContent)
         let encodedString: Blob | string;
         if (type === 'text/plain' || type === 'application/pdf') {
             encodedString = new Blob([translatedContent], {type});
         } else {
-            const newDocxBuffer = await createNewDocx(translatedContent);
-            encodedString = newDocxBuffer.toString('base64');
+            const test = await fetch('http://localhost:8000/files/download/85ffe83c-6679-4b4d-add9-b9c568fa5095', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session?.accessToken}`
+                }
+            })
+            console.log(test)
+            encodedString = await test.blob();
+
+
+            // const newDocxBuffer = await createNewDocx(translatedContent);
+            // encodedString = newDocxBuffer.toString('base64');
         }
 
 

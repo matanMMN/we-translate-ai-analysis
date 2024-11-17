@@ -1,3 +1,5 @@
+import {getUser} from "@/lib/AuthGuard";
+
 interface NewProjectData {
     title: string;
     description: string;
@@ -7,6 +9,7 @@ interface NewProjectData {
     referenceFile: File;
     accessToken: string | undefined;
 }
+
 
 export const createNewProject = async (data: NewProjectData) => {
 
@@ -28,7 +31,6 @@ export const createNewProject = async (data: NewProjectData) => {
 
     const fileId = await uploadRes.json();
 
-    console.log(fileId)
 
     if (uploadRes.status >= 400)
         throw new Error("Failed to upload reference file")
@@ -54,13 +56,15 @@ export const createNewProject = async (data: NewProjectData) => {
 
     const project = await res.json();
 
-
     if (project.status_code >= 400)
-        throw new Error("Failed to create project")
+        throw {
+            error: Error("Failed to create project"),
+            reason: 'Project name is already taken'
+        }
 
     if (project.status_code === 201) {
         const injectFileIdRes = await fetch(`http://localhost:8000/jobs/${project.data.id}`, {
-            method: 'POST',
+            method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
                 'accept': 'application/json',
@@ -69,11 +73,12 @@ export const createNewProject = async (data: NewProjectData) => {
             body: JSON.stringify({reference_file_id: fileId.data.id})
         })
         const projectData = await injectFileIdRes.json()
+        console.log(projectData)
         return {
             ...projectData.data,
             dueDate: project.data.dueDate ? new Date(projectData.data.dueDate).toLocaleDateString("en") : new Date(Date.now()).toLocaleDateString("en"),
             createdAt: project.data.createdAt ? new Date(projectData.data.createdAt).toLocaleDateString("en") : new Date(Date.now()).toLocaleDateString("en"),
-            updatedAt:  project.data.updatedAt ? new Date(projectData.data.updatedAt).toLocaleDateString("en") : new Date(Date.now()).toLocaleDateString("en"),
+            updatedAt: project.data.updatedAt ? new Date(projectData.data.updatedAt).toLocaleDateString("en") : new Date(Date.now()).toLocaleDateString("en"),
             // activities: project.data.activities.map((activity: any) => ({
             //     ...activity,
             //     timestamp: new Date(activity.timestamp).toLocaleDateString("en")
@@ -121,4 +126,18 @@ export const createNewProject = async (data: NewProjectData) => {
     //     approvedAt: undefined,
     //     approvedBy: undefined
     // };
-}; 
+};
+
+
+export const checkProjectName = async (name: string) => {
+    const user = await getUser()
+    const accessToken = user?.accessToken;
+    const res = await fetch(`http://localhost:8000/jobs`, {
+        headers: {
+            'accept': 'application/json',
+            'Authorization': `Bearer ${accessToken}`
+        }
+    });
+    const projects = await res.json();
+    return projects.data.some((project: any) => project.title === name);
+}

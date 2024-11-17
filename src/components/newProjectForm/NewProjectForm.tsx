@@ -9,7 +9,7 @@ import FormField from './FormField';
 import {Button} from '@/components/ui/button';
 import {useRouter} from 'next/navigation';
 import {toast} from 'sonner';
-import {createNewProject} from '@/lib/projectFactory';
+import {checkProjectName, createNewProject} from '@/lib/projectFactory';
 import {useSession} from 'next-auth/react';
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import UploadFileModal from "@/components/newProjectForm/UploadFileModal";
@@ -22,6 +22,10 @@ const formSchema = z.object({
         .max(50, {message: "Name must be less than 50 characters"})
         .regex(/^[a-zA-Z0-9\s-]+$/, {
             message: "Name can only contain letters, numbers, spaces, and hyphens"
+        }).refine(async (title: string) => {
+            return !(await checkProjectName(title))
+        }, {
+            message: "Project name already taken",
         }),
     description: z.string()
         .min(10, {message: "Description must be at least 10 characters"})
@@ -128,7 +132,8 @@ export default function NewProjectForm() {
         },
     ], [])
 
-    const handleUpload = (files: File[]) => {
+    const handleUpload = async (files: File[]) => {
+
         if (files.length > 0) {
             setSelectedFile(files[0])
             form.setValue('referenceFile', files[0])
@@ -137,6 +142,7 @@ export default function NewProjectForm() {
     }
 
     const onSubmit = useCallback(async (data: FormData) => {
+
 
         if (!selectedFile) {
             toast.error('Please select a reference file');
@@ -155,7 +161,7 @@ export default function NewProjectForm() {
             });
 
             // const isSaved = await saveNewProject(newProject);
-
+            console.log(newProject)
             if (newProject) {
                 toast.success('Project created successfully');
                 router.back();

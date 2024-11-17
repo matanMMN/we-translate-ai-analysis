@@ -39,6 +39,7 @@ export default function TranslateFile() {
 
 
     const handleFileSelect = async (file: File) => {
+
         try {
             setSelectedFile(file)
             const formData = new FormData()
@@ -72,7 +73,7 @@ export default function TranslateFile() {
 
             if (response.success) {// && response.docxHash && response.fileId) {
                 // Save to localStorage if we have mock content
-                if (response.mockBlob) { // In development it's  a txt file!
+                if (response.mockBlob) { // In development, it's  a txt file!
                     // Need to transform the blob to Sfdt content and save it to localStorage
 
                     // localStorage.setItem('editorContent', response.mockContent)

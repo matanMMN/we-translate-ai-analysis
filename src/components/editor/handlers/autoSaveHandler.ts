@@ -7,7 +7,6 @@ import store from '@/store/store';
 import {updateFileMetadata} from '@/store/slices/projectSlice';
 import {useSelector} from "react-redux";
 import {selectSession} from "@/store/slices/sessionSlice";
-import {useSession} from "next-auth/react";
 
 const LOCAL_SAVE_INTERVAL = 1000;   // 1 second
 const BACKEND_SAVE_INTERVAL = 30000; // 30 seconds
@@ -26,7 +25,6 @@ export const useAutoSave = (
     const backendSaveIntervalId = useRef<NodeJS.Timeout>();
     const isFirstSave = useRef(true);
     const {projectId} = useSelector(selectSession)
-    const {data: session} = useSession()
 
 
     useEffect(() => {
@@ -46,7 +44,7 @@ export const useAutoSave = (
                     replies: JSON.parse(JSON.stringify(comment.replies))
                 }));
 
-                const result = await handleEditorChanges(blob, comments as unknown as string[], docxHash, commentsHash, session);
+                const result = await handleEditorChanges(blob, comments as unknown as string[], docxHash, commentsHash);
 
                 console.log(result)
                 if (result.success) {

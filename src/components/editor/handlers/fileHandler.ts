@@ -164,7 +164,12 @@ async function handleDocxContent(
     container: RefObject<DocumentEditorContainerComponent>,
     fileBlob: Blob
 ) {
-    container.current?.documentEditor.open(fileBlob);
+    console.log("Got here")
+    const reader = new FileReader();
+    reader.readAsDataURL(fileBlob);
+    reader.onloadend = () => {
+        container.current?.documentEditor.open(reader.result);
+    };
 
 }
 
