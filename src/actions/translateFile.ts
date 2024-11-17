@@ -1,11 +1,7 @@
 'use server'
 
 import {revalidatePath} from 'next/cache'
-import {getTextExtractor} from "office-text-extractor";
 import Anthropic from '@anthropic-ai/sdk';
-import {Document, Packer, Paragraph, TextRun} from 'docx';
-import JSZip from 'jszip';
-import {XMLSerializer, DOMParser} from '@xmldom/xmldom';
 import {Session} from "next-auth";
 import path from "path";
 
@@ -18,111 +14,111 @@ interface TranslationResponse {
     blobType?: string,
     error?: string
 }
+//
+// interface DocxContent {
+//     text: string;
+//     documentXml: string;
+// }
 
-interface DocxContent {
-    text: string;
-    documentXml: string;
-}
+// async function extractDocxContentPreservingStructure(buffer: Buffer): Promise<DocxContent> {
+//     // Load the DOCX as a ZIP file
+//     const zip = new JSZip();
+//     await zip.loadAsync(buffer);
+//
+//     // Get the main document XML
+//     const documentXml = await zip.file('word/document.xml')?.async('text');
+//     if (!documentXml) {
+//         throw new Error('Could not find document.xml in DOCX file');
+//     }
+//
+//     // Parse the XML
+//     const parser = new DOMParser();
+//     const doc = parser.parseFromString(documentXml, 'text/xml');
+//
+//     // Extract only text content while preserving XML structure
+//     const textNodes: string[] = [];
+//     const wElements = doc.getElementsByTagName('w:t');
+//     for (let i = 0; i < wElements.length; i++) {
+//         const node = wElements[i];
+//         textNodes.push(node.textContent || '');
+//     }
+//
+//     return {
+//         text: textNodes.join(' '),
+//         documentXml: documentXml
+//     };
+// }
 
-async function extractDocxContentPreservingStructure(buffer: Buffer): Promise<DocxContent> {
-    // Load the DOCX as a ZIP file
-    const zip = new JSZip();
-    await zip.loadAsync(buffer);
+// async function injectTranslatedText(originalXml: string, translatedText: string): Promise<string> {
+//     const parser = new DOMParser();
+//     const serializer = new XMLSerializer();
+//     const doc = parser.parseFromString(originalXml, 'text/xml');
+//
+//     // Split translated text into chunks
+//     const translatedChunks = translatedText.split('\n').filter(chunk => chunk.trim());
+//     let chunkIndex = 0;
+//
+//     // Replace text content while preserving structure
+//     const wElements = doc.getElementsByTagName('w:t');
+//     for (let i = 0; i < wElements.length; i++) {
+//         const node = wElements[i];
+//         if (node.textContent?.trim()) {
+//             node.textContent = translatedChunks[chunkIndex] || '';
+//             chunkIndex++;
+//         }
+//     }
+//
+//     return serializer.serializeToString(doc);
+// }
 
-    // Get the main document XML
-    const documentXml = await zip.file('word/document.xml')?.async('text');
-    if (!documentXml) {
-        throw new Error('Could not find document.xml in DOCX file');
-    }
-
-    // Parse the XML
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(documentXml, 'text/xml');
-
-    // Extract only text content while preserving XML structure
-    const textNodes: string[] = [];
-    const wElements = doc.getElementsByTagName('w:t');
-    for (let i = 0; i < wElements.length; i++) {
-        const node = wElements[i];
-        textNodes.push(node.textContent || '');
-    }
-
-    return {
-        text: textNodes.join(' '),
-        documentXml: documentXml
-    };
-}
-
-async function injectTranslatedText(originalXml: string, translatedText: string): Promise<string> {
-    const parser = new DOMParser();
-    const serializer = new XMLSerializer();
-    const doc = parser.parseFromString(originalXml, 'text/xml');
-
-    // Split translated text into chunks
-    const translatedChunks = translatedText.split('\n').filter(chunk => chunk.trim());
-    let chunkIndex = 0;
-
-    // Replace text content while preserving structure
-    const wElements = doc.getElementsByTagName('w:t');
-    for (let i = 0; i < wElements.length; i++) {
-        const node = wElements[i];
-        if (node.textContent?.trim()) {
-            node.textContent = translatedChunks[chunkIndex] || '';
-            chunkIndex++;
-        }
-    }
-
-    return serializer.serializeToString(doc);
-}
-
-async function createDocxWithPreservedStructure(
-    buffer: Buffer,
-    translatedText: string
-): Promise<Buffer> {
-    const zip = new JSZip();
-
-    // Load original DOCX
-    await zip.loadAsync(buffer);
-
-    // Get and modify document.xml
-    const documentXml = await zip.file('word/document.xml')?.async('text');
-    if (!documentXml) {
-        throw new Error('Could not find document.xml in DOCX file');
-    }
-
-    // Inject translated text while preserving structure
-    const modifiedXml = await injectTranslatedText(documentXml, translatedText);
-
-    // Replace document.xml in the ZIP
-    zip.file('word/document.xml', modifiedXml);
-
-    // Generate new DOCX buffer
-    return await zip.generateAsync({type: 'nodebuffer'});
-}
-
-async function createNewDocx(translatedText: string): Promise<Buffer> {
-    // Split the text into paragraphs
-    const paragraphs = translatedText.split('\n').filter(p => p.trim());
-
-    // Create a new document
-    const doc = new Document({
-        sections: [{
-            properties: {},
-            children: paragraphs.map(text =>
-                new Paragraph({
-                    children: [
-                        new TextRun({
-                            text: text,
-                        }),
-                    ],
-                })
-            ),
-        }],
-    });
-
-    // Generate buffer
-    return await Packer.toBuffer(doc);
-}
+// async function createDocxWithPreservedStructure(
+//     buffer: Buffer,
+//     translatedText: string
+// ): Promise<Buffer> {
+//     const zip = new JSZip();
+//
+//     // Load original DOCX
+//     await zip.loadAsync(buffer);
+//
+//     // Get and modify document.xml
+//     const documentXml = await zip.file('word/document.xml')?.async('text');
+//     if (!documentXml) {
+//         throw new Error('Could not find document.xml in DOCX file');
+//     }
+//
+//     // Inject translated text while preserving structure
+//     const modifiedXml = await injectTranslatedText(documentXml, translatedText);
+//
+//     // Replace document.xml in the ZIP
+//     zip.file('word/document.xml', modifiedXml);
+//
+//     // Generate new DOCX buffer
+//     return await zip.generateAsync({type: 'nodebuffer'});
+// }
+//
+// async function createNewDocx(translatedText: string): Promise<Buffer> {
+//     // Split the text into paragraphs
+//     const paragraphs = translatedText.split('\n').filter(p => p.trim());
+//
+//     // Create a new document
+//     const doc = new Document({
+//         sections: [{
+//             properties: {},
+//             children: paragraphs.map(text =>
+//                 new Paragraph({
+//                     children: [
+//                         new TextRun({
+//                             text: text,
+//                         }),
+//                     ],
+//                 })
+//             ),
+//         }],
+//     });
+//
+//     // Generate buffer
+//     return await Packer.toBuffer(doc);
+// }
 
 
 const determineType = (fileExt: string) => {
@@ -149,21 +145,21 @@ const decodeTxtFile = async (file: File) => {
 //     return buffer.toString('base64')
 // }
 
-const decodePdfFile = async (file: File) => {
-
-    const extractor = getTextExtractor()
-    const buffer = Buffer.from(await file.arrayBuffer())
-    // const read = await readFile(buffer)
-    const text = await extractor.extractText({input: buffer, type: 'buffer'})
-    return decodeTxtFile(new File([text], 'document.txt'))
-
-    // const buffer = Buffer.from(await file.arrayBuffer())
-    // const base64Content = buffer.toString('base64')
-    // const binaryContent = atob(base64Content)
-    // return new Blob([Uint8Array.from(binaryContent.split('').map(char => char.charCodeAt(0)))], {type: 'application/pdf'})
-    // const buffer = Buffer.from(await file.arrayBuffer())
-    // return buffer.toString('base64')
-}
+// const decodePdfFile = async (file: File) => {
+//
+//     const extractor = getTextExtractor()
+//     const buffer = Buffer.from(await file.arrayBuffer())
+//     // const read = await readFile(buffer)
+//     const text = await extractor.extractText({input: buffer, type: 'buffer'})
+//     return decodeTxtFile(new File([text], 'document.txt'))
+//
+//     // const buffer = Buffer.from(await file.arrayBuffer())
+//     // const base64Content = buffer.toString('base64')
+//     // const binaryContent = atob(base64Content)
+//     // return new Blob([Uint8Array.from(binaryContent.split('').map(char => char.charCodeAt(0)))], {type: 'application/pdf'})
+//     // const buffer = Buffer.from(await file.arrayBuffer())
+//     // return buffer.toString('base64')
+// }
 
 // Add these constants for default settings
 const DEFAULT_SETTINGS = {

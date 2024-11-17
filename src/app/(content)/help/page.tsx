@@ -1,4 +1,4 @@
-import {Typography, Container, List, ListItem} from '@mui/material';
+import {Typography, List, ListItem} from '@mui/material';
 
 
 export default function HelpPage() {

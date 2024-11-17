@@ -167,7 +167,7 @@ async function handleDocxContent(
     console.log("Got here")
     const reader = new FileReader();
     reader.readAsDataURL(fileBlob);
-    reader.onloadend = () => {
+    reader.onloadend = () => { // Untested technique
         container.current?.documentEditor.open(reader.result);
     };
 

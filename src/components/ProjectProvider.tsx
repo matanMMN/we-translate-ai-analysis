@@ -7,7 +7,7 @@ import {getUser} from "@/lib/AuthGuard";
 import {useProjectCache} from "@/hooks/useProjectCache";
 import {useProjectRevalidation} from "@/hooks/useProjectRevalidation";
 import {Project} from "@/lib/userData";
-import {selectCurrentFile, setCurrentFileMetadata} from "@/store/slices/projectSlice";
+import {setCurrentFileMetadata} from "@/store/slices/projectSlice";
 
 interface ProjectProviderProps {
     children: ReactNode;
@@ -24,7 +24,6 @@ export default function ProjectProvider({
     const session = useSelector(selectSession);
     const {getProjectFromCache} = useProjectCache();
     const {revalidateProject} = useProjectRevalidation(projectId);
-    const file = useSelector(selectCurrentFile);
     useEffect(() => {
         const initializeProject = async () => {
             try {
