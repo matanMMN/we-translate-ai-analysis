@@ -46,13 +46,13 @@ export default function EditOrViewGrid() {
                     onClick={onEditClick}
                     className="bg-[#1D3B34] hover:bg-[#1D3B34]/90 text-white"
                 >
-                    Edit Project
+                    Editor mode
                 </Button>
                 <Button
                     onClick={onViewClick}
                     className="bg-[#1D3B34] hover:bg-[#1D3B34]/90 text-white"
                 >
-                    View Project
+                    Viewer mode
                 </Button>
             </div>
         </>

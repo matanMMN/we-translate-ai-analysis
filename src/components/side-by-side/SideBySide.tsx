@@ -10,6 +10,7 @@ import {SectionNavigation} from './SectionNavigation';
 import {useAppDispatch} from '@/hooks/useAppDispatch';
 import {useAppSelector} from '@/hooks/useAppSelector';
 import {
+    fetchSectionsData,
     selectActiveSectionData,
     selectSourceLanguage,
     selectTargetLanguage,
@@ -18,28 +19,22 @@ import {
 import {translateText} from '@/services/translationService';
 import {useState} from 'react';
 import {toast} from 'sonner';
-import {useParams} from 'next/navigation';
-import {initializeProject, selectProjectId} from '@/store/slices/projectSlice'
+import {selectSession} from "@/store/slices/sessionSlice";
 
 
 export default function SideBySide() {
-    const params = useParams();
     const dispatch = useAppDispatch();
-    const projectId = useAppSelector(selectProjectId);
+    const {projectId} = useAppSelector(selectSession);
     const activeSection = useAppSelector(selectActiveSectionData)
     const sourceLang = useAppSelector(selectSourceLanguage);
     const targetLang = useAppSelector(selectTargetLanguage);
     const [isGlossaryOpen, setIsGlossaryOpen] = useState(false);
     const [isTranslating, setIsTranslating] = useState(false);
 
-
-    console.log(activeSection)
-
     useEffect(() => {
-        if (params.projectId && !projectId) {
-            dispatch(initializeProject({ id: params.projectId as string }))
-        }
-    }, [params.projectId, projectId, dispatch])
+        if (!projectId) return;
+        dispatch(fetchSectionsData({projectId}));
+    }, [dispatch, projectId]);
 
     const handleTranslate = async () => {
         if (!activeSection?.sourceContent || !projectId) {
@@ -60,10 +55,10 @@ export default function SideBySide() {
                 targetLang,
                 projectId
             })
-
             dispatch(updateSection({
                 id: activeSection.id,
-                targetContent: result.translatedText
+                targetContent: result.translatedText,
+                projectId
             }))
 
             toast.success('Translation completed!')
@@ -84,23 +79,25 @@ export default function SideBySide() {
     }
     return (
         <div className="flex h-[calc(100vh-300px)]">
-            <SectionNavigation/>
+            <SectionNavigation projectId={projectId as string}/>
 
             <div className="flex-1 flex flex-col p-4">
                 <LanguageSelector sourceLanguage={sourceLang || ''}/>
 
-                <div id="quills" className="grid grid-cols-2 gap-4 flex-1" >
+                <div id="quills" className="grid grid-cols-2 gap-4 flex-1">
                     <QuillEditor
                         id={activeSection.id}
                         content={activeSection.targetContent}
                         readOnly={false} // Target content is editable for translation
                         isRTL={true} // Hebrew is always RTL
+                        projectId={projectId as string}
                     />
                     <QuillEditor
                         id={activeSection.id}
                         content={activeSection.sourceContent}
                         isRTL={sourceLang === 'he' || sourceLang === 'ar'}
                         readOnly={true} // Source content is read-only as it comes from the editor
+                        projectId={projectId as string}
                     />
                 </div>
 

@@ -8,7 +8,7 @@ import {containsRTL} from '@/lib/utils/textUtils';
 import {createSfdtContent} from '@/lib/utils/documentUtils';
 import * as defaultData from '@/app/(content)/[projectId]/editor/data-default.json';
 import store from '@/store/store';
-import {selectProjectFiles, selectCurrentFile} from '@/store/slices/projectSlice';
+import {selectCurrentFile} from '@/store/slices/projectSlice';
 
 
 export const handleFileLoad = async (
@@ -19,13 +19,11 @@ export const handleFileLoad = async (
     titleBar: TitleBar
 ) => {
     if (!container.current) return;
-
     // Set current user
     container.current.documentEditor.currentUser = userSession?.user?.name as string
 
     try {
         const state = store.getState();
-        const projectFiles = selectProjectFiles(state);
         const currentFile = selectCurrentFile(state);
 
         // Check localStorage first
@@ -34,7 +32,7 @@ export const handleFileLoad = async (
         const lastSaveTime = localStorage.getItem(
             `lastSaveTime-${projectId}`
         );
-
+        console.log(currentFile)
         // If we have a lastModified timestamp from the backend/translation
         if (currentFile.lastModified) {
             // Check if localStorage is newer than our last known modification
@@ -43,9 +41,9 @@ export const handleFileLoad = async (
                 container.current.documentEditor.open(savedContent);
                 return;
             }
-            console.log(projectId, projectFiles)
+            console.log(savedContent, projectId)
             // If localStorage is older or doesn't exist, try to fetch from backend
-            if (projectId && projectFiles.srcFileId) {
+            if (projectId) {
                 try {
                     console.log('Fetching newer content from backend');
                     // const res = await fetchProjectFile(projectId, projectFiles.srcFileId);
@@ -69,7 +67,10 @@ export const handleFileLoad = async (
 
         // Fallback to default content
         console.log('Using default content');
-        container.current.documentEditor.open(JSON.stringify(defaultData));
+        if (savedContent)
+            container.current.documentEditor.open(savedContent);
+        else
+            container.current.documentEditor.open(JSON.stringify(defaultData));
 
         // Set document properties
         container.current.documentEditor.documentName = headerTitle;
@@ -167,9 +168,9 @@ async function handleDocxContent(
     console.log("Got here")
     const reader = new FileReader();
     reader.readAsDataURL(fileBlob);
-    reader.onloadend = () => { // Untested technique
-        container.current?.documentEditor.open(reader.result);
-    };
+    // reader.onloadend = () => { // Untested technique
+    //     container.current?.documentEditor.open(reader.result);
+    // };
 
 }
 

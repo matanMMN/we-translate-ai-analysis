@@ -5,28 +5,30 @@ import {Trash2} from "lucide-react";
 import {useAppDispatch} from "@/hooks/useAppDispatch";
 import {useAppSelector} from "@/hooks/useAppSelector";
 import {
-    deleteSection,
+
+    deleteSectionAndSync,
     selectActiveSection,
     selectSections, setActiveSection,
 } from "@/store/slices/sideBySideSlice";
 import {toast} from "sonner";
 
-export function SectionNavigation() {
+export function SectionNavigation({projectId}: { projectId: string }) {
     const dispatch = useAppDispatch();
     const sections = useAppSelector(selectSections);
     const activeSection = useAppSelector(selectActiveSection);
+
     const handleDeleteSection = (id: string) => {
         if (sections.length <= 1) {
             toast.error("Cannot delete the last section");
             return;
         }
-        dispatch(deleteSection(id));
+        dispatch(deleteSectionAndSync({ id, projectId }));
+
     };
 
     const handleSectionClick = (id: string) => {
         dispatch(setActiveSection(id));
     };
-    console.log(sections)
     return (
         <div className="w-12 border-r bg-background flex flex-col items-center py-4 space-y-2">
             {sections.map((section, index) => (

@@ -39,7 +39,7 @@ export default function ProjectTable({projects}: { projects: Project[] }) {
     const [sortConfig, setSortConfig] = useState<SortConfig>({key: null, direction: 'asc'})
     const parentRef = useRef<HTMLDivElement>(null)
     const [searchQuery, setSearchQuery] = useState('')
-    const [debouncedQuery] = useDebounce(searchQuery, 300)
+    const [debouncedQuery] = useDebounce(searchQuery, 100)
     const [searchResults, setSearchResults] = useState<Project[]>([])
     const [showResults, setShowResults] = useState(false)
 
@@ -168,9 +168,14 @@ export default function ProjectTable({projects}: { projects: Project[] }) {
                                             setShowResults(false)
                                         }}
                                     >
-                                        <span className="font-normal">{result.title.slice(0, searchQuery.length)}</span>
-                                        <span
-                                            className="text-white font-normal">{result.title.slice(searchQuery.length)}</span>
+                                        {
+                                            result.title.toLowerCase().indexOf(searchQuery.toLowerCase()) >= 0 &&
+                                            <>
+                                        <span className="font-normal text-white">{result.title.slice(0, result.title.toLowerCase().indexOf(searchQuery.toLowerCase()))}</span>
+                                        <span className="font-normal">{result.title.slice(result.title.toLowerCase().indexOf(searchQuery.toLowerCase()), result.title.toLowerCase().indexOf(searchQuery.toLowerCase()) + searchQuery.length)}</span>
+                                        <span className="font-normal text-white">{result.title.slice(result.title.toLowerCase().indexOf(searchQuery.toLowerCase()) + searchQuery.length)}</span>
+                                            </>
+                                        }
                                     </motion.div>
                                 ))}
                             </motion.div>

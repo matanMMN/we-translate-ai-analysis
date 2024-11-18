@@ -3,9 +3,11 @@
 import {useEffect, useState, useRef, RefObject} from 'react';
 import dynamic from 'next/dynamic';
 import {useAppDispatch} from '@/hooks/useAppDispatch';
-import {updateSection} from '@/store/slices/sideBySideSlice';
+import {updateSection, syncWithBackend, selectSections} from '@/store/slices/sideBySideSlice';
 import 'react-quill-new/dist/quill.snow.css';
 import type ReactQuill from 'react-quill-new';
+import {debounce} from 'lodash';
+import {useAppSelector} from "@/hooks/useAppSelector";
 
 // Add proper types for the dynamic import component
 type QuillProps = {
@@ -15,14 +17,14 @@ type QuillProps = {
 
 const ReactQuillComponent = dynamic(
     async () => {
-        const { default: RQ } = await import('react-quill-new');
-        return function comp({ forwardedRef, ...props }: QuillProps) {
+        const {default: RQ} = await import('react-quill-new');
+        return function comp({forwardedRef, ...props}: QuillProps) {
             return <RQ ref={forwardedRef} {...props} />;
         };
     },
     {
         ssr: false,
-        loading: () => <div className="h-full animate-pulse bg-gray-100 rounded-md" />
+        loading: () => <div className="h-full animate-pulse bg-gray-100 rounded-md"/>
     }
 );
 
@@ -31,6 +33,7 @@ interface QuillEditorProps {
     content: string;
     readOnly?: boolean;
     isRTL?: boolean;
+    projectId?: string;
 }
 
 interface ModuleProps {
@@ -57,11 +60,18 @@ const formats = [
     'align', 'direction'
 ];
 
-export function QuillEditor({ id, content, readOnly = false, isRTL = false }: QuillEditorProps) {
+export function QuillEditor({id, content, readOnly = false, isRTL = false, projectId}: QuillEditorProps) {
 
     const editor = useRef<ReactQuill>(null);
     const dispatch = useAppDispatch();
+    const sections = useAppSelector(selectSections);
     const [mounted, setMounted] = useState(false);
+    // Create debounced sync function
+    const debouncedSync = useRef(
+        debounce((sections, projectId) => {
+            dispatch(syncWithBackend({projectId, sections}));
+        }, 1000)
+    ).current;
 
     useEffect(() => {
         setMounted(true);
@@ -70,8 +80,14 @@ export function QuillEditor({ id, content, readOnly = false, isRTL = false }: Qu
     const handleChange = (value: string) => {
         dispatch(updateSection({
             id,
-            [readOnly ? 'sourceContent' : 'targetContent']: value
+            [readOnly ? 'sourceContent' : 'targetContent']: value,
+            projectId
         }));
+
+        // Trigger sync with backend
+        if (projectId) {
+            debouncedSync(sections, projectId);
+        }
     };
 
     if (!mounted) {

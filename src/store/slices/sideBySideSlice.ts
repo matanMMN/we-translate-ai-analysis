@@ -1,6 +1,8 @@
 import {createSlice, PayloadAction, createAsyncThunk} from '@reduxjs/toolkit';
 import {RootState} from '../store.types';
 import {v4 as uuid} from 'uuid';
+import {compareAsc} from 'date-fns';
+import {getUser} from "@/lib/AuthGuard";
 
 interface Section {
     id: string;
@@ -13,6 +15,7 @@ interface Section {
 
 interface SideBySideState {
     sections: Section[];
+    projectId: string;
     sourceLanguage: string | null;
     targetLanguage: string;
     activeSection: string;
@@ -22,6 +25,7 @@ interface SideBySideState {
 
 const initialState: SideBySideState = {
     sections: [],
+    projectId: '',
     sourceLanguage: null,
     targetLanguage: 'he',
     activeSection: '1',
@@ -29,40 +33,84 @@ const initialState: SideBySideState = {
     error: null
 };
 
-// Async thunks for file operations
-export const saveSectionToFile = createAsyncThunk(
-    'sideBySide/saveSection',
-    async (section: Section, {rejectWithValue}) => {
-        try {
-            // First save to public/uploads
-            const formData = new FormData();
-            formData.append('sourceContent', section.sourceContent);
-            formData.append('targetContent', section.targetContent);
-            formData.append('sectionId', section.id);
+export const deleteSectionAndSync = createAsyncThunk(
+    'sideBySide/deleteSectionAndSync',
+    async ({id, projectId}: { id: string, projectId: string }, {dispatch, getState}) => {
+        dispatch(deleteSection({id, projectId}));
+        const state = getState() as RootState;
+        const sections = selectSections(state);
+        await dispatch(syncWithBackend({projectId, sections}));
+    }
+);
 
-            const response = await fetch('/api/sections/save', {
-                method: 'POST',
-                body: formData
+// new thunks for backend operations
+export const syncWithBackend = createAsyncThunk(
+    'sideBySide/syncWithBackend',
+    async ({projectId, sections}: {
+        projectId: string,
+        sections: Section[]
+    }, {rejectWithValue}) => {
+        try {
+
+            const user = await getUser()
+
+            if (!user) {
+                return rejectWithValue('User authentication failed')
+            }
+            const authToken = user.accessToken
+            const response = await fetch(`http://localhost:8000/jobs/${projectId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`
+                },
+                body: JSON.stringify({
+                    data: {
+                        sideBySideSections: sections.map(section => ({
+                            ...section,
+                            lastModified: section.lastModified || new Date().toISOString()
+                        }))
+                    }
+                })
             });
 
-            if (!response.ok) throw new Error('Failed to save section');
-
-            const data = await response.json();
-            return data; // Returns { id, filePath, lastModified }
+            if (!response.ok) throw new Error('Failed to sync with backend');
+            return await response.json();
         } catch (error) {
             return rejectWithValue((error as Error).message);
         }
     }
 );
 
-export const fetchUserSections = createAsyncThunk(
-    'sideBySide/fetchSections',
-    async (_, {rejectWithValue}) => {
+export const fetchSectionsData = createAsyncThunk(
+    'sideBySide/fetchSectionsData',
+    async ({projectId}: { projectId: string }, {rejectWithValue}) => {
         try {
-            return []
-            // const response = await fetch('/api/sections');
-            // if (!response.ok) throw new Error('Failed to fetch sections');
-            // return await response.json();
+            const user = await getUser()
+            if (!user) {
+                return rejectWithValue('User authentication failed')
+            }
+            const authToken = user.accessToken
+
+            // Get data from localStorage
+            const localData = localStorage.getItem(`sideBySideSections_${projectId}`);
+            const localSections = localData ? JSON.parse(localData) : null;
+            const localLastModified = localSections?.lastModified || '1970-01-01';
+
+            // Get data from backend
+            const response = await fetch(`http://localhost:8000/jobs/${projectId}`, {headers: {'Authorization': `Bearer ${authToken}`}});
+            if (!response.ok) throw new Error('Failed to fetch from backend');
+            const backendData = await response.json();
+            const backendSections = backendData.data?.data?.sideBySideSections || [];
+            const backendLastModified = backendSections.length > 0
+                ? Math.max(...backendSections.map((s: Section) => new Date(s.lastModified || '1970-01-01').getTime()))
+                : '1970-01-01';
+
+            // Compare dates and return the newest data
+            if (compareAsc(new Date(localLastModified), new Date(backendLastModified)) > 0) {
+                return localSections.sections;
+            }
+            return backendSections;
         } catch (error) {
             return rejectWithValue((error as Error).message);
         }
@@ -86,6 +134,7 @@ const sideBySideSlice = createSlice({
             id: string;
             sourceContent?: string;
             targetContent?: string;
+            projectId?: string
         }>) => {
             const section = state.sections.find(s => s.id === action.payload.id);
             if (section) {
@@ -95,6 +144,13 @@ const sideBySideSlice = createSlice({
                 if (action.payload.targetContent !== undefined) {
                     section.targetContent = action.payload.targetContent;
                 }
+                section.lastModified = new Date().toISOString();
+
+                // Update localStorage
+                localStorage.setItem(`sideBySideSections_${action.payload.projectId}`, JSON.stringify({
+                    sections: state.sections,
+                    lastModified: new Date().toISOString()
+                }));
             }
         },
         setActiveSection: (state, action: PayloadAction<string>) => {
@@ -106,6 +162,7 @@ const sideBySideSlice = createSlice({
         initializeWithText: (state, action: PayloadAction<{
             text: string;
             sourceLanguage: string;
+            projectId?: string
         }>) => {
             const newSection = {
                 id: uuid(),
@@ -113,48 +170,49 @@ const sideBySideSlice = createSlice({
                 targetContent: ''
             };
             state.sections.push(newSection);
+            state.projectId = action.payload.projectId!
             state.sourceLanguage = action.payload.sourceLanguage;
             state.activeSection = newSection.id;
+
+            localStorage.setItem(`sideBySideSections_${state.projectId}`, JSON.stringify({
+                sections: state.sections,
+                lastModified: new Date().toISOString()
+            }));
+
         },
-        deleteSection: (state, action: PayloadAction<string>) => {
-            state.sections = state.sections.filter(s => s.id !== action.payload);
-            if (state.activeSection === action.payload) {
+        deleteSection: (state, action: PayloadAction<string | { id: string, projectId: string }>) => {
+            const sectionId = typeof action.payload === 'string' ? action.payload : action.payload.id;
+            state.sections = state.sections.filter(s => s.id !== sectionId);
+            if (state.activeSection === sectionId) {
                 state.activeSection = state.sections[0]?.id || '1';
             }
+
+            // Update localStorage
+            localStorage.setItem(`sideBySideSections_${state.projectId || (typeof action.payload !== 'string' && action.payload.projectId)}`, JSON.stringify({
+                sections: state.sections,
+                lastModified: new Date().toISOString()
+            }));
+
         }
     },
     extraReducers: (builder) => {
         builder
-            // Save section handling
-            .addCase(saveSectionToFile.pending, (state) => {
-                state.isLoading = true;
-                state.error = null;
-            })
-            .addCase(saveSectionToFile.fulfilled, (state, action) => {
-                state.isLoading = false;
-                const section = state.sections.find(s => s.id === action.payload.id);
-                if (section) {
-                    section.filePath = action.payload.filePath;
-                    section.lastModified = action.payload.lastModified;
-                }
-            })
-            .addCase(saveSectionToFile.rejected, (state, action) => {
-                state.isLoading = false;
-                state.error = action.payload as string;
-            })
-            // Fetch sections handling
-            .addCase(fetchUserSections.pending, (state) => {
-                state.isLoading = true;
-                state.error = null;
-            })
-            .addCase(fetchUserSections.fulfilled, (state, action: PayloadAction<Section[]>) => {
-                state.isLoading = false;
+            .addCase(fetchSectionsData.fulfilled, (state, action) => {
                 state.sections = action.payload;
-                state.activeSection = action.payload[0]!.id || '1';
-            })
-            .addCase(fetchUserSections.rejected, (state, action) => {
+                state.activeSection = action.payload[0]?.id || '1';
                 state.isLoading = false;
-                state.error = action.payload as string;
+            })
+            .addCase(syncWithBackend.fulfilled, (state) => {
+                state.isLoading = false;
+            })
+            .addCase(deleteSectionAndSync.pending, (state) => {
+                state.isLoading = true;
+            })
+            .addCase(deleteSectionAndSync.fulfilled, (state) => {
+                state.isLoading = false;
+            })
+            .addCase(deleteSectionAndSync.rejected, (state) => {
+                state.isLoading = false;
             });
     }
 });
@@ -176,7 +234,6 @@ export const selectSourceLanguage = (state: RootState) => state.sideBySide.sourc
 export const selectTargetLanguage = (state: RootState) => state.sideBySide.targetLanguage;
 export const selectActiveSectionData = (state: RootState) =>
     state.sideBySide.sections.find((section: Section) => {
-        console.log(section.id, state.sideBySide.activeSection, typeof section.id, typeof state.sideBySide.activeSection)
         return section.id == state.sideBySide.activeSection
     });
 export const selectIsLoading = (state: RootState) => state.sideBySide.isLoading;

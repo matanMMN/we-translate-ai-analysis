@@ -51,15 +51,15 @@ export const handleEditorChanges = async (
                 const file = new File([buffer], 'document.docx', {type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
                 formData.append('file', file)
 
-                const res = await fetch('', {
-                    headers: {
-                        'Authorization': `Bearer ${session?.accessToken}`,
-                    },
-                    method: 'PUT',
-                    body: formData
-                })
-                const isUploaded = await res.json()
-                console.log(isUploaded)
+                // const res = await fetch('', {
+                //     headers: {
+                //         'Authorization': `Bearer ${session?.accessToken}`,
+                //     },
+                //     method: 'PUT',
+                //     body: formData
+                // })
+                // const isUploaded = await res.json()
+                // console.log(isUploaded)
             } catch (e) {
                 console.error(e)
             }

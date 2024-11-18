@@ -9,7 +9,7 @@ interface SetupContextMenuProps {
     container: RefObject<DocumentEditorContainerComponent>;
     dispatch: AppDispatch;
     navigate: (path: string) => void;
-    projectId?: string | null
+    projectId: string | null
     sourceLanguage: string;
 }
 
@@ -40,6 +40,10 @@ export const setupContextMenu = ({
     container.current.documentEditor.customContextMenuSelect = async (args: { id: string }) => {
         if (!container.current) return;
 
+        if (!projectId) {
+            toast.error('Project not found');
+            return;
+        }
         const id: string = container.current.documentEditor.element.id;
         const selectedText = container.current.documentEditor.selection.text;
 

@@ -81,14 +81,17 @@ export const fetchProjectById = async (projectId: string): Promise<Project | nul
             }
         })
         const project = await res.json();
-        if (project.status_code === 200)
+        if (project.status_code === 200) {
+            // Project fetch succeed, feed caches before returning.
+            /* TODO */
             return {
                 ...project.data,
                 dueDate: project.data.dueDate ? new Date(project.data.dueDate).toLocaleDateString("en") : new Date(Date.now()).toLocaleDateString("en"),
                 createdAt: project.data.createdAt ? new Date(project.data.createdAt).toLocaleDateString("en") : new Date(Date.now()).toLocaleDateString("en"),
                 updatedAt: project.data.updatedAt ? new Date(project.data.updatedAt).toLocaleDateString("en") : new Date(Date.now()).toLocaleDateString("en"),
             }
-        else throw new Error("Failed to fetch project")
+        } else
+            throw new Error("Failed to fetch project")
         // // Get the path to the JSON file
         // const filePath = path.join(process.cwd(), 'src', 'data', 'userData.json');
         //

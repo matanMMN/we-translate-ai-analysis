@@ -19,7 +19,6 @@ const EditOrViewGrid = dynamic(
 
 export default function ProjectDetails() {
     const {project, userSession} = useSelector(selectSession);
-    console.log(project)
     if (!project) return null;
 
     return (
