@@ -15,8 +15,5 @@ from dataclasses import dataclass
 @dataclass
 class TranslationInput:
     input_bytes: BytesIO
-    input_fname: str
     reference_bytes: BytesIO
-    reference_fname: str
-    user_id: str
     config: Optional[Dict[str, str]] = None

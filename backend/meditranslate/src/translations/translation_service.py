@@ -141,11 +141,7 @@ class TranslationService(BaseService[Translation]):
             logger.error(f"error in file extention '{dst_file_extension}' in translate file {str(e)}")
             raise e
 
-        translation_input = TranslationInput(
-            input_bytes=src_file_stream, input_fname=src_file_name,
-            reference_bytes=ref_file_stream, reference_fname=ref_file_pointer.file_name,
-            user_id=current_user.id)
-
+        translation_input = TranslationInput(input_bytes=src_file_stream, reference_bytes=ref_file_stream)
         translation_output = await self.translation_engine.translate_file(translation_input)
 
         created_translation = await self.create_translation(
