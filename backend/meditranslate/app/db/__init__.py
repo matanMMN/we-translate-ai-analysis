@@ -15,5 +15,6 @@ from meditranslate.app.db.models import *
 async def init_db():
     engine = engines['writer']
     async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
-        await conn.run_sync(Base.metadata.create_all)
+        # await conn.run_sync(Base.metadata.drop_all)
+        # await conn.run_sync(Base.metadata.create_all)
+        pass
