@@ -5,7 +5,7 @@ from meditranslate.app.errors import AppError,ErrorSeverity,HTTPStatus,ErrorType
 
 
 class TranslationEngine:
-    async def translate(self, translation_input: TranslationInput) -> TranslationOutput:
+    async def translate_file(self, translation_input: TranslationInput) -> TranslationOutput:
         try:
             translation_output = TranslationOutput(
                 output_bytes=translation_input.input_bytes,

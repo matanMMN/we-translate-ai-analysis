@@ -57,8 +57,8 @@ class TranslationController(BaseController[Translation]):
             current_user,
             src_file,
             src_file_stream,
-            # ref_file,
-            # ref_file_stream,
+            ref_file,
+            ref_file_stream,
             translation_file_schema
         )
 

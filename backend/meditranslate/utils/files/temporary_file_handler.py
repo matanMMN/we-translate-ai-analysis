@@ -53,7 +53,7 @@ class TemporaryFileHandler:
         unique_filename = generate_unique_filename(filename, user_id)
         file_path = os.path.join(self.directory, unique_filename)
         with open(file_path, "wb") as f:
-            f.write(file_data)
+            f.write(file_data.getbuffer())
 
         temp_file = TempFileModel(original_filename=filename, filename=unique_filename, file_path=file_path, user_id=user_id, created_at=datetime.now())
         self.temp_files.append(temp_file)

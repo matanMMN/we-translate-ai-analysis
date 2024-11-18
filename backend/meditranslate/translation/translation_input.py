@@ -3,14 +3,20 @@
 # from pydantic import Field
 from typing import Dict, Optional
 from io import BytesIO
+from dataclasses import dataclass
+
 
 # class TranslationInput(BaseSchema):
 #     config: Optional[Dict[str,str]] = Field(None,title="",description="")
 #     input_bytes: BytesIO
 #     reference_bytes: BytesIO
 
+
+@dataclass
 class TranslationInput:
-    def __init__(self, input_bytes: BytesIO, reference_bytes: BytesIO, config: Optional[Dict[str, str]]):
-        self.input_bytes = input_bytes
-        self.reference_bytes = reference_bytes
-        self.config = config
+    input_bytes: BytesIO
+    input_fname: str
+    reference_bytes: BytesIO
+    reference_fname: str
+    user_id: str
+    config: Optional[Dict[str, str]] = None

@@ -1,6 +1,9 @@
 from idlelib.pyparse import trans
 from io import BytesIO
 from typing import Any,Dict,List,Optional,Tuple
+
+from sqlalchemy.sql.functions import current_user
+
 from meditranslate.src.translations.translation_repository import TranslationRepository
 from meditranslate.app.db.models import Translation
 from meditranslate.app.shared.base_service import BaseService
@@ -112,108 +115,73 @@ class TranslationService(BaseService[Translation]):
     async def translate_file(
             self,
             current_user: User,
-            file_pointer: File,
-            file_stream: BytesIO,
+            src_file_pointer: File,
+            src_file_stream: BytesIO,
+            ref_file_pointer: File,
+            ref_file_stream: BytesIO,
             translation_file_schema: TranslationFileSchema):
-        file_extension = file_pointer.file_format_type
-        file_name = file_pointer.file_name
+        src_file_extension = src_file_pointer.file_format_type
+        src_file_name = src_file_pointer.file_name
+        dst_file_extension = translation_file_schema.target_file_format
 
-        if file_name is None:
+        if src_file_name is None:
             raise AppError("no file name")
-        file_name = file_name.rsplit(".", 1)[0]
+
+        src_file_name = src_file_name.rsplit(".", 1)[0]
+
         try:
-            file_format_type = FileFormatType(file_extension)
+            src_file_format_type = FileFormatType(src_file_extension)
         except ValueError as e:
-            logger.error(f"error in file extention '{file_extension}' in translate file {str(e)}")
+            logger.error(f"error in file extention '{src_file_extension}' in translate file {str(e)}")
             raise e
 
-        # file_content = FileFormatHandler().extract_text(file_format=file_format_type, file_stream=file_stream)
-        # input_text = file_content
-        translation_input = TranslationInput(input_bytes=file_stream, reference_bytes=file_stream, config=None)
-        translation_output = await self.translation_engine.translate(translation_input)
+        try:
+            dst_file_format_type = FileFormatType(dst_file_extension)
+        except ValueError as e:
+            logger.error(f"error in file extention '{dst_file_extension}' in translate file {str(e)}")
+            raise e
+
+        translation_input = TranslationInput(
+            input_bytes=src_file_stream, input_fname=src_file_name,
+            reference_bytes=ref_file_stream, reference_fname=ref_file_pointer.file_name,
+            user_id=current_user.id)
+
+        translation_output = await self.translation_engine.translate_file(translation_input)
 
         created_translation = await self.create_translation(
             current_user=current_user,
             translation_create_schema=TranslationCreateSchema(
                 source_language=translation_file_schema.source_language,
                 target_language=translation_file_schema.target_language,
-                input_text=FileFormatHandler().extract_text(file_format=file_format_type, file_stream=file_stream),
+                input_text=FileFormatHandler().extract_text(
+                    file_format=src_file_format_type, file_stream=src_file_stream),
+                output_text=FileFormatHandler().extract_text(
+                    file_format=dst_file_format_type, file_stream=translation_output.output_bytes),
                 translation_job_id=translation_file_schema.translation_job_id,
-                translation_metadata=translation_output.translation_metadata,
-                output_text=FileFormatHandler().extract_text(file_format=file_format_type,
-                                                             file_stream=translation_output.output_bytes)
+                translation_metadata=translation_output.translation_metadata
             )
         )
+
         if created_translation is None:
             raise AppError(
                 title="failed to create translation",
                 http_status=HTTPStatus.INTERNAL_SERVER_ERROR
             )
+
         new_file_stream = translation_output.output_bytes
         new_file_stream.seek(0)
-        content_type = FileFormatHandler().get_content_type(file_format_type)
-        new_file_name = f"{file_name}_{translation_file_schema.source_language}_{translation_file_schema.target_language}.{file_format_type.value}"
+        content_type = FileFormatHandler().get_content_type(src_file_format_type)
+        new_file_name = (f"{src_file_name}"
+                         + f"_{translation_file_schema.source_language}"
+                         + f"_{translation_file_schema.target_language}"
+                         + f".{src_file_format_type.value}")
+
         return new_file_stream, new_file_name, content_type
 
 
-    # async def translate_file(
-    #         self,
-    #         current_user: User,
-    #         src_file_pointer: File,
-    #         src_file_stream: BytesIO,
-    #         ref_file_pointer: File,
-    #         ref_file_stream: BytesIO,
-    #         translation_file_schema: TranslationFileSchema) -> Tuple[BytesIO, str, str]:
-    #     new_file_name = (f"{src_file_pointer.original_file_name}"
-    #                      + f"_{translation_file_schema.source_language}"
-    #                      + f"_{translation_file_schema.target_language}")
-    #
-    #     self._validate_formats(
-    #         (src_file_pointer.file_format_type,
-    #          src_file_pointer.original_file_name,
-    #          "Uploaded file to be translated."),
-    #         (ref_file_pointer.file_format_type,
-    #          ref_file_pointer.original_file_name,
-    #          "Reference file uploaded in advance on project creation."),
-    #         (new_file_name,
-    #          translation_file_schema.target_file_format,
-    #          "Resulting translated file.")
-    #     )
-    #
-    #     translation_input = TranslationInput(input_bytes=src_file_stream, reference_bytes=ref_file_stream, config=None)
-    #     translation_output = await self.translation_engine.translate(translation_input)
-    #
-    #     # TODO - fix input and output texts:
-    #     created_translation = await self.create_translation(
-    #         current_user=current_user,
-    #         translation_create_schema=TranslationCreateSchema(
-    #                 source_language=translation_file_schema.source_language,
-    #                 target_language=translation_file_schema.target_language,
-    #                 input_text=FileFormatHandler().extract_text(
-    #                     FileFormatType(src_file_pointer.file_format_type), src_file_stream),
-    #                 output_text=FileFormatHandler().extract_text(
-    #                     FileFormatType(translation_file_schema.target_file_format), translation_output.output_bytes),
-    #                 translation_job_id=translation_file_schema.translation_job_id,
-    #                 translation_metadata=translation_output.translation_metadata
-    #             )
-    #     )
-    #
-    #     if created_translation is None:
-    #         raise AppError(
-    #             title="Failed to create translation",
-    #             http_status=HTTPStatus.INTERNAL_SERVER_ERROR
-    #         )
-    #
-    #     # new_file_stream = FileFormatHandler().create_file(
-    #     #     file_format=translation_file_schema.target_file_format,
-    #     #     text=translation_output.output_text)
-    #     content_type = FileFormatHandler().get_content_type(translation_file_schema.target_file_format)
-    #
-    #     return translation_output.output_bytes, new_file_name, content_type
-
     async def translate_text(self,current_user:User,translation_text_schema:TranslationTextSchema):
         translation_input = TranslationInput(input_text=translation_text_schema.input_text,config=None)
-        translation_output = await self.translation_engine.translate(translation_input)
+        translation_output = await self.translation_engine.translate_file(translation_input)
         created_translation = await self.create_translation(
             current_user=current_user,
             translation_create_schema=TranslationCreateSchema(

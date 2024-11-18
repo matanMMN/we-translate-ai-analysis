@@ -97,7 +97,7 @@ class Translate():
 
         def _translate(translator: BaseTranslator, index: int):
             translator = self._instantiate_translator(translator, self.services, index)
-            result = translator.translate(
+            result = translator.translate_file(
                 text=text, destination_language=dest_lang, source_language=source_lang
             )
             if result is None:
