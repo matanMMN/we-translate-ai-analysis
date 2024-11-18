@@ -25,3 +25,12 @@ class DocxFileManager(FileManager):
         # Extract text from the .docx file using python-docx
         text = '\n'.join([para.text for para in document.paragraphs])
         return text
+
+    def create_file(self, text: str) -> BytesIO:
+        document = docx.Document()
+        document.add_paragraph(text)
+        docx_stream = BytesIO()
+        document.save(docx_stream)
+        docx_stream.seek(0)
+
+        return docx_stream
