@@ -1,4 +1,4 @@
-from typing import Any, List,Tuple
+from typing import Any, Dict, List,Tuple
 from meditranslate.app.shared.base_controller import BaseController
 from meditranslate.src.files.file_service import FileService
 from meditranslate.src.files.file_schemas import (
@@ -20,7 +20,7 @@ class FileController(BaseController[File]):
     async def upload_file(self,current_user:User,file:UploadFile) -> File:
         return await self.file_service.upload_file(current_user,file)
 
-    async def get_file(self,file_id: str) -> File:
+    async def get_file(self,file_id: str) -> Dict[str, Any]:
         return await self.file_service.get_file(file_id)
 
     @Transactional(propagation=Propagation.REQUIRED_NEW)

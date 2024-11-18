@@ -76,7 +76,7 @@ class FileService(BaseService[File]):
         content_type = FileFormatHandler().get_content_type(FileFormatType(file.file_format_type))
         return file_stream, file.original_file_name,content_type
 
-    async def download_file_sync(self,file_id:str) -> BytesIO:
+    async def download_file_sync(self,file_id:str) -> Tuple[BytesIO, str, str]:
         file = await self.file_repository.get_by("id",file_id,unique=True)
         if not file:
             raise AppError(
@@ -186,13 +186,20 @@ class FileService(BaseService[File]):
         update_file_data = file_update_schema.model_dump()
         await self.file_repository.update(file,update_file_data)
 
-    async def get_file(self,file_id: str) -> Optional[File]:
+    async def fetch_file_entity(self, file_id: str) -> File:
         file = await self.file_repository.get_by("id",file_id,unique=True)
+
         if not file:
             raise AppError(
                 title="get translation job endpoint",
                 http_status=HTTPStatus.NOT_FOUND
             )
+
+        return file
+
+    async def get_file(self, file_id: str) -> Dict[str, Any]:
+        file = await self.fetch_file_entity(file_id)
+
         public_file = self._to_public_file_pointer(file)
         return public_file
 

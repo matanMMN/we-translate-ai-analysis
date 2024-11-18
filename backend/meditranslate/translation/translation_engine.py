@@ -1,14 +1,14 @@
-
 from meditranslate.translation.translation_input import TranslationInput
 from meditranslate.translation.translation_output import TranslationOutput
 from meditranslate.app.configurations import config
 from meditranslate.app.errors import AppError,ErrorSeverity,HTTPStatus,ErrorType
 
+
 class TranslationEngine:
-    async def translate(self,translation_input:TranslationInput) -> TranslationOutput:
+    async def translate(self, translation_input: TranslationInput) -> TranslationOutput:
         try:
             translation_output = TranslationOutput(
-                output_text="output text",
+                output_bytes=translation_input.input_bytes,
                 translation_metadata={
                     "service":"none"
                 }

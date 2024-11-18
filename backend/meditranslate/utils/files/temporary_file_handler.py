@@ -3,6 +3,7 @@ from typing import List
 import os
 import shutil
 import uuid
+from io import BytesIO
 from datetime import datetime
 from .filename import generate_unique_filename
 
@@ -44,7 +45,7 @@ class TemporaryFileHandler:
         os.makedirs(self.directory, exist_ok=True)
         self.temp_files: List[TempFileModel] = []
 
-    def save_file(self, file_data: bytes, filename: str, user_id: str) -> str:
+    def save_file(self, file_data: BytesIO, filename: str, user_id: str) -> str:
         """
         Save the file with a unique name based on the user ID and a UUID.
         Returns the full path to the file.

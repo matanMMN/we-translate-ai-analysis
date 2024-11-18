@@ -70,40 +70,99 @@ class TranslationService(BaseService[Translation]):
         return public_translations,total
 
 
+    @staticmethod
+    def _get_supported_formats() -> List[FileFormatType]:
+        return [
+            FileFormatType.DOCX
+        ]
 
-    async def translate_file(self,current_user:User,file_pointer:dict,file_stream:BytesIO,translation_file_schema:TranslationFileSchema):
-        file_extension = file_pointer.get("file_format_type")
-        file_name = file_pointer.get("file_name")
+
+    @staticmethod
+    def _is_supported_format(format_type_string: str) -> bool:
         try:
-            file_format_type = FileFormatType(file_extension)
+            file_format_type = FileFormatType(format_type_string)
         except ValueError as e:
-            logger.error(f"error in file extention '{file_extension}' in translate file {str(e)}")
+            logger.error(f"error in file extention '{format_type_string}' in translate file {str(e)}")
             raise e
 
-        file_content = FileFormatHandler().extract_text(file_format=file_format_type,file_stream=file_stream)
-        input_text = file_content
-        translation_input = TranslationInput(input_text=input_text,config=None)
+        if file_format_type not in TranslationService._get_supported_formats():
+            return False
+
+        return True
+
+    @staticmethod
+    def _validate_formats(*to_vals: Tuple[str, str, str]):
+        """
+        Used to validate file formats before access to translation engine.
+
+        :param to_vals: Tuples of format, file name and short description to be inserted into error message.
+        """
+        for val in to_vals:
+            format_, name, desc = val
+            if not TranslationService._is_supported_format(format_):
+                message = f"Can not handle file format {format_} for file {name} ({desc})"
+
+                raise AppError(
+                    title="Developer Error: Unsupported file format",
+                    description=message,
+                    http_status=HTTPStatus.INTERNAL_SERVER_ERROR
+                )
+
+
+    async def translate_file(
+            self,
+            current_user: User,
+            src_file_pointer: File,
+            src_file_stream: BytesIO,
+            ref_file_pointer: File,
+            ref_file_stream: BytesIO,
+            translation_file_schema: TranslationFileSchema) -> Tuple[BytesIO, str, str]:
+        new_file_name = (f"{src_file_pointer.original_file_name}"
+                         + f"_{translation_file_schema.source_language}"
+                         + f"_{translation_file_schema.target_language}")
+
+        self._validate_formats(
+            (src_file_pointer.file_format_type,
+             src_file_pointer.original_file_name,
+             "Uploaded file to be translated."),
+            (ref_file_pointer.file_format_type,
+             ref_file_pointer.original_file_name,
+             "Reference file uploaded in advance on project creation."),
+            (new_file_name,
+             translation_file_schema.target_file_format,
+             "Resulting translated file.")
+        )
+
+        translation_input = TranslationInput(input_bytes=src_file_stream, reference_bytes=ref_file_stream, config=None)
         translation_output = await self.translation_engine.translate(translation_input)
+
+        # TODO - fix input and output texts:
         created_translation = await self.create_translation(
             current_user=current_user,
             translation_create_schema=TranslationCreateSchema(
                     source_language=translation_file_schema.source_language,
                     target_language=translation_file_schema.target_language,
-                    input_text=input_text,
+                    input_text=FileFormatHandler().extract_text(
+                        FileFormatType(src_file_pointer.file_format_type), src_file_stream),
+                    output_text=FileFormatHandler().extract_text(
+                        FileFormatType(translation_file_schema.target_file_format), translation_output.output_bytes),
                     translation_job_id=translation_file_schema.translation_job_id,
-                    translation_metadata=translation_output.translation_metadata,
-                    output_text=translation_output.output_text
+                    translation_metadata=translation_output.translation_metadata
                 )
         )
+
         if created_translation is None:
             raise AppError(
-                title="failed to create translation",
+                title="Failed to create translation",
                 http_status=HTTPStatus.INTERNAL_SERVER_ERROR
             )
-        new_file_stream = FileFormatHandler().create_file(file_format=file_format_type,text=translation_output.output_text)
-        content_type = FileFormatHandler().get_content_type(file_format_type)
-        new_file_name = f"{file_name}_{translation_file_schema.source_language}_{translation_file_schema.target_language}"
-        return new_file_stream,new_file_name,content_type
+
+        # new_file_stream = FileFormatHandler().create_file(
+        #     file_format=translation_file_schema.target_file_format,
+        #     text=translation_output.output_text)
+        content_type = FileFormatHandler().get_content_type(translation_file_schema.target_file_format)
+
+        return translation_output.output_bytes, new_file_name, content_type
 
     async def translate_text(self,current_user:User,translation_text_schema:TranslationTextSchema):
         translation_input = TranslationInput(input_text=translation_text_schema.input_text,config=None)
