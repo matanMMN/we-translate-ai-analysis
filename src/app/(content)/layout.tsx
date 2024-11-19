@@ -28,7 +28,7 @@ export default async function RootLayout(
                 <DrawerProvider>
                     <LeftDrawer/>
                     <div
-                        className="transition-all duration-300 ease-in-out mt-14 pt-12 px-20 flex flex-1 w-full flex-col">
+                        className="transition-all overflow-auto h-dvh max-h-[calc(100dvh-140px)] duration-300 ease-in-out my-20 mb-40 pt-8 px-20 flex flex-1 w-full flex-col">
                         {children}
                     </div>
                 </DrawerProvider>

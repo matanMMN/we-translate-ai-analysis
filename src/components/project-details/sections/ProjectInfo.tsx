@@ -1,63 +1,52 @@
 'use client'
 
-import { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
-import { getPriority, getPriorityColor, getStatusColor, getLanguage, getStatus } from "@/lib/functions";
-import { InfoField } from "../components/InfoField";
-import { Project } from "@/lib/userData";
-import { useDispatch } from "react-redux";
-import { updateProject } from "@/store/slices/sessionSlice";
+import {Card, CardContent} from "@/components/ui/card";
+import {Badge} from "@/components/ui/badge";
+import {Button} from "@/components/ui/button";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
+import {Calendar} from "@/components/ui/calendar";
+import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
+import {format} from "date-fns";
+import {CalendarIcon} from "lucide-react";
+import {getPriority, getPriorityColor, getStatusColor, getLanguage, getStatus} from "@/lib/functions";
+import {InfoField} from "../components/InfoField";
+import {Project} from "@/lib/userData";
+import {useState} from "react";
 
 interface ProjectInfoProps {
     project: Project;
+    editProject: Project | null;
+    isEditing: boolean;
+    onEditAction: () => void;
+    onSaveAction: () => void;
+    onCancelAction: () => void;
+    onChangeAction: (fields: Partial<Project>) => void;
 }
 
-export default function ProjectInfo({project}: ProjectInfoProps) {
-    const [isEditing, setIsEditing] = useState(false);
-    const [editedProject, setEditedProject] = useState(project);
-    const dispatch = useDispatch();
-
-    const handleSave = async () => {
-        try {
-            const response = await fetch(`http://localhost:8000/${project.id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(editedProject),
-            });
-
-            if (!response.ok) throw new Error('Failed to update project');
-            
-            // Optimistically update the UI
-            dispatch(updateProject(editedProject));
-            setIsEditing(false);
-        } catch (error) {
-            console.error('Error updating project:', error);
-            // You might want to add error handling UI here
-        }
-    };
+export default function ProjectInfo({
+                                        project,
+                                        editProject,
+                                        isEditing,
+                                        onEditAction,
+                                        onSaveAction,
+                                        onCancelAction,
+                                        onChangeAction
+                                    }: ProjectInfoProps) {
+    const [isCalendarOpen, setIsCalendarOpen] = useState(false)
 
     const renderEditableField = (field: any) => {
         switch (field.label) {
             case "Status":
                 return (
                     <Select
-                        value={editedProject.status}
-                        onValueChange={(value) => setEditedProject({...editedProject, status: value})}
+                        value={editProject?.status || project.status}
+                        onValueChange={(value) => onChangeAction({status: value})}
                     >
                         <SelectTrigger>
-                            <SelectValue placeholder="Select status" />
+                            <SelectValue placeholder="Select status"/>
                         </SelectTrigger>
                         <SelectContent>
-                            {["not_started", "in_progress", "completed"].map((status) => (
+                            {["On Hold", "initial", "Planned", "Completed"].map((status) => (
                                 <SelectItem key={status} value={status}>
                                     {getStatus(status)}
                                 </SelectItem>
@@ -68,15 +57,15 @@ export default function ProjectInfo({project}: ProjectInfoProps) {
             case "Priority":
                 return (
                     <Select
-                        value={editedProject.priority}
-                        onValueChange={(value) => setEditedProject({...editedProject, priority: value})}
+                        value={editProject?.priority as string ?? project.priority as string}
+                        onValueChange={(value) => onChangeAction({priority: value})}
                     >
                         <SelectTrigger>
-                            <SelectValue placeholder="Select priority" />
+                            <SelectValue placeholder="Select priority"/>
                         </SelectTrigger>
                         <SelectContent>
-                            {["low", "medium", "high"].map((priority) => (
-                                <SelectItem key={priority} value={priority}>
+                            {[0, 1, 2, 3].map((priority) => (
+                                <SelectItem key={priority} value={priority as unknown as string}>
                                     {getPriority(priority)}
                                 </SelectItem>
                             ))}
@@ -85,19 +74,29 @@ export default function ProjectInfo({project}: ProjectInfoProps) {
                 );
             case "Due date":
                 return (
-                    <Popover>
+                    <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
                         <PopoverTrigger asChild>
-                            <Button variant="outline" className="w-full justify-start text-left font-normal">
-                                <CalendarIcon className="mr-2 h-4 w-4" />
-                                {editedProject.dueDate ? format(new Date(editedProject.dueDate), 'PPP') : <span>Pick a date</span>}
+                            <Button variant="outline"
+                                    className="w-full lg:justify-start justify-center text-left font-normal">
+                                <CalendarIcon className="lg:mr-2 h-4 w-4"/>
+                                <div className="hidden lg:block">
+                                    {editProject?.due_date ? format(new Date(editProject?.due_date), 'PPP') : project.due_date ? format(new Date(project.due_date), 'PPP') :
+                                        <span>Pick a date</span>}
+                                </div>
                             </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0">
                             <Calendar
                                 mode="single"
-                                selected={editedProject.dueDate ? new Date(editedProject.dueDate) : undefined}
-                                onSelect={(date) => setEditedProject({...editedProject, dueDate: date})}
+                                selected={editProject?.due_date ? new Date(editProject?.due_date) : project.due_date ? new Date(project.due_date) : undefined}
+                                onSelect={(date) => {
+                                    if (date) {
+                                        onChangeAction({due_date: date!.toISOString()})
+                                        setIsCalendarOpen(false)
+                                    }
+                                }}
                                 disabled={(date) => date < new Date()}
+                                initialFocus
                             />
                         </PopoverContent>
                     </Popover>
@@ -106,53 +105,75 @@ export default function ProjectInfo({project}: ProjectInfoProps) {
                 return <InfoField {...field} />;
         }
     };
-
-    const infoFields: any = [
+    const infoFields = [
         {label: "Name", value: project.title},
         {
             label: "Status",
-            value: getStatus(project.status as string),
-            className: getStatusColor(project.status)
+            value: getStatus(editProject?.status || project!.status),
+            className: getStatusColor(editProject?.status || project!.status)
         },
         {
             label: "Priority",
-            value: project.priority,
+            value: editProject?.priority || project!.priority,
             render: (value: string) => (
                 <Badge variant="secondary" className={getPriorityColor(value)}>
                     {getPriority(value)}
                 </Badge>
             )
         },
-        {label: "Last Update", value: project.updatedAt?.toLocaleString()},
+        {label: "Last Update", value: project.updated_at?.toLocaleString()},
         {label: "Source Language", value: getLanguage(project.source_language)},
         {label: "Target Language", value: getLanguage(project.target_language)},
-        {label: "Due date", value: project.dueDate?.toLocaleString()},
-        {label: "Start date", value: project.createdAt.toLocaleString()}
+        {
+            label: "Due date",
+            value: new Date(editProject!.due_date!).toLocaleDateString("en") || new Date(project!.due_date!).toLocaleDateString("en")
+        },
+        {label: "Start date", value: project.created_at.toLocaleString()}
     ];
-
     return (
         <Card>
             <CardContent className="pt-6">
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-lg font-semibold">Project Details</h2>
-                    <Button
-                        onClick={() => isEditing ? handleSave() : setIsEditing(true)}
-                        variant="outline"
-                    >
-                        {isEditing ? "Save changes" : "Edit Project details"}
-                    </Button>
+                    <div className="space-x-2">
+                        {isEditing ? (
+                            <>
+                                <Button
+                                    onClick={onCancelAction}
+                                    variant="outline"
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    onClick={onSaveAction}
+                                    className="text-white"
+                                >
+                                    {"Save changes"}
+                                </Button>
+                            </>
+                        ) : (
+                            <Button
+                                onClick={onEditAction}
+                                variant="outline">
+                                Edit Project details
+                            </Button>
+                        )}
+                    </div>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                     {infoFields.map((field: any) => (
                         <div key={field.label}>
-                            {isEditing && ["Status", "Priority", "Due date"].includes(field.label)
-                                ? renderEditableField(field)
-                                : <InfoField {...field} />
-                            }
+                            <div>
+                                <div className="text-sm text-muted-foreground mb-1">{field.label}</div>
+                                {isEditing && ["Status", "Priority", "Due date"].includes(field.label)
+                                    ? renderEditableField(field) : <InfoField {...field} />
+                                }
+                            </div>
                         </div>
                     ))}
                 </div>
             </CardContent>
         </Card>
-    );
-} 
+    )
+        ;
+}

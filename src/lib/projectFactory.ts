@@ -1,11 +1,12 @@
 import {getUser} from "@/lib/AuthGuard";
+import {serverUrl} from "@/lib/functions";
 
 interface NewProjectData {
     title: string;
     description: string;
     sourceLanguage: string;
     destinationLanguage: string;
-    industry: string;
+    // industry: string;
     referenceFile: File;
     accessToken: string | undefined;
 }
@@ -17,10 +18,9 @@ export const createNewProject = async (data: NewProjectData) => {
         throw new Error('User not authenticated');
     }
 
-    // upload the reference file first
     const formData = new FormData();
     formData.append('file', data.referenceFile);
-    const uploadRes = await fetch(`http://localhost:8000/files/upload/`, {
+    const uploadRes = await fetch(`${serverUrl}/files/upload/`, {
         method: 'POST',
         headers: {
             'accept': 'application/json',
@@ -36,7 +36,7 @@ export const createNewProject = async (data: NewProjectData) => {
         throw new Error("Failed to upload reference file")
 
 
-    const res = await fetch('http://localhost:8000/jobs', {
+    const res = await fetch(`${serverUrl}/jobs`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -48,9 +48,7 @@ export const createNewProject = async (data: NewProjectData) => {
             description: data.description,
             source_language: data.sourceLanguage,
             target_language: data.destinationLanguage,
-            // reference_file: data.referenceFile,
-            // members: members,
-            // currentUser: data.currentUser
+            due_date: new Date(Date.now()).toISOString()
         })
     })
 
@@ -63,7 +61,7 @@ export const createNewProject = async (data: NewProjectData) => {
         }
 
     if (project.status_code === 201) {
-        const injectFileIdRes = await fetch(`http://localhost:8000/jobs/${project.data.id}`, {
+        const injectFileIdRes = await fetch(`${serverUrl}/jobs/${project.data.id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -76,63 +74,18 @@ export const createNewProject = async (data: NewProjectData) => {
         console.log(projectData)
         return {
             ...projectData.data,
-            dueDate: project.data.dueDate ? new Date(projectData.data.dueDate).toLocaleDateString("en") : new Date(Date.now()).toLocaleDateString("en"),
-            createdAt: project.data.createdAt ? new Date(projectData.data.createdAt).toLocaleDateString("en") : new Date(Date.now()).toLocaleDateString("en"),
-            updatedAt: project.data.updatedAt ? new Date(projectData.data.updatedAt).toLocaleDateString("en") : new Date(Date.now()).toLocaleDateString("en"),
-            // activities: project.data.activities.map((activity: any) => ({
-            //     ...activity,
-            //     timestamp: new Date(activity.timestamp).toLocaleDateString("en")
-            // }))
+            due_date: project.data.dueDate ? new Date(projectData.data.dueDate).toLocaleDateString("en") : new Date(Date.now()).toLocaleDateString("en"),
+            created_at: project.data.createdAt ? new Date(projectData.data.createdAt).toLocaleDateString("en") : new Date(Date.now()).toLocaleDateString("en"),
+            updated_at: project.data.updatedAt ? new Date(projectData.data.updatedAt).toLocaleDateString("en") : new Date(Date.now()).toLocaleDateString("en"),
         }
     }
-
-    // return {
-    //     id: crypto.randomUUID(),
-    //     clientId: crypto.randomUUID(),
-    //     sourceFileId: crypto.randomUUID(),
-    //     destFileId: crypto.randomUUID(),
-    //     reference_file_id: crypto.randomUUID(),
-    //
-    //     name: data.name,
-    //     description: data.description,
-    //     sourceLanguage: data.sourceLanguage,
-    //     destinationLanguage: data.destinationLanguage,
-    //
-    //     priority: 'Normal',
-    //     status: 'Planned',
-    //     currentStepIndex: 0,
-    //
-    //     comments: ["Initial setup"],
-    //     members: members,
-    //     activities: [
-    //         {
-    //             id: crypto.randomUUID(),
-    //             user: members[0],
-    //             action: 'created the project',
-    //             timestamp: now.toLocaleDateString()
-    //         }
-    //     ],
-    //
-    //     dueDate: new Date(now.setMonth(now.getMonth() + 1)).toLocaleDateString("en"),
-    //     createdAt: now.toLocaleDateString("en"),
-    //     updatedAt: now.toLocaleDateString("en"),
-    //
-    //     currentUser,
-    //     createdBy: currentUser,
-    //     updatedBy: currentUser,
-    //
-    //     deletedAt: undefined,
-    //     deletedBy: undefined,
-    //     approvedAt: undefined,
-    //     approvedBy: undefined
-    // };
 };
 
 
-export const checkProjectName = async (name: string) => {
+export const checkProjectName = async (name: string, serverUrlString: string) => {
     const user = await getUser()
     const accessToken = user?.accessToken;
-    const res = await fetch(`http://localhost:8000/jobs`, {
+    const res = await fetch(`${serverUrlString}/jobs`, {
         headers: {
             'accept': 'application/json',
             'Authorization': `Bearer ${accessToken}`

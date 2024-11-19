@@ -1,6 +1,14 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { RootState } from '../store.types';
-import { Project } from '@/lib/userData';
+import {createSlice, PayloadAction} from '@reduxjs/toolkit';
+import {RootState} from '../store.types';
+import {Project} from '@/lib/userData';
+import {createAsyncThunk} from '@reduxjs/toolkit';
+
+export const clearAllLocalStorage = createAsyncThunk(
+    'localStorage/clearAll',
+    async ({projectId}: { projectId: string }) => {
+        localStorage.setItem(`sideBySideSections_${projectId}`, JSON.stringify({}));
+    }
+);
 
 export interface CachedProject {
     data: Project;
@@ -28,7 +36,7 @@ const projectCacheSlice = createSlice({
     initialState,
     reducers: {
         cacheProject: (
-            state, 
+            state,
             action: PayloadAction<{ projectId: string; project: Project }>
         ) => {
             state.cache[action.payload.projectId] = {
@@ -44,7 +52,7 @@ const projectCacheSlice = createSlice({
             delete state.cache[action.payload];
         },
         updateCacheEntry: (
-            state, 
+            state,
             action: PayloadAction<{ projectId: string; project: Project }>
         ) => {
             if (state.cache[action.payload.projectId]) {
@@ -61,13 +69,13 @@ const projectCacheSlice = createSlice({
 });
 
 
-export const selectProjectFromCache = (projectId: string) => 
+export const selectProjectFromCache = (projectId: string) =>
     (state: RootState) => state.projectCache.cache[projectId];
 
-export const selectCacheExpiryTime = (state: RootState) => 
+export const selectCacheExpiryTime = (state: RootState) =>
     state.projectCache.expiryTime;
 
-export const selectLastRevalidation = (state: RootState) => 
+export const selectLastRevalidation = (state: RootState) =>
     state.projectCache.lastRevalidation;
 
 export const {

@@ -3,21 +3,21 @@ import {RootState} from '../store.types';
 import {v4 as uuid} from 'uuid';
 import {compareAsc} from 'date-fns';
 import {getUser} from "@/lib/AuthGuard";
+import {serverUrl} from "@/lib/functions";
 
 interface Section {
     id: string;
     sourceContent: string;
     targetContent: string;
-    filePath?: string;  // Path to stored file
     lastModified?: string;
     projectId?: string | undefined
+    sourceLanguage: string;
+    targetLanguage: string
 }
 
 interface SideBySideState {
     sections: Section[];
     projectId: string;
-    sourceLanguage: string | null;
-    targetLanguage: string;
     activeSection: string;
     isLoading: boolean;
     error: string | null;
@@ -26,8 +26,6 @@ interface SideBySideState {
 const initialState: SideBySideState = {
     sections: [],
     projectId: '',
-    sourceLanguage: null,
-    targetLanguage: 'he',
     activeSection: '1',
     isLoading: false,
     error: null
@@ -58,7 +56,7 @@ export const syncWithBackend = createAsyncThunk(
                 return rejectWithValue('User authentication failed')
             }
             const authToken = user.accessToken
-            const response = await fetch(`http://localhost:8000/jobs/${projectId}`, {
+            const response = await fetch(`${serverUrl}/jobs/${projectId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -98,7 +96,7 @@ export const fetchSectionsData = createAsyncThunk(
             const localLastModified = localSections?.lastModified || '1970-01-01';
 
             // Get data from backend
-            const response = await fetch(`http://localhost:8000/jobs/${projectId}`, {headers: {'Authorization': `Bearer ${authToken}`}});
+            const response = await fetch(`${serverUrl}/jobs/${projectId}`, {headers: {'Authorization': `Bearer ${authToken}`}});
             if (!response.ok) throw new Error('Failed to fetch from backend');
             const backendData = await response.json();
             const backendSections = backendData.data?.data?.sideBySideSections || [];
@@ -121,15 +119,6 @@ const sideBySideSlice = createSlice({
     name: 'sideBySide',
     initialState,
     reducers: {
-        addSection: (state) => {
-            const newId = uuid();
-            state.sections.push({
-                id: newId,
-                sourceContent: '',
-                targetContent: ''
-            });
-            state.activeSection = newId;
-        },
         updateSection: (state, action: PayloadAction<{
             id: string;
             sourceContent?: string;
@@ -157,21 +146,27 @@ const sideBySideSlice = createSlice({
             state.activeSection = action.payload;
         },
         setTargetLanguage: (state, action: PayloadAction<string>) => {
-            state.targetLanguage = action.payload;
+            if (state.activeSection && !!state.sections.length) {
+                const targetSection = state.sections.find((section: Section) => section!.id! === state!.activeSection!)
+                targetSection!.targetLanguage = action.payload;
+            }
         },
         initializeWithText: (state, action: PayloadAction<{
             text: string;
-            sourceLanguage: string;
+            sourceLanguage?: string;
             projectId?: string
         }>) => {
-            const newSection = {
+            const newSection: Section = {
                 id: uuid(),
                 sourceContent: action.payload.text,
-                targetContent: ''
+                targetContent: '',
+                lastModified: new Date().toISOString(),
+                sourceLanguage: action.payload.sourceLanguage || "en",
+                targetLanguage: 'he',
+                projectId: action.payload.projectId!,
             };
             state.sections.push(newSection);
             state.projectId = action.payload.projectId!
-            state.sourceLanguage = action.payload.sourceLanguage;
             state.activeSection = newSection.id;
 
             localStorage.setItem(`sideBySideSections_${state.projectId}`, JSON.stringify({
@@ -219,7 +214,6 @@ const sideBySideSlice = createSlice({
 
 // Actions
 export const {
-    addSection,
     updateSection,
     setActiveSection,
     setTargetLanguage,
@@ -230,8 +224,8 @@ export const {
 // Selectors
 export const selectSections = (state: RootState) => state.sideBySide.sections;
 export const selectActiveSection = (state: RootState) => state.sideBySide.activeSection;
-export const selectSourceLanguage = (state: RootState) => state.sideBySide.sourceLanguage;
-export const selectTargetLanguage = (state: RootState) => state.sideBySide.targetLanguage;
+export const selectSourceLanguage = (state: RootState) => state.sideBySide.sections.find((section) => section.id == state.sideBySide.activeSection)?.sourceLanguage;
+export const selectTargetLanguage = (state: RootState) => state.sideBySide.sections.find((section) => section.id == state.sideBySide.activeSection)?.targetLanguage;
 export const selectActiveSectionData = (state: RootState) =>
     state.sideBySide.sections.find((section: Section) => {
         return section.id == state.sideBySide.activeSection

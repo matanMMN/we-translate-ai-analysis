@@ -5,15 +5,14 @@ interface InfoFieldProps {
     render?: (value: string) => React.ReactNode;
 }
 
-export function InfoField({ label, value, className = '', render }: InfoFieldProps) {
+export function InfoField({value, className = '', render}: InfoFieldProps) {
     return (
-        <div>
-            <div className="text-sm text-muted-foreground mb-1">{label}</div>
-            {render ? (
+
+            render ? (
                 render(value as string)
             ) : (
                 <div className={`font-medium ${className}`}>{value}</div>
-            )}
-        </div>
+            )
+
     );
 } 

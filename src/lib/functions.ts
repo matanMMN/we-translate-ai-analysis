@@ -1,10 +1,19 @@
 import {Project} from "@/lib/userData";
 
 
-export const getStatus = (status: string) => {
+export const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL
+
+export const getStatus = (status: string | undefined) => {
     switch (status) {
         case 'initial':
+        case 'In Progress':
             return 'In Progress'
+        case 'Planned':
+            return 'Planned'
+        case 'Completed':
+            return 'Completed'
+        case 'On Hold':
+            return 'On Hold'
         // case 'Planned':
         //     return 'text-slate-500'
         // case 'In Progress':

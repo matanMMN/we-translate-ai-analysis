@@ -35,7 +35,6 @@ export default function Editor({
     const [docxHash, setDocxHash] = useState<string | null>(null);
     const [commentsHash, setCommentsHash] = useState<string | null>(null);
     const hostUrl = "https://services.syncfusion.com/react/production/api/documenteditor/";
-    const sourceLanguage = "he";
     let titleBar: TitleBar;
 
     useAutoSave(container, docxHash, commentsHash, setDocxHash, setCommentsHash);
@@ -61,12 +60,13 @@ export default function Editor({
 
         if (!readOnly) {
             document.getElementById("defaultDialog_dialog-content")?.remove()
+            container.current.toolbarItems = ['Undo', 'Redo', 'Separator', 'Image', 'Table', 'Hyperlink', 'Bookmark', 'TableOfContents', 'Separator', 'Header', 'Footer', 'PageSetup', 'PageNumber', 'Break', 'InsertFootnote', 'InsertEndnote', 'Separator', 'Find', 'Separator', 'Comments', 'TrackChanges', 'Separator', 'FormFields', 'UpdateFields', 'ContentControl', 'XML Mapping'];
             setupContextMenu({
                 container,
                 dispatch,
                 navigate: router.push,
                 projectId,
-                sourceLanguage
+                sourceLanguage: project.project?.source_language
             });
         }
 

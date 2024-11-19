@@ -1,6 +1,6 @@
 'use server'
-
-import store from "@/store/store"
+import {serverUrl} from "@/lib/functions";
+import {getUser} from "@/lib/AuthGuard";
 //
 // interface ProjectFileResponse {
 //     content: string
@@ -8,32 +8,30 @@ import store from "@/store/store"
 //     lastModified: number
 // }
 
-export async function fetchProjectFile(projectId: string, fileId: string): Promise<{
-    blob: Blob | null,
-    type: string | null
-} | null> {
+export async function fetchProjectFile(projectId: string): Promise<File | null> {
+    const user = await getUser()
+    if (!user) {
+        throw new Error('User authentication failed')
+    }
     try {
-        // In development, read from local file system
-        // if (process.env.NODE_ENV === 'development') {
-            console.log(projectId, fileId)
-            const state = store.getState()
-            const currentFile = state.project.currentFile
-            console.log(currentFile)
-            return {blob: currentFile.blob!, type: currentFile.type!}
-            // const filePath = path.join(process.cwd(), 'public', 'uploads', projectId, 'document.docx')
-            // const fileBuffer = await fs.readFile(filePath)
-            //
-            // return {
-            //     content: fileBuffer.toString('base64'),
-            //     type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            //     lastModified: (await fs.stat(filePath)).mtimeMs
-            // }
-        // }
-        //
-        // // TODO: In production, fetch from actual storage using fileId
-        // return null
+        const projectRes = await fetch(`${serverUrl}/jobs/${projectId}`, {
+            headers: {
+                Authorization: `Bearer ${user?.accessToken}`,
+                'Content-Type': 'application/json'
+            }
+        })
+        const project = await projectRes.json();
+        const fileId = project.data.reference_file_id
+        const fileRes = await fetch(`${serverUrl}/files/download/${fileId}`, {
+            headers: {
+                Authorization: `Bearer ${user?.accessToken}`,
+                'Content-Type': 'application/json'
+            }
+        })
+        const fileBlob = await fileRes.blob()
+        return new File([fileBlob], project.data.file_name, {type: fileBlob.type});
     } catch (error) {
         console.error('Error fetching project file:', error)
-        return null
+        return null;
     }
 } 

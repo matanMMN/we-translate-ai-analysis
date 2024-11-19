@@ -1,6 +1,7 @@
 import {NextAuthOptions} from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import {encode as defaultEncode, JWTEncodeParams} from "next-auth/jwt";
+import {serverUrl} from "@/lib/functions";
 
 
 export const authOptions: NextAuthOptions = {
@@ -30,7 +31,7 @@ export const authOptions: NextAuthOptions = {
 
                     // const res: User = await ApiClient.login(email, password);
                     console.log(email, password)
-                    const data = await fetch('http://localhost:8000/auth/token', {
+                    const data = await fetch(`${serverUrl}/auth/token`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
@@ -51,7 +52,7 @@ export const authOptions: NextAuthOptions = {
                         throw new Error('User not found');
                     }
                     console.log("Res", res)
-                    const userRes = await fetch(`http://localhost:8000/users/me/`, { // default user
+                    const userRes = await fetch(`${serverUrl}/users/me/`, { // default user
                         headers: {
                             'accept': 'application/json',
                             'Content-Type': 'application/json',
@@ -62,7 +63,6 @@ export const authOptions: NextAuthOptions = {
                     console.log(user)
                     if (user.status_code !== 200)
                         throw new Error("User not found")
-
                     return {
                         name: (user.data.first_name + " " + user.data.last_name) || "Null Null",
                         email: user.data.email || "null@email.com",
@@ -77,7 +77,8 @@ export const authOptions: NextAuthOptions = {
                     // } as unknown as User;
 
                 } catch (e) {
-                    throw e;
+                    console.error(e)
+                    throw new Error("Login failed");
                 }
             }
         }),
@@ -94,7 +95,7 @@ export const authOptions: NextAuthOptions = {
                 session.userId = token.userId as string
             }
 
-            const userRes = await fetch(`http://localhost:8000/users/me/`, { // default user
+            const userRes = await fetch(`${serverUrl}/users/me/`, { // default user
                 headers: {
                     'accept': 'application/json',
                     'Content-Type': 'application/json',

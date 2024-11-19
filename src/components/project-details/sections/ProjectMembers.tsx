@@ -11,7 +11,7 @@ export default function ProjectMembers({ members }: ProjectMembersProps) {
         <Card>
             <CardContent className="pt-6">
                 <h2 className="text-lg font-semibold mb-4">Members</h2>
-                <div className="flex gap-4">
+                <div className="flex flex-col lg:flex-row gap-4">
                     {members.map((member) => (
                         <div key={member.id} className="flex items-center gap-2">
                             <Avatar>

@@ -13,9 +13,9 @@ export default function NewProjectButton() {
             className="flex justify-center mb-6"
         >
             <Link href={"/new-project"}>
-                <Button className="bg-[#1D3B34] hover:bg-[#1D3B34]/90">
+                <Button className="bg-[#1D3B34] hover:bg-[#1D3B34]/90 text-white">
                     <Plus className="w-4 h-4 mr-2"/>
-                    NEW PROJECT
+                    New Project
                 </Button>
             </Link>
         </motion.div>

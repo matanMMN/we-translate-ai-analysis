@@ -1,35 +1,29 @@
 "use server"
 
+
 import {Project} from "@/lib/userData";
 import {getUser} from "@/lib/AuthGuard";
 import fs from 'fs/promises';
 import path from 'path';
 import {revalidatePath} from "next/cache";
+import {serverUrl} from "@/lib/functions";
 
 
 export const fetchProjects = async (): Promise<Project[]> => {
     try {
         const user = await getUser();
-        const res = await fetch(`http://localhost:8000/jobs?offset=0&sort_order=asc"}`, {
+        const res = await fetch(`${serverUrl}/jobs`, {
             headers: {
-                'accept': 'application/json',
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${user?.accessToken}`
-            }
+            },
         })
 
         const projects = await res.json();
-        // const projects = await import('@/data/userData.json');
-        // return projects.default.map((project) => ({
-        //     ...project,
-        //     dueDate: project.dueDate ? new Date(project.dueDate).toLocaleDateString("en") : undefined,
-        //     createdAt: project.createdAt ? new Date(project.createdAt).toLocaleDateString("en") : undefined,
-        //     updatedAt: project.updatedAt ? new Date(project.updatedAt).toLocaleDateString("en") : undefined,
-        //
-        // }))
-        if (projects.status_code === 200)
+        if (projects && projects.status_code === 200)
             return projects.data;
-        else throw new Error("Failed to fetch user projects")
+        else
+            throw new Error("Failed to fetch user projects")
     } catch (error) {
         console.error('Error fetching projects:', error);
         return []
@@ -73,7 +67,7 @@ export const saveNewProject = async (project: Project): Promise<boolean> => {
 export const fetchProjectById = async (projectId: string): Promise<Project | null> => {
     try {
         const user = await getUser();
-        const res = await fetch(`http://localhost:8000/jobs/${projectId}`, {
+        const res = await fetch(`${serverUrl}/jobs/${projectId}`, {
             headers: {
                 'accept': 'application/json',
                 'Content-Type': 'application/json',
@@ -86,9 +80,9 @@ export const fetchProjectById = async (projectId: string): Promise<Project | nul
             /* TODO */
             return {
                 ...project.data,
-                dueDate: project.data.dueDate ? new Date(project.data.dueDate).toLocaleDateString("en") : new Date(Date.now()).toLocaleDateString("en"),
-                createdAt: project.data.createdAt ? new Date(project.data.createdAt).toLocaleDateString("en") : new Date(Date.now()).toLocaleDateString("en"),
-                updatedAt: project.data.updatedAt ? new Date(project.data.updatedAt).toLocaleDateString("en") : new Date(Date.now()).toLocaleDateString("en"),
+                due_date: project.data.due_date ? new Date(project.data.due_date).toLocaleDateString("en") : new Date(Date.now()).toLocaleDateString("en"),
+                created_at: project.data.created_at ? new Date(project.data.created_at).toLocaleDateString("en") : new Date(Date.now()).toLocaleDateString("en"),
+                updated_at: project.data.updated_at ? new Date(project.data.updated_at).toLocaleDateString("en") : new Date(Date.now()).toLocaleDateString("en"),
             }
         } else
             throw new Error("Failed to fetch project")

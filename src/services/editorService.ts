@@ -4,7 +4,7 @@ import {toast} from 'sonner';
 
 interface CopyToSideBySideOptions {
     text: string;
-    sourceLanguage: string;
+    sourceLanguage?: string;
     dispatch: AppDispatch;
     projectId: string;
 }

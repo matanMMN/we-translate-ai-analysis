@@ -10,7 +10,7 @@ interface SetupContextMenuProps {
     dispatch: AppDispatch;
     navigate: (path: string) => void;
     projectId: string | null
-    sourceLanguage: string;
+    sourceLanguage?: string;
 }
 
 export const setupContextMenu = ({

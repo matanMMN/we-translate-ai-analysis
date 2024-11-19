@@ -15,6 +15,7 @@ import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import UploadFileModal from "@/components/newProjectForm/UploadFileModal";
 import {AlertCircle} from "lucide-react";
 import {cn} from "@/lib/utils";
+import {serverUrl} from "@/lib/functions";
 
 const formSchema = z.object({
     title: z.string()
@@ -23,16 +24,16 @@ const formSchema = z.object({
         .regex(/^[a-zA-Z0-9\s-]+$/, {
             message: "Name can only contain letters, numbers, spaces, and hyphens"
         }).refine(async (title: string) => {
-            return !(await checkProjectName(title))
+            return !(await checkProjectName(title, serverUrl!))
         }, {
             message: "Project name already taken",
         }),
     description: z.string()
         .min(10, {message: "Description must be at least 10 characters"})
         .max(500, {message: "Description must be less than 500 characters"}),
-    industry: z.enum(["Cosmetics", "Leaflets", "Medical_Devices"], {
-        required_error: "Please select an industry",
-    }),
+    // industry: z.enum(["Cosmetics", "Leaflets", "Medical_Devices"], {
+    //     required_error: "Please select an industry",
+    // }),
     sourceLanguage: z.enum(["en", "he"], {
         required_error: "Please select a source language",
     }),
@@ -50,11 +51,11 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
-const industryOptions = [
-    {value: "Cosmetics", label: "Cosmetics"},
-    {value: "Leaflets", label: "Leaflets"},
-    {value: "Medical_Devices", label: "Medical Devices"}
-];
+// const industryOptions = [
+//     {value: "Cosmetics", label: "Cosmetics"},
+//     {value: "Leaflets", label: "Leaflets"},
+//     {value: "Medical_Devices", label: "Medical Devices"}
+// ];
 
 const languageOptions = [
     {value: "en", label: "English"},
@@ -78,13 +79,14 @@ export default function NewProjectForm() {
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
 
+
     const form = useForm<FormData>({
         resolver: zodResolver(formSchema),
         mode: 'onChange',
         defaultValues: {
             title: '',
             description: '',
-            industry: undefined,
+            // industry: undefined,
             sourceLanguage: undefined,
             destinationLanguage: undefined,
             referenceFile: undefined
@@ -106,13 +108,13 @@ export default function NewProjectForm() {
             placeholder: 'Enter project description',
             required: true,
         },
-        {
-            name: 'industry',
-            label: 'Industry',
-            type: 'select' as const,
-            options: industryOptions,
-            required: true,
-        },
+        // {
+        //     name: 'industry',
+        //     label: 'Industry',
+        //     type: 'select' as const,
+        //     options: industryOptions,
+        //     required: true,
+        // },
     ], []);
 
     const languageFields: FormFieldConfig[] = useMemo<FormFieldConfig[]>(() => [
@@ -160,14 +162,17 @@ export default function NewProjectForm() {
                 accessToken: session.accessToken
             });
 
-            // const isSaved = await saveNewProject(newProject);
-            console.log(newProject)
             if (newProject) {
                 toast.success('Project created successfully');
                 router.back();
+
                 setTimeout(() => {
-                    router.push(`/${newProject.id}/details`);
-                }, 100);
+                    router.refresh()
+                }, 50);
+                setTimeout(() => {
+                    router.replace(`/${newProject.id}/details`);
+                }, 300);
+
             }
         } catch (error) {
             console.error('Failed to create project:', error);

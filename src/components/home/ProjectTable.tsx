@@ -2,7 +2,7 @@
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
 import {Badge} from "@/components/ui/badge";
 import {cn} from "@/lib/utils";
-import {getPriority, getPriorityColor, getStatusColor} from "@/lib/functions";
+import {getPriority, getPriorityColor, getStatus, getStatusColor} from "@/lib/functions";
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
 import {Button} from "@/components/ui/button";
 import {ChevronDown, ChevronUp, Edit2, Search, MoreVertical, Trash2} from "lucide-react";
@@ -17,6 +17,7 @@ import {Project} from "@/lib/userData";
 import {useRouter} from "next/navigation";
 import {toast} from 'sonner';
 import {deleteProject} from '@/actions/deleteProject';
+import NoProjects from "@/components/home/NoProjects";
 
 // export interface Project {
 //     id: string
@@ -32,7 +33,6 @@ export type SortConfig = {
 
 
 export default function ProjectTable({projects}: { projects: Project[] }) {
-
 
     const {data: session, status} = useSession()
     const router = useRouter()
@@ -119,11 +119,10 @@ export default function ProjectTable({projects}: { projects: Project[] }) {
 
     const handleDeleteProject = async (projectId: string) => {
         try {
-            // Add your delete project action here
+
             const response = await deleteProject(projectId, session?.accessToken as string);
             if (response) {
                 toast.success('Project deleted successfully');
-                // Optionally refresh the projects list or remove from current list
                 router.refresh();
             }
         } catch (error) {
@@ -141,13 +140,17 @@ export default function ProjectTable({projects}: { projects: Project[] }) {
                 className="p-4 flex w-full justify-center relative"
             >
                 <div className="relative bg-[#F0F2F5] border-none rounded-2xl w-full max-w-2xl">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 text-muted-foreground"/>
-                    <Input
-                        placeholder="Search Project"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-12 pr-4 py-6 text-xl w-full h-[46px] focus:outline-none focus:ring-0 focus:border-blue-500"
-                    />
+                    {!!projects.length &&
+                        <>
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 text-muted-foreground"/>
+                            <Input
+                                placeholder="Search Project"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="pl-12 pr-4 py-6 text-xl w-full h-[46px] focus:outline-none focus:ring-0 focus:border-blue-500"
+                            />
+                        </>
+                    }
                     <AnimatePresence>
                         {showResults && searchResults.length > 0 && (
                             <motion.div
@@ -171,9 +174,12 @@ export default function ProjectTable({projects}: { projects: Project[] }) {
                                         {
                                             result.title.toLowerCase().indexOf(searchQuery.toLowerCase()) >= 0 &&
                                             <>
-                                        <span className="font-normal text-white">{result.title.slice(0, result.title.toLowerCase().indexOf(searchQuery.toLowerCase()))}</span>
-                                        <span className="font-normal">{result.title.slice(result.title.toLowerCase().indexOf(searchQuery.toLowerCase()), result.title.toLowerCase().indexOf(searchQuery.toLowerCase()) + searchQuery.length)}</span>
-                                        <span className="font-normal text-white">{result.title.slice(result.title.toLowerCase().indexOf(searchQuery.toLowerCase()) + searchQuery.length)}</span>
+                                                <span
+                                                    className="font-normal text-white">{result.title.slice(0, result.title.toLowerCase().indexOf(searchQuery.toLowerCase()))}</span>
+                                                <span
+                                                    className="font-normal">{result.title.slice(result.title.toLowerCase().indexOf(searchQuery.toLowerCase()), result.title.toLowerCase().indexOf(searchQuery.toLowerCase()) + searchQuery.length)}</span>
+                                                <span
+                                                    className="font-normal text-white">{result.title.slice(result.title.toLowerCase().indexOf(searchQuery.toLowerCase()) + searchQuery.length)}</span>
                                             </>
                                         }
                                     </motion.div>
@@ -185,100 +191,104 @@ export default function ProjectTable({projects}: { projects: Project[] }) {
             </motion.header>
 
             <main className="flex-1 p-8 overflow-hidden">
+                {projects.length > 0 ? (
 
-                <motion.div
-                    initial={{y: 40, opacity: 0}}
-                    animate={{y: 0, opacity: 1}}
-                    transition={{delay: 0.4}}
-                    ref={parentRef}
-                    className="border-2 border-gray-200 dark:border-gray-700 rounded-2xl overflow-auto h-[calc(100vh-20rem)] shadow-inner bg-white dark:bg-gray-800"
-                >
-                    <div className="min-w-[900px]">
-                        <Table>
-                            <TableHeader className="sticky top-0 bg-gray-50 dark:bg-gray-900 z-10">
-                                <TableRow
-                                    className="hover:bg-transparent">
-                                    <SortableHeader column={`${'project Name' as "title"}`} width="30%"/>
-                                    <SortableHeader column="priority" width="30%"/>
-                                    <SortableHeader column="status" width="30%"/>
-                                    <TableHead style={{width: '10%'}}>
-                                        <span className={"text-2xl"}>Actions</span>
-                                    </TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody style={{
-                                height: `${rowVirtualizer.getTotalSize()}px`,
-                                width: '100%',
-                                position: 'relative',
-                            }}>
-                                {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-                                    let project
-                                    if (searchResults.length > 0) {
-                                        project = searchResults[virtualRow.index]
-                                    } else {
-                                        project = sortedProjects![virtualRow.index]
-                                    }
-                                    return (
-                                        <TableRow
-                                            key={project.id}
-                                            className="absolute w-full flex items-center text-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                                            style={{
-                                                height: `${virtualRow.size}px`,
-                                                transform: `translateY(${virtualRow.start}px)`,
-                                            }}
-                                        >
+                    <motion.div
+                        initial={{y: 40, opacity: 0}}
+                        animate={{y: 0, opacity: 1}}
+                        transition={{delay: 0.4}}
+                        ref={parentRef}
+                        className="border-2 border-gray-200 dark:border-gray-700 rounded-2xl overflow-auto h-[calc(100vh-20rem)] shadow-inner bg-white dark:bg-gray-800"
+                    >
+                        <div className="min-w-[900px]">
+                            <Table>
+                                <TableHeader className="sticky top-0 bg-gray-50 dark:bg-gray-900 z-10">
+                                    <TableRow
+                                        className="hover:bg-transparent">
+                                        <SortableHeader column={`${'project Name' as "title"}`} width="30%"/>
+                                        <SortableHeader column="priority" width="30%"/>
+                                        <SortableHeader column="status" width="30%"/>
+                                        <TableHead style={{width: '10%'}}>
+                                            <span className={"text-2xl"}>Actions</span>
+                                        </TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody style={{
+                                    height: `${rowVirtualizer.getTotalSize()}px`,
+                                    width: '100%',
+                                    position: 'relative',
+                                }}>
+                                    {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+                                        let project
+                                        if (searchResults.length > 0) {
+                                            project = searchResults[virtualRow.index]
+                                        } else {
+                                            project = sortedProjects![virtualRow.index]
+                                        }
+                                        return (
+                                            <TableRow
+                                                key={project.id}
+                                                className="absolute w-full flex items-center text-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                                                style={{
+                                                    height: `${virtualRow.size}px`,
+                                                    transform: `translateY(${virtualRow.start}px)`,
+                                                }}
+                                            >
 
-                                            <TableCell onClick={() => router.push(`/${project.id}/details`)}
-                                                       className="text-lg hover:cursor-pointer max-w-[30%] w-full text-start">{project.title}</TableCell>
+                                                <TableCell onClick={() => router.push(`/${project.id}/details`)}
+                                                           className="text-lg hover:cursor-pointer max-w-[30%] w-full text-start">{project.title}</TableCell>
 
-                                            <TableCell style={{width: '30%'}}
-                                                       className="py-6 text-start w-full max-w-[30%]">
-                                                <Badge variant="secondary"
-                                                       className={cn('text-base font-medium px-4 py-2 ', getPriorityColor(project.priority))}>
-                                                    {getPriority(project.priority)}
-                                                </Badge>
-                                            </TableCell>
-                                            <TableCell style={{width: '30%'}}
-                                                       className="py-6 text-start w-full max-w-[30%]">
+                                                <TableCell style={{width: '30%'}}
+                                                           className="py-6 text-start w-full max-w-[30%]">
+                                                    <Badge variant="secondary"
+                                                           className={cn('text-base font-medium px-4 py-2 ', getPriorityColor(project.priority))}>
+                                                        {getPriority(project.priority)}
+                                                    </Badge>
+                                                </TableCell>
+                                                <TableCell style={{width: '30%'}}
+                                                           className="py-6 text-start w-full max-w-[30%]">
                                         <span className={cn('text-lg font-bold', getStatusColor(project.status))}>
-                                          {project.status}
+                                          {getStatus(project.status)}
                                         </span>
-                                            </TableCell>
-                                            <TableCell style={{width: '10%'}}
-                                                       className="py-6 text-start w-full max-w-[30%]">
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            className="hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full w-8 h-8"
-                                                        >
-                                                            <MoreVertical className="w-4 h-4"/>
-                                                        </Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end" className="w-[160px]">
-                                                        <DropdownMenuItem
-                                                            onClick={() => router.push(`/${project.id}/details`)}>
-                                                            <Edit2 className="mr-2 h-4 w-4"/>
-                                                            View Project
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuItem
-                                                            className="text-red-600 focus:text-red-600"
-                                                            onClick={() => handleDeleteProject(project.id as string)}
-                                                        >
-                                                            <Trash2 className="mr-2 h-4 w-4"/>
-                                                            Delete Project
-                                                        </DropdownMenuItem>
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
-                                            </TableCell>
-                                        </TableRow>
-                                    )
-                                })}
-                            </TableBody>
-                        </Table>
-                    </div>
-                </motion.div>
+                                                </TableCell>
+                                                <TableCell style={{width: '10%'}}
+                                                           className="py-6 text-start w-full max-w-[30%]">
+                                                    <DropdownMenu>
+                                                        <DropdownMenuTrigger asChild>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                className="hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full w-8 h-8"
+                                                            >
+                                                                <MoreVertical className="w-4 h-4"/>
+                                                            </Button>
+                                                        </DropdownMenuTrigger>
+                                                        <DropdownMenuContent align="end" className="w-[160px]">
+                                                            <DropdownMenuItem
+                                                                onClick={() => router.push(`/${project.id}/details`)}>
+                                                                <Edit2 className="mr-2 h-4 w-4"/>
+                                                                View Project
+                                                            </DropdownMenuItem>
+                                                            <DropdownMenuItem
+                                                                className="text-red-600 focus:text-red-600"
+                                                                onClick={() => handleDeleteProject(project.id as string)}
+                                                            >
+                                                                <Trash2 className="mr-2 h-4 w-4"/>
+                                                                Delete Project
+                                                            </DropdownMenuItem>
+                                                        </DropdownMenuContent>
+                                                    </DropdownMenu>
+                                                </TableCell>
+                                            </TableRow>
+                                        )
+                                    })}
+                                </TableBody>
+                            </Table>
+                        </div>
+                    </motion.div>
+                ) : (
+                    <NoProjects/>
+                )}
             </main>
         </>
     )

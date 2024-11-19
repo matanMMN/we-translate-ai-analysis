@@ -3,6 +3,7 @@
 import {revalidatePath} from 'next/cache';
 import {getUser} from "@/lib/AuthGuard";
 import {Session} from "next-auth";
+import {serverUrl} from "@/lib/functions";
 
 export async function updateUserProfile(data: {
     first_name: string;
@@ -14,7 +15,7 @@ export async function updateUserProfile(data: {
             throw new Error('Unauthorized');
         }
 
-        const res = await fetch(`http://localhost:8000/users/${user.userId}`, {
+        const res = await fetch(`${serverUrl}/users/${user.userId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',

@@ -87,7 +87,6 @@ const mockTerms: MedicalTerm[] = [
 export async function fetchMedicalTerms({
     page,
     search = '',
-    language,
     limit = 9,
 }: FetchParams) {
     // Simulate API delay

@@ -25,14 +25,9 @@ export const handleFileLoad = async (
     try {
         const state = store.getState();
         const currentFile = selectCurrentFile(state);
-
         // Check localStorage first
-        const savedContent = localStorage.getItem(`editorContent-${projectId}`
-        );
-        const lastSaveTime = localStorage.getItem(
-            `lastSaveTime-${projectId}`
-        );
-        console.log(currentFile)
+        const savedContent = localStorage.getItem(`editorContent-${projectId}`);
+        const lastSaveTime = localStorage.getItem(`lastSaveTime-${projectId}`);
         // If we have a lastModified timestamp from the backend/translation
         if (currentFile.lastModified) {
             // Check if localStorage is newer than our last known modification
@@ -41,7 +36,6 @@ export const handleFileLoad = async (
                 container.current.documentEditor.open(savedContent);
                 return;
             }
-            console.log(savedContent, projectId)
             // If localStorage is older or doesn't exist, try to fetch from backend
             if (projectId) {
                 try {
@@ -50,7 +44,6 @@ export const handleFileLoad = async (
                     const res = {blob: currentFile.blob, type: currentFile.type}
                     console.log(res)
                     if (res?.type && res.blob) {
-                        // const blob = base64ToBlob(fileData.content, fileData.type);
                         await loadFileContent(container, res.blob, res.type);
                         return;
                     }
@@ -165,13 +158,7 @@ async function handleDocxContent(
     container: RefObject<DocumentEditorContainerComponent>,
     fileBlob: Blob
 ) {
-    console.log("Got here")
-    const reader = new FileReader();
-    reader.readAsDataURL(fileBlob);
-    // reader.onloadend = () => { // Untested technique
-    //     container.current?.documentEditor.open(reader.result);
-    // };
-
+    container.current?.documentEditor.open(fileBlob);
 }
 
 // Helper function to convert base64 to Blob

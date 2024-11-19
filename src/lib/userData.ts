@@ -261,8 +261,8 @@ export const user = {
 
 export interface Project {
     id: number | string;
-    clientId?: number | string;
-    sourceFileId?: number | string;
+    client_id?: number | string;
+    source_file_id?: number | string;
     destFileId?: number | string;
     description: string,
     reference_file_id?: number | string;
@@ -271,20 +271,21 @@ export interface Project {
     target_language: string;
     priority: number | string;
     status?: string;
-    currentStepIndex?: number;
+    data: any;
+    current_step_index?: number;
     // data: any;
     // settings: any;
     comments?: Array<string>
     activities?: Array<ActivityItem>
     members?: Array<ProjectMember>
-    dueDate?: string;
-    currentUser?: User;
-    createdAt: string;
-    createdBy?: User
-    updatedAt?: string;
-    updatedBy?: User;
-    deletedAt?: string | undefined
-    deletedBy?: User | undefined
-    approvedAt?: string | undefined
-    approvedBy?: User | undefined
+    due_date?: string;
+    current_user?: User;
+    created_at: string;
+    created_by?: User
+    updated_at?: string;
+    updated_by?: User;
+    deleted_at?: string | undefined
+    deleted_by?: User | undefined
+    approved_at?: string | undefined
+    approved_by?: User | undefined
 }

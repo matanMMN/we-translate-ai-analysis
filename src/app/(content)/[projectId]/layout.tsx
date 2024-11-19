@@ -2,7 +2,6 @@ import "@/app/globals.css"
 import '@/app/(content)/[projectId]/editor/page.module.css'
 import {ReactNode} from "react";
 import {AuthGuard} from "@/lib/AuthGuard";
-import {redirect} from "next/navigation";
 import {log} from "@/lib/log";
 import ProjectNavBar from "@/components/project/ProjectNavBar";
 import ProjectProvider from "@/components/ProjectProvider";
@@ -18,8 +17,7 @@ export default async function ProjectLayout(
         params: Promise<{ projectId: string }>
     }): Promise<ReactNode> {
 
-    if (!await AuthGuard())
-        return redirect('/login')
+    await AuthGuard()
 
     log("Rendering specific project layout");
 
@@ -32,7 +30,7 @@ export default async function ProjectLayout(
 
     return (
         <ProjectProvider projectId={projectId} initialProject={project}>
-            <div>
+            <div className="pb-8">
                 <ProjectNavBar project={project}/>
                 {children}
             </div>

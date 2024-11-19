@@ -34,7 +34,7 @@ export default function UploadFileModal({open, onClose, onUpload}: UploadModalPr
         setFileStatus({file, status: 'validating'})
 
         // Simulate validation delay for UX
-        await new Promise(resolve => setTimeout(resolve, 1500))
+        await new Promise(resolve => setTimeout(resolve, 1000))
 
         const validation = validateFile(file)
         if (!validation.valid) {

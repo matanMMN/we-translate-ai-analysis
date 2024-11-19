@@ -15,12 +15,13 @@ import {setTranslatedFile} from '@/store/slices/projectSlice'
 import {useRouter} from 'next/navigation'
 import {useSession} from "next-auth/react";
 import {selectSession} from "@/store/slices/sessionSlice";
+import {clearAllLocalStorage} from "@/store/slices/projectCacheSlice";
 
 const ACCEPTED_FILE_TYPES = {
-    'application/pdf': ['.pdf'],
-    'application/msword': ['.doc'],
+    // 'application/pdf': ['.pdf'],
+    // 'application/msword': ['.doc'],
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
-    'text/plain': ['.txt']
+    // 'text/plain': ['.txt']
 }
 
 type TranslationState = 'idle' | 'uploading' | 'translating' | 'completed' | 'error';
@@ -29,7 +30,7 @@ export default function TranslateFile() {
     const dispatch = useAppDispatch()
     const {data: session} = useSession()
     const router = useRouter()
-    const {projectId} = useAppSelector(selectSession)
+    const {projectId, project} = useAppSelector(selectSession)
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
     const [detectedLanguage, setDetectedLanguage] = useState<string | null>(null)
     const [targetLanguage, setTargetLanguage] = useState('')
@@ -48,7 +49,8 @@ export default function TranslateFile() {
             setDetectedLanguage(language)
             setError(null)
         } catch (error) {
-            setError(`Failed to detect file language ${error}`)
+            console.error(error)
+            setError(`Failed to detect file language`)
             toast.error('Failed to detect file language')
         }
     }
@@ -69,33 +71,24 @@ export default function TranslateFile() {
             formData.append('file', selectedFile)
 
 
-            const response = await translateFile(formData, detectedLanguage, targetLanguage, projectId, session!)
+            const response = await translateFile(formData, detectedLanguage, targetLanguage, projectId, session!, project!.data)
 
-            if (response.success) {// && response.docxHash && response.fileId) {
-                // Save to localStorage if we have mock content
-                if (response.mockBlob) { // In development, it's  a txt file!
-                    // Need to transform the blob to Sfdt content and save it to localStorage
-
-                    // localStorage.setItem('editorContent', response.mockContent)
-                    // localStorage.setItem('lastSaveTime', Date.now().toString())
+            if (response.success) {
+                if (response.mockBlob) {
                 }
 
-                // Update project's source file
                 if (response.mockBlob && response.blobType) {
                     dispatch(setTranslatedFile({
                         fileId: response.fileId || "1",
                         blob: response.mockBlob as Blob,
                         type: response.blobType
-                        // docxHash: response.docxHash,
-                        // commentsHash: response.commentsHash || null
                     }))
                 } else {
                     throw new Error("Blob couldn't be extracted")
                 }
 
                 setTranslationState('completed')
-
-                // Redirect to editor after short delay
+                dispatch(clearAllLocalStorage({projectId}))
                 setTimeout(() => {
                     router.push('editor')
                 }, 1250)
@@ -145,7 +138,7 @@ export default function TranslateFile() {
             <div className="container mx-auto p-4 max-w-4xl text-center space-y-6">
                 <h2 className="text-2xl font-semibold">Translating your file...</h2>
                 <p className="text-muted-foreground">
-                    This process may take up to 5 minutes. You must not leave this page.
+                    This process could take up to 5 minutes. You must not leave this page.
                 </p>
                 <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
                     <div className="h-full bg-primary animate-pulse" style={{width: '100%'}}/>

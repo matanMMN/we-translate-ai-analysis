@@ -18,8 +18,8 @@ export default function AuthProviders({children}: Readonly<{ children: React.Rea
     if (isMobile) {
         return <div
             className="w-full h-dvh flex font-bold text-center whitespace-pre-line justify-center items-center content-center">
-            {`Mobile support is under development.
-             For now please use your PC instead.`}</div>;
+            {`MediTranslate doesn't support Mobile screens currently.
+             Please use your PC instead.`}</div>;
     }
     return (
         <SessionProvider>{children}</SessionProvider>

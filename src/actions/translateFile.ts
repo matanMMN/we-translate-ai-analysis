@@ -1,9 +1,9 @@
 'use server'
 
 import {revalidatePath} from 'next/cache'
-import Anthropic from '@anthropic-ai/sdk';
 import {Session} from "next-auth";
 import path from "path";
+import {serverUrl} from "@/lib/functions";
 
 interface TranslationResponse {
     success: boolean
@@ -14,6 +14,7 @@ interface TranslationResponse {
     blobType?: string,
     error?: string
 }
+
 //
 // interface DocxContent {
 //     text: string;
@@ -133,12 +134,12 @@ const determineType = (fileExt: string) => {
     return mimeTypes[fileExt] || 'application/octet-stream'
 }
 
-const decodeTxtFile = async (file: File) => {
-    const buffer = Buffer.from(await file.arrayBuffer())
-    const base64Content = buffer.toString('base64')
-    const binaryContent = atob(base64Content)
-    return new Blob([Uint8Array.from(binaryContent.split('').map(char => char.charCodeAt(0)))], {type: 'text/plain'})
-}
+// const decodeTxtFile = async (file: File) => {
+//     const buffer = Buffer.from(await file.arrayBuffer())
+//     const base64Content = buffer.toString('base64')
+//     const binaryContent = atob(base64Content)
+//     return new Blob([Uint8Array.from(binaryContent.split('').map(char => char.charCodeAt(0)))], {type: 'text/plain'})
+// }
 
 // const decodeDocxFile = async (file: File) => {
 //     const buffer = Buffer.from(await file.arrayBuffer())
@@ -162,69 +163,69 @@ const decodeTxtFile = async (file: File) => {
 // }
 
 // Add these constants for default settings
-const DEFAULT_SETTINGS = {
-    API_KEY: process.env.ANTHROPIC_API_KEY || '',
-    MODEL: 'claude-3-opus-20240229',
-    MAX_TOKENS: 4000,
-    TEMPERATURE: 0.2
-} as const;
+// const DEFAULT_SETTINGS = {
+//     API_KEY: process.env.ANTHROPIC_API_KEY || '',
+//     MODEL: 'claude-3-opus-20240229',
+//     MAX_TOKENS: 4000,
+//     TEMPERATURE: 0.2
+// } as const;
+//
+// // Create the system prompt function
+// function createSystemPrompt() {
+//     const SUCCESS_TAG = '[TRANSLATION_SUCCESSFUL]';
+//     const FAIL_TAG = '[TRANSLATION_FAILED]';
+//
+//     return `
+//     As a translation model specialized in Hebrew to English translation, your task is to accurately translate a specific paragraph from a CMI leaflet originally written in Hebrew into English, contained within the following tags: <heb_text> ... </heb_text>.
+//
+//     The translation should convey the original meaning, tone, style, and pertinent terminology while effectively communicating the leaflet's message and respecting cultural nuances and idiomatic expressions unique to the source material. It should be precise, well-structured, and coherent, capturing the essence of the original text.
+//
+//     The final translation should feel natural and fluent to English speakers, reading like an original English text while maintaining the integrity of the original content.
+//
+//     Contain the translation of the text within the following tags: <eng_text> ... </eng_text>.
+//
+//     Upon successful translation, please include the phrase ${SUCCESS_TAG} at the end and only at the end of your response to indicate that the task has been completed effectively.
+//
+//     If you fail for whatever reason, response with ${FAIL_TAG} and explain why.
+//
+// <!--    If the text you receive contains no Hebrew text, contains no medical/pharmacological information or could not appear in a CMI leaflet, respond with ${FAIL_TAG}.-->
+//
+//     Provide a response without any additional information or comments besides the previously stated phrase and annotations.
+//
+//     Do not translate html tags and translate the texts inside each tag while keeping their output in their corresponding position.
+//   `;
+// }
 
-// Create the system prompt function
-function createSystemPrompt() {
-    const SUCCESS_TAG = '[TRANSLATION_SUCCESSFUL]';
-    const FAIL_TAG = '[TRANSLATION_FAILED]';
+// async function translateWithLLM(text: string) {
+//     const anthropic = new Anthropic({
+//         apiKey: DEFAULT_SETTINGS.API_KEY,
+//     });
+//     const response: any = await anthropic.messages.create({
+//         model: DEFAULT_SETTINGS.MODEL,
+//         max_tokens: DEFAULT_SETTINGS.MAX_TOKENS,
+//         temperature: DEFAULT_SETTINGS.TEMPERATURE,
+//         system: createSystemPrompt(),
+//         messages: [{
+//             role: 'user',
+//             content: `<heb_text>${text}</heb_text>`
+//         }]
+//     });
+//
+//     const rawText = response.content[0].text;
+//     console.log("response: ", rawText)
+//     if (rawText.includes('[TRANSLATION_SUCCESSFUL]')) {
+//         const startTag = '<eng_text>';
+//         const endTag = '</eng_text>';
+//         const startIndex = rawText.indexOf(startTag) + startTag.length;
+//         const endIndex = rawText.indexOf(endTag);
+//         return rawText.substring(startIndex, endIndex).trim();
+//     } else {
+//         // throw new Error(`Translation failed. Raw output: ${rawText}`);
+//         throw new Error(`Translation failed.\nMake sure the source and target languages are accurate.`);
+//     }
+// }
 
-    return `
-    As a translation model specialized in Hebrew to English translation, your task is to accurately translate a specific paragraph from a CMI leaflet originally written in Hebrew into English, contained within the following tags: <heb_text> ... </heb_text>.
-
-    The translation should convey the original meaning, tone, style, and pertinent terminology while effectively communicating the leaflet's message and respecting cultural nuances and idiomatic expressions unique to the source material. It should be precise, well-structured, and coherent, capturing the essence of the original text. 
-
-    The final translation should feel natural and fluent to English speakers, reading like an original English text while maintaining the integrity of the original content.
-
-    Contain the translation of the text within the following tags: <eng_text> ... </eng_text>.
-
-    Upon successful translation, please include the phrase ${SUCCESS_TAG} at the end and only at the end of your response to indicate that the task has been completed effectively.
-    
-    If you fail for whatever reason, response with ${FAIL_TAG} and explain why.
-
-<!--    If the text you receive contains no Hebrew text, contains no medical/pharmacological information or could not appear in a CMI leaflet, respond with ${FAIL_TAG}.-->
-
-    Provide a response without any additional information or comments besides the previously stated phrase and annotations.
-
-    Do not translate html tags and translate the texts inside each tag while keeping their output in their corresponding position.
-  `;
-}
-
-async function translateWithLLM(text: string) {
-    const anthropic = new Anthropic({
-        apiKey: DEFAULT_SETTINGS.API_KEY,
-    });
-    const response: any = await anthropic.messages.create({
-        model: DEFAULT_SETTINGS.MODEL,
-        max_tokens: DEFAULT_SETTINGS.MAX_TOKENS,
-        temperature: DEFAULT_SETTINGS.TEMPERATURE,
-        system: createSystemPrompt(),
-        messages: [{
-            role: 'user',
-            content: `<heb_text>${text}</heb_text>`
-        }]
-    });
-
-    const rawText = response.content[0].text;
-    console.log("response: ", rawText)
-    if (rawText.includes('[TRANSLATION_SUCCESSFUL]')) {
-        const startTag = '<eng_text>';
-        const endTag = '</eng_text>';
-        const startIndex = rawText.indexOf(startTag) + startTag.length;
-        const endIndex = rawText.indexOf(endTag);
-        return rawText.substring(startIndex, endIndex).trim();
-    } else {
-        // throw new Error(`Translation failed. Raw output: ${rawText}`);
-        throw new Error(`Translation failed.\nMake sure the source and target languages are accurate.`);
-    }
-}
-
-export async function translateFile(formData: FormData, detectedLanguage: string, targetLanguage: string, projectId: string, session: Session): Promise<TranslationResponse> {
+export async function translateFile(formData: FormData, detectedLanguage: string, targetLanguage: string, projectId: string, session: Session, projectData: any): Promise<TranslationResponse> {
 
     if (!formData || !detectedLanguage || !targetLanguage || !projectId) {
         return {success: false, error: 'Missing required fields'}
@@ -234,9 +235,12 @@ export async function translateFile(formData: FormData, detectedLanguage: string
     const fileExt = path.extname(fileCopy.name).toLowerCase()
     const type = determineType(fileExt)
 
+    if (fileExt !== '.docx')
+        return {success: false, error: 'Only DOCX files are supported at this moment'}
+
     // First send file and attach it to the project
     // #1 Send file to back
-    const srcFileRes = await fetch('http://localhost:8000/files/upload/', {
+    const srcFileRes = await fetch(`${serverUrl}/files/upload/`, {
         headers: {
             'Authorization': `Bearer ${session.accessToken}`,
         },
@@ -245,11 +249,11 @@ export async function translateFile(formData: FormData, detectedLanguage: string
     });
     const srcFileData = await srcFileRes.json();
 
-    if (srcFileData.status_code !== 201)
+    if (srcFileData && srcFileData.status_code !== 201)
         return {success: false, error: 'Failed to process the file'}
 
     // #2 Inject src file ID into project
-    const updateProject = await fetch(`http://localhost:8000/jobs/${projectId}/`, {
+    const updateProject = await fetch(`${serverUrl}/jobs/${projectId}/`, {
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${session.accessToken}`,
@@ -257,34 +261,32 @@ export async function translateFile(formData: FormData, detectedLanguage: string
         },
         method: 'PUT',
         body: JSON.stringify({
-            source_file_id: srcFileData.data.id
+            source_file_id: srcFileData.data.id,
+            data: {...projectData, sideBySideSections: []}
         })
     })
-
     const isUpdateSuccess = await updateProject.json()
-
-    if (isUpdateSuccess.status_code !== 200)
+    if (isUpdateSuccess && isUpdateSuccess.status_code !== 200)
         return {success: false, error: 'Failed to process the file'}
 
-    // #3 Translate the file - CURRENTLY DOESNT WORK
-    // const translationRes = await fetch(`http://localhost:8000/translations/file/${srcFileData.data.id}`, {
+    // #3 Ask for the translated version - CURRENTLY DOESNT WORK
+    // const translationRes = await fetch(`${serverUrl}/translations/file/${srcFileData.data.id}`, {
     //     headers: {
     //         'Content-Type': 'application/json',
     //         'Authorization': `Bearer ${session.accessToken}`,
-    //         'accept': 'application/json'
     //     },
     //     method: 'POST',
     //     body: JSON.stringify({
     //         translation_job_id: isUpdateSuccess.data.id,
     //         source_language: detectedLanguage,
     //         target_language: targetLanguage,
-    //         target_file_format: fileExt
+    //         target_file_format: fileExt.slice(1)
     //     })
     // })
-    //
+
     // const isTranslationSuccess = await translationRes.json()
     //
-    // if (isTranslationSuccess.status_code !== 200)
+    // if (isTranslationSuccess && isTranslationSuccess?.status_code !== 200)
     //     return {success: false, error: 'Failed to process the file'}
 
     try {
@@ -296,8 +298,8 @@ export async function translateFile(formData: FormData, detectedLanguage: string
         //     content = await pdfBlob.text();
         //     break;
         // case 'text/plain':
-        const txtBlob = await decodeTxtFile(fileCopy);
-        const content = await txtBlob.text();
+        // const txtBlob = await decodeTxtFile(fileCopy);
+        // const content = await txtBlob.text();
         // break;
         // default:
         //     buffer = Buffer.from(await file.arrayBuffer());
@@ -316,27 +318,17 @@ export async function translateFile(formData: FormData, detectedLanguage: string
         // }
 
 
-        const translatedContent = await translateWithLLM(content);
-        console.log(translatedContent)
-        let encodedString: Blob | string;
-        if (type === 'text/plain' || type === 'application/pdf') {
-            encodedString = new Blob([translatedContent], {type});
-        } else {
-            const test = await fetch('http://localhost:8000/files/download/85ffe83c-6679-4b4d-add9-b9c568fa5095', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${session?.accessToken}`
-                }
-            })
-            console.log(test)
-            encodedString = await test.blob();
+        // const translatedContent = await translateWithLLM(content);
+        // console.log(translatedContent)
+        // let encodedString: Blob | string;
+        // if (type === 'text/plain' || type === 'application/pdf') {
+        //     encodedString = new Blob([translatedContent], {type});
+        // } else {
 
-
-            // const newDocxBuffer = await createNewDocx(translatedContent);
-            // encodedString = newDocxBuffer.toString('base64');
-        }
-
+        // const newDocxBuffer = await createNewDocx(translatedContent);
+        // encodedString = newDocxBuffer.toString('base64');
+        // }
+        const encodedString = Buffer.from(await fileCopy.arrayBuffer()).toString('base64');
 
         revalidatePath(`/${projectId}/editor`);
 

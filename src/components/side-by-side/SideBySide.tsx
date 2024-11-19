@@ -1,7 +1,6 @@
 'use client'
 
 import {useEffect} from 'react';
-import {ThumbsUp, ThumbsDown} from 'lucide-react';
 import {Button} from '@/components/ui/button';
 import {LanguageSelector} from './LanguageSelector';
 import {QuillEditor} from './QuillEditor';
@@ -20,11 +19,12 @@ import {translateText} from '@/services/translationService';
 import {useState} from 'react';
 import {toast} from 'sonner';
 import {selectSession} from "@/store/slices/sessionSlice";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 
 export default function SideBySide() {
     const dispatch = useAppDispatch();
-    const {projectId} = useAppSelector(selectSession);
+    const {projectId, userSession} = useAppSelector(selectSession);
     const activeSection = useAppSelector(selectActiveSectionData)
     const sourceLang = useAppSelector(selectSourceLanguage);
     const targetLang = useAppSelector(selectTargetLanguage);
@@ -53,7 +53,8 @@ export default function SideBySide() {
                 text: activeSection.sourceContent,
                 sourceLang,
                 targetLang,
-                projectId
+                projectId,
+                userSession
             })
             dispatch(updateSection({
                 id: activeSection.id,
@@ -82,16 +83,17 @@ export default function SideBySide() {
             <SectionNavigation projectId={projectId as string}/>
 
             <div className="flex-1 flex flex-col p-4">
-                <LanguageSelector sourceLanguage={sourceLang || ''}/>
+                <LanguageSelector sourceLanguage={sourceLang || 'en'}/>
 
                 <div id="quills" className="grid grid-cols-2 gap-4 flex-1">
-                    <QuillEditor
-                        id={activeSection.id}
-                        content={activeSection.targetContent}
-                        readOnly={false} // Target content is editable for translation
-                        isRTL={true} // Hebrew is always RTL
-                        projectId={projectId as string}
-                    />
+                    {isTranslating ? <LoadingSpinner/> :
+                        <QuillEditor
+                            id={activeSection.id}
+                            content={activeSection.targetContent}
+                            readOnly={false} // Target content is editable for translation
+                            isRTL={true} // Hebrew is always RTL
+                            projectId={projectId as string}
+                        />}
                     <QuillEditor
                         id={activeSection.id}
                         content={activeSection.sourceContent}
@@ -99,17 +101,18 @@ export default function SideBySide() {
                         readOnly={true} // Source content is read-only as it comes from the editor
                         projectId={projectId as string}
                     />
+
                 </div>
 
-                <div className="flex justify-between items-center mt-4">
-                    <div className="flex gap-2">
-                        <Button variant="ghost" size="icon" className="rounded-full">
-                            <ThumbsUp className="h-4 w-4"/>
-                        </Button>
-                        <Button variant="ghost" size="icon" className="rounded-full">
-                            <ThumbsDown className="h-4 w-4"/>
-                        </Button>
-                    </div>
+                <div className="flex justify-end items-center mt-4">
+                    {/*<div className="flex gap-2">*/}
+                    {/*    <Button variant="ghost" size="icon" className="rounded-full">*/}
+                    {/*        <ThumbsUp className="h-4 w-4"/>*/}
+                    {/*    </Button>*/}
+                    {/*    <Button variant="ghost" size="icon" className="rounded-full">*/}
+                    {/*        <ThumbsDown className="h-4 w-4"/>*/}
+                    {/*    </Button>*/}
+                    {/*</div>*/}
                     <div className="flex gap-2">
                         <Button
                             className="bg-[#1D3B34] hover:bg-[#1D3B34]/90 text-white px-8"
@@ -118,12 +121,12 @@ export default function SideBySide() {
                         >
                             {isTranslating ? 'Translating...' : 'Translate'}
                         </Button>
-                        <Button
-                            variant="secondary"
-                            onClick={() => setIsGlossaryOpen(true)}
-                        >
-                            Glossary
-                        </Button>
+                        {/*<Button*/}
+                        {/*    variant="secondary"*/}
+                        {/*    onClick={() => setIsGlossaryOpen(true)}*/}
+                        {/*>*/}
+                        {/*    Glossary*/}
+                        {/*</Button>*/}
                     </div>
                 </div>
             </div>
@@ -132,7 +135,7 @@ export default function SideBySide() {
                 open={isGlossaryOpen}
                 onOpenChange={setIsGlossaryOpen}
                 sourceLang={sourceLang || ''}
-                targetLang={targetLang}
+                targetLang={targetLang!}
                 projectId={projectId}
             />
         </div>
