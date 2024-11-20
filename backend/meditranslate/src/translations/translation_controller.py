@@ -1,4 +1,3 @@
-from io import BytesIO
 from typing import Any, List,Tuple
 
 from fastapi import UploadFile
@@ -58,7 +57,6 @@ class TranslationController(BaseController[Translation]):
             current_user,
             src_file,
             src_file_stream,
-            ref_file,
             ref_file_stream,
             translation_file_schema
         )
@@ -83,6 +81,13 @@ class TranslationController(BaseController[Translation]):
         return result_file
 
     @Transactional(propagation=Propagation.REQUIRED_NEW)
-    async def translate_text(self,current_user:User,translation_text_schema:TranslationTextSchema):
-        return await self.translation_service.translate_text(current_user,translation_text_schema)
+    async def translate_text(self,current_user: User, translation_text_schema: TranslationTextSchema):
+        translation_job = await self.translation_job_service.get_translation_job(
+            translation_text_schema.translation_job_id, to_public=False)
+        ref_file = await self.file_service.fetch_file_entity(translation_job.reference_file_id)
+        ref_file_stream, _, _ = await self.file_service.download_file_sync(file_id=ref_file.id)
 
+        return await self.translation_service.translate_text(
+            current_user,
+            ref_file_stream,
+            translation_text_schema)

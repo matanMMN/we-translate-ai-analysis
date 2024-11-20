@@ -80,12 +80,17 @@ class TextProcessor:
 
         return '\n'.join(full_text)
 
-    async def preprocess_files(self, src_bytes: BytesIO, ref_bytes: BytesIO) -> Tuple[str, str]:
-        with LocalFilesContext({"src.docx": src_bytes, "ref.docx": ref_bytes}) as lf_con:
+    async def preprocess_src_file(self, src_bytes: BytesIO) -> str:
+        with LocalFilesContext({"src.docx": src_bytes}) as lf_con:
             src_html = self._docx_to_html(lf_con.get_path("src.docx"))
+
+        return src_html
+
+    async def preprocess_ref_file(self, ref_bytes: BytesIO) -> str:
+        with LocalFilesContext({"ref.docx": ref_bytes}) as lf_con:
             ref_text = self._docx_to_text(lf_con.get_path("ref.docx"))
 
-        return src_html, ref_text
+        return ref_text
 
     async def postprocess_result(self, result: str) -> BytesIO:
         with LocalFilesContext({"dst.docx": None}) as lf_con:

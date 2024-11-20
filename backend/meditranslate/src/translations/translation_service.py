@@ -5,7 +5,6 @@ from typing import Any,Dict,List,Optional,Tuple
 from sqlalchemy.sql.functions import current_user
 
 from meditranslate.src.translations.translation_repository import TranslationRepository
-from meditranslate.app.db.models import Translation
 from meditranslate.app.shared.base_service import BaseService
 from meditranslate.app.errors import AppError,ErrorSeverity,ErrorType,HTTPStatus
 from meditranslate.app.db.models import Translation
@@ -18,8 +17,8 @@ from meditranslate.src.translations.translation_schemas import (
 )
 from meditranslate.app.db import User,File
 from meditranslate.translation import TranslationEngine
-from meditranslate.translation.translation_input import TranslationInput
-from meditranslate.translation.translation_output import TranslationOutput
+from meditranslate.translation.translation_input import FileTranslationInput, TextTranslationInput
+from meditranslate.translation.translation_output import FileTranslationOutput
 from meditranslate.utils.files.file_format_type import FileFormatType
 from meditranslate.app.loggers import logger
 from meditranslate.utils.files.formats.file_format_handler import FileFormatHandler
@@ -74,52 +73,13 @@ class TranslationService(BaseService[Translation]):
         return public_translations,total
 
 
-    @staticmethod
-    def _get_supported_formats() -> List[FileFormatType]:
-        return [
-            FileFormatType.DOCX
-        ]
-
-
-    @staticmethod
-    def _is_supported_format(format_type_string: str) -> bool:
-        try:
-            file_format_type = FileFormatType(format_type_string)
-        except ValueError as e:
-            logger.error(f"error in file extention '{format_type_string}' in translate file {str(e)}")
-            raise e
-
-        if file_format_type not in TranslationService._get_supported_formats():
-            return False
-
-        return True
-
-    @staticmethod
-    def _validate_formats(*to_vals: Tuple[str, str, str]):
-        """
-        Used to validate file formats before access to translation engine.
-
-        :param to_vals: Tuples of format, file name and short description to be inserted into error message.
-        """
-        for val in to_vals:
-            format_, name, desc = val
-            if not TranslationService._is_supported_format(format_):
-                message = f"Can not handle file format {format_} for file {name} ({desc})"
-
-                raise AppError(
-                    title="Developer Error: Unsupported file format",
-                    description=message,
-                    http_status=HTTPStatus.INTERNAL_SERVER_ERROR
-                )
-
     async def translate_file(
             self,
             current_user: User,
             src_file_pointer: File,
             src_file_stream: BytesIO,
-            ref_file_pointer: File,
             ref_file_stream: BytesIO,
-            translation_file_schema: TranslationFileSchema):
+            translation_file_schema: TranslationFileSchema) -> Tuple[BytesIO, str, str]:
         src_file_extension = src_file_pointer.file_format_type
         src_file_name = src_file_pointer.file_name
         dst_file_extension = translation_file_schema.target_file_format
@@ -141,7 +101,7 @@ class TranslationService(BaseService[Translation]):
             logger.error(f"error in file extention '{dst_file_extension}' in translate file {str(e)}")
             raise e
 
-        translation_input = TranslationInput(input_bytes=src_file_stream, reference_bytes=ref_file_stream)
+        translation_input = FileTranslationInput(input_bytes=src_file_stream, reference_bytes=ref_file_stream)
         translation_output = await self.translation_engine.translate_file(translation_input)
 
         created_translation = await self.create_translation(
@@ -154,9 +114,7 @@ class TranslationService(BaseService[Translation]):
                 output_text=FileFormatHandler().extract_text(
                     file_format=dst_file_format_type, file_stream=translation_output.output_bytes),
                 translation_job_id=translation_file_schema.translation_job_id,
-                translation_metadata=translation_output.translation_metadata
-            )
-        )
+                translation_metadata=translation_output.translation_metadata))
 
         if created_translation is None:
             raise AppError(
@@ -175,9 +133,15 @@ class TranslationService(BaseService[Translation]):
         return new_file_stream, new_file_name, content_type
 
 
-    async def translate_text(self,current_user:User,translation_text_schema:TranslationTextSchema):
-        translation_input = TranslationInput(input_text=translation_text_schema.input_text,config=None)
-        translation_output = await self.translation_engine.translate_file(translation_input)
+    async def translate_text(
+            self,
+            current_user: User,
+            ref_bytes_stream: BytesIO,
+            translation_text_schema: TranslationTextSchema):
+        translation_input = TextTranslationInput(input_text=translation_text_schema.input_text,
+                                                 reference_bytes=ref_bytes_stream)
+        translation_output = await self.translation_engine.translate_text(translation_input)
+
         created_translation = await self.create_translation(
             current_user=current_user,
             translation_create_schema=TranslationCreateSchema(
@@ -186,9 +150,8 @@ class TranslationService(BaseService[Translation]):
                     input_text=translation_text_schema.input_text,
                     translation_job_id=translation_text_schema.translation_job_id,
                     translation_metadata=translation_output.translation_metadata,
-                    output_text=translation_output.output_text
-                )
-        )
+                    output_text=translation_output.output_text))
+
         return self._to_public_translation(created_translation)
 
 

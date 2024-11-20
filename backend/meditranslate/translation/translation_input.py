@@ -13,7 +13,14 @@ from dataclasses import dataclass
 
 
 @dataclass
-class TranslationInput:
+class FileTranslationInput:
     input_bytes: BytesIO
+    reference_bytes: BytesIO
+    config: Optional[Dict[str, str]] = None
+
+
+@dataclass
+class TextTranslationInput:
+    input_text: str
     reference_bytes: BytesIO
     config: Optional[Dict[str, str]] = None

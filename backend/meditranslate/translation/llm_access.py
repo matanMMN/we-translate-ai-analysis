@@ -25,7 +25,7 @@ class AnthropicClient:
 
         self.client = AsyncAnthropic(api_key=self.api_key)
 
-    async def file_translation(self, system_prompt: str, file_contents: str, **params: Any) -> str:
+    async def translation(self, system_prompt: str, file_contents: str, **params: Any) -> str:
         """
         Sends a message to a Claude LLM, and then repeatedly asks for responses until the LLM responds with either:
             - "end_turn" -          The LLM has reached the end of its response.
@@ -80,8 +80,7 @@ class AnthropicClient:
                 severity=ErrorSeverity.HIGH_MAJOR_ISSUE,
                 error_type=ErrorType.TRANSLATION_ERROR,
                 http_status=HTTPStatus.INTERNAL_SERVER_ERROR,
-                user_message="Something went wrong during file translation."
-            )
+                user_message="Something went wrong during file translation.")
 
         # Finalize the translation and return:
         output_text = self._finalize_translation(output_text)
@@ -93,6 +92,7 @@ class AnthropicClient:
                 system=system_prompt,
                 messages=built_message_seq,
                 **params)
+
             return response
 
         except Exception as e:
@@ -115,8 +115,7 @@ class AnthropicClient:
                 severity=ErrorSeverity.HIGH_MAJOR_ISSUE,
                 error_type=ErrorType.TRANSLATION_ERROR,
                 http_status=HTTPStatus.INTERNAL_SERVER_ERROR,
-                user_message="Something went wrong during file translation."
-            )
+                user_message="Something went wrong during file translation.")
 
     @staticmethod
     def _parse_response(response: Any) -> str:
@@ -136,8 +135,7 @@ class AnthropicClient:
                     severity=ErrorSeverity.HIGH_MAJOR_ISSUE,
                     error_type=ErrorType.TRANSLATION_ERROR,
                     http_status=HTTPStatus.INTERNAL_SERVER_ERROR,
-                    user_message="Something went wrong during file translation."
-                )
+                    user_message="Something went wrong during file translation.")
 
         translation = translation[:translation.index(stop_token)]
         translation = translation[

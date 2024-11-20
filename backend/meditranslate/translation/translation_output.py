@@ -1,5 +1,6 @@
 # from pydantic import BaseModel,StringConstraints
 # from meditranslate.app.shared.base_schema import BaseSchema
+from dataclasses import dataclass
 from typing import Dict
 from io import BytesIO
 
@@ -7,7 +8,13 @@ from io import BytesIO
 #     translation_metadata: Dict[str,str]
 #     output_bytes: BytesIO
 
-class TranslationOutput:
-    def __init__(self, output_bytes: BytesIO, translation_metadata: Dict[str, str]):
-        self.output_bytes = output_bytes
-        self.translation_metadata = translation_metadata
+@dataclass
+class FileTranslationOutput:
+    output_bytes: BytesIO
+    translation_metadata: Dict[str, str]
+
+
+@dataclass
+class TextTranslationOutput:
+    output_text: str
+    translation_metadata: Dict[str, str]
