@@ -5,7 +5,7 @@ from meditranslate.utils.files.file_format_type import FileFormatType
 from meditranslate.utils.language import Language
 from meditranslate.utils.security.json_web_tokens import JWTAlgorithm
 from typing import Annotated,ClassVar, List,Set,Tuple
-from pydantic import StringConstraints
+from pydantic import StringConstraints, PositiveInt, PositiveFloat
 import os
 from datetime import date,datetime
 from languages import Hebrew,English
@@ -96,12 +96,34 @@ class AppConfig(Config):
         )
     ] = Field(os.environ.get("OPENAI_API_KEY"),title="OPENAI_API_KEY",description="")
 
-    ANTHROPIC_API_KEY:Annotated[
+    ANTHROPIC_API_KEY: Annotated[
         str,
         StringConstraints(
             strip_whitespace=True
         )
     ] = Field(os.environ.get("ANTHROPIC_API_KEY"),title="ANTHROPIC_API_KEY",description="")
+
+    ANTHROPIC_MODEL_NAME: Annotated[
+        str,
+        StringConstraints(
+            strip_whitespace=True
+        )
+    ] = Field(os.environ.get("ANTHROPIC_MODEL_NAME"),title="ANTHROPIC_MODEL_NAME",description="")
+
+    CLAUDE_MAX_TOKENS: PositiveInt = Field(
+        os.environ.get("CLAUDE_MAX_TOKENS"),
+        le=4096,
+        title="CLAUDE_MAX_TOKENS",description="Maximum amount of tokens to generate per response from Claude.")
+
+    CLAUDE_TEMPERATURE: PositiveFloat = Field(
+        os.environ.get("CLAUDE_TEMPERATURE"),
+        lt=1,
+        title="CLAUDE_TEMPERATURE",description="Temperature to be used on generation by Claude.")
+
+    CLAUDE_MAX_REPS: PositiveInt = Field(
+        os.environ.get("CLAUDE_MAX_REPS"),
+        lt=10,
+        title="CLAUDE_MAX_REPS",description="Max repetitions to request a response from the Claude.")
 
     AWS_ENDPOINT_URL:Annotated[
         str,

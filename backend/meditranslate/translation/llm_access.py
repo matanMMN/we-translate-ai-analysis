@@ -1,0 +1,156 @@
+from http import HTTPStatus
+from typing import List, Dict, Any
+
+from anthropic import AsyncAnthropic
+
+from meditranslate.app.configurations import config
+from meditranslate.app.errors import AppError, ErrorSeverity, ErrorType
+from meditranslate.app.loggers import logger
+
+
+class AnthropicClient:
+    def __init__(
+            self,
+            api_key: str = config.ANTHROPIC_API_KEY,
+            model_name: str = config.ANTHROPIC_MODEL_NAME,
+            max_tokens: int = config.CLAUDE_MAX_TOKENS,
+            temperature: float = config.CLAUDE_TEMPERATURE,
+            max_reps: int = config.CLAUDE_MAX_REPS
+    ):
+        self.api_key = api_key
+        self.model_name = model_name
+        self.max_tokens = max_tokens
+        self.temperature = temperature
+        self.max_reps = max_reps
+
+        self.client = AsyncAnthropic(api_key=self.api_key)
+
+    async def file_translation(self, system_prompt: str, file_contents: str, **params: Any) -> str:
+        """
+        Sends a message to a Claude LLM, and then repeatedly asks for responses until the LLM responds with either:
+            - "end_turn" -          The LLM has reached the end of its response.
+            - "stop_sequences" -    The LLM has generated a sequence which was specified as a stopping point.
+
+        The repetition aspect was implememted to overcome Anthropic API's limitation on response size - The API allows
+        for a response of up to 4096 tokens, which is not enough for full file translation. Therefore, we request a
+        response multiple times, with the old generated response preceeding the current response, to continue
+        the translation generation process.
+        """
+        # Set up parameters for call:
+        sent_params = dict(
+            model=self.model_name,
+            max_tokens=self.max_tokens,
+            temperature=self.temperature
+        )
+        sent_params.update(params)
+
+        # Send first message:
+        response = await self._send_message(
+            system_prompt=system_prompt,
+            built_message_seq=[{"role": "user", "content": file_contents}],
+            **sent_params)
+
+        reps = 1
+        output_text = self._parse_response(response)
+        stop_reason = response.stop_reason
+
+        # Repeat message sending process until "end_turn" or "stop_sequences" is reached:
+        while stop_reason not in ["end_turn", "stop_sequences"] and reps < self.max_reps:
+            response = await self._send_message(
+                system_prompt=system_prompt,
+                built_message_seq=[
+                    {"role": "user", "content": file_contents},
+                    {"role": "assistant", "content": output_text}
+                ],
+                **sent_params)
+
+            reps += 1
+            output_text += self._parse_response(response)
+            stop_reason = response.stop_reason
+
+        # Verify that "end_turn" or "stop_sequences" was indeed reached.
+        if stop_reason not in ["end_turn", "stop_sequences"]:
+            logger.error(f"Anthropic could not finish generation before max_reps={self.max_reps} - {stop_reason=}")
+            logger.error(f"Generated output: '''\n{output_text}\n'''")
+
+            raise AppError(
+                title="Developer Error: Unfinished Translation",
+                description=f"Anthropic client could not finish translation before reaching max_reps={self.max_reps}",
+                operable=False,
+                severity=ErrorSeverity.HIGH_MAJOR_ISSUE,
+                error_type=ErrorType.TRANSLATION_ERROR,
+                http_status=HTTPStatus.INTERNAL_SERVER_ERROR,
+                user_message="Something went wrong during file translation."
+            )
+
+        # Finalize the translation and return:
+        output_text = self._finalize_translation(output_text)
+        return output_text
+
+    async def _send_message(self, system_prompt: str, built_message_seq: List[Dict[str, Any]], **params: Any):
+        try:
+            response = await self.client.messages.create(
+                system=system_prompt,
+                messages=built_message_seq,
+                **params)
+            return response
+
+        except Exception as e:
+            logger.error(f"Some error has occurred when sending a message to the underlying client.")
+            logger.error(f"System Prompt=\n{system_prompt}")
+            logger.error(f"Message Sequence=[")
+
+            for msg in built_message_seq:
+                logger.error(f"{msg}")
+
+            logger.error(f"Added Params={params}")
+            logger.error(f"\nRaised: {e}")
+
+            raise AppError(
+                error=e,
+                error_class=AppError,
+                title="Developer Error: Send Message to Anthropic",
+                description="Error occured while sending a message to an Anthropic client",
+                operable=False,
+                severity=ErrorSeverity.HIGH_MAJOR_ISSUE,
+                error_type=ErrorType.TRANSLATION_ERROR,
+                http_status=HTTPStatus.INTERNAL_SERVER_ERROR,
+                user_message="Something went wrong during file translation."
+            )
+
+    @staticmethod
+    def _parse_response(response: Any) -> str:
+        return response.content[0].text
+
+    @staticmethod
+    def _finalize_translation(translation: str) -> str:
+        stop_token = "[TRANSLATION_SUCCESSFUL]"
+        wrap_tokens = ["<eng_text>", "</eng_text>"]
+
+        for token in [stop_token] + wrap_tokens:
+            if token not in translation:
+                raise AppError(
+                    title="Developer Error: Missing Token in Translation",
+                    description=f"Anthropic response is missing the token: {token}",
+                    operable=False,
+                    severity=ErrorSeverity.HIGH_MAJOR_ISSUE,
+                    error_type=ErrorType.TRANSLATION_ERROR,
+                    http_status=HTTPStatus.INTERNAL_SERVER_ERROR,
+                    user_message="Something went wrong during file translation."
+                )
+
+        translation = translation[:translation.index(stop_token)]
+        translation = translation[
+                      translation.index(wrap_tokens[0]) + len(wrap_tokens[0]):
+                      translation.index(wrap_tokens[1])]
+
+        return translation
+
+    def close(self):
+        if self.client is not None:
+            self.client.close()
+            self.client = None
+
+    def __del__(self):
+        self.close()
+

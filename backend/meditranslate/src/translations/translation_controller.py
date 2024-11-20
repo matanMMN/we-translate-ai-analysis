@@ -4,6 +4,7 @@ from typing import Any, List,Tuple
 from fastapi import UploadFile
 from meditranslate.app.shared.base_controller import BaseController
 from meditranslate.src.files.file_service import FileService
+from meditranslate.src.translation_jobs.translation_job_schemas import TranslationJobUpdateSchema
 from meditranslate.src.translation_jobs.translation_job_service import TranslationJobService
 from meditranslate.src.translations.translation_service import TranslationService
 from meditranslate.src.translations.translation_schemas import (
@@ -70,7 +71,16 @@ class TranslationController(BaseController[Translation]):
 
             }
         )
-        return await self.file_service.upload_file(current_user,upload_file)
+
+        result_file = await self.file_service.upload_file(current_user,upload_file)
+
+        await self.translation_job_service.update_translation_job(
+            current_user=current_user,
+            translation_job_id=translation_job.id,
+            update_translation_job_data=TranslationJobUpdateSchema(target_file_id=result_file.get("id"))
+        )
+
+        return result_file
 
     @Transactional(propagation=Propagation.REQUIRED_NEW)
     async def translate_text(self,current_user:User,translation_text_schema:TranslationTextSchema):

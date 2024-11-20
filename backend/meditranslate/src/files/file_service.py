@@ -151,7 +151,7 @@ class FileService(BaseService[File]):
                 http_status=HTTPStatus.INTERNAL_SERVER_ERROR
             ) from e
 
-    async def upload_file(self,current_user:User,file:UploadFile) -> File:
+    async def upload_file(self,current_user:User,file:UploadFile) -> Dict[Any, dict | str | None]:
         new_file_name,original_file_name,storage_file_path,file_language,file_size,extension = await self.upload_file_to_storage(file=file)
         file_create_schema = FilePointerCreateSchema(
             file_path = storage_file_path,

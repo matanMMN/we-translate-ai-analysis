@@ -3,6 +3,8 @@ from meditranslate.app.dependancies.auth import AuthenticationRequired
 from meditranslate.app.dependancies.user import CurrentUserDep
 from meditranslate.app.shared.factory import Factory
 from typing import Any,List,Annotated,Optional
+
+from meditranslate.src.files.file_schemas import FilePointerResponseSchema
 from meditranslate.src.translations.translation_schemas import (
     TranslationCreateSchema,
     TranslationResponseSchema,
@@ -68,19 +70,20 @@ async def translation_text(
 
 @translation_router.post(
     path="/file/{file_id}",
-    status_code=200
+    status_code=200,
+    response_model=FilePointerResponseSchema
 )
 async def translation_file(
     current_user: CurrentUserDep,
     file_id:str,
     translation_file_schema: Annotated[TranslationFileSchema,Body()],
     translation_controller: TranslationController = Depends(Factory.get_translation_controller)
-):
+) -> FilePointerResponseSchema:
     """
     Create a new translation.
     """
-    await translation_controller.translate_file(current_user,file_id,translation_file_schema)
-
+    file = await translation_controller.translate_file(current_user,file_id,translation_file_schema)
+    return FilePointerResponseSchema(data=file, status=200)
 
 
 @translation_router.post(

@@ -1,0 +1,41 @@
+As a translation model specialized in Hebrew to English translation, your task is to accurately translate a specific paragraph from a CMI leaflet originally written in Hebrew into English, contained within the following tags: <heb_text> ... </heb_text>.
+
+The translation should convey the original meaning, tone, style, and pertinent terminology while effectively communicating the leaflet's message and respecting cultural nuances and idiomatic expressions unique to the source material. It should be precise, well-structured, and coherent, capturing the essence of the original text. 
+
+The final translation should feel natural and fluent to English speakers, reading like an original English text while maintaining the integrity of the original content.
+
+Contain the translation of the text within the following tags: <eng_text> ... </eng_text>.
+
+Upon successful translation, please include the phrase {success} at the end and only at the end of your response to indicate that the task has been completed effectively.
+
+If the text you recieve contains no Hebrew text, contains no medical/pharmacological information or could not appear in a CMI leaflet, respond with {fail}.
+
+Provide a response without any additional information or comments besides the previously stated phrase and annotations.
+
+Do not translate html tags and translate the texts inside each tag while keeping their output in their coresponding position.
+
+Here are some examples:
+
+Example 1:
+
+If I give you the following paragraph:
+
+<heb_text>  אקמול היא תרופה לצינון. </heb_text>
+
+Then your response will be:
+
+<eng_text> Acamol is a medication for the common cold. </eng_text>
+
+{success}
+
+Example 2:
+
+If I give you the following paragraph:
+
+<heb_text>  <p><span dir="rtl">אקמול היא תרופה <strong>לצינון</strong>.</span></p> </heb_text>
+
+Then your response will be:
+
+<eng_text> <p><span dir="rtl">Acamol is a medication for the <strong>common cold<strong>.</span></p> </eng_text>
+
+use this text `{ref_text}` for comprehensive context and detailed understanding, ensuring accuracy in translation.

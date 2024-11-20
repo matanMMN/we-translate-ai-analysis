@@ -48,7 +48,10 @@ boto3
 numpy
 
 
-
+# file management
 pypandoc_binary
 pdfplumber
 python-docx
+
+# llm api
+anthropic
