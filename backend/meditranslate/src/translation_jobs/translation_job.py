@@ -29,8 +29,8 @@ class TranslationJob(Base):
     current_step_index: Mapped[int] = mapped_column(Integer, default=0)
 
     reference_file_id: Mapped[Optional[str]] = mapped_column(ForeignKey('files.id'),nullable=True)
-
     source_file_id: Mapped[Optional[str]] = mapped_column(ForeignKey('files.id'),nullable=True)
+    target_file_id: Mapped[Optional[str]] = mapped_column(ForeignKey('files.id'),nullable=True)
 
     current_user_id: Mapped[Optional[str]] = mapped_column(ForeignKey('users.id', onupdate="CASCADE"),nullable=True,default=None)
 

@@ -46,4 +46,4 @@ The following text, encapsulated in square brackets [], should be used for compr
 
 ]
 
-Be sure to perserve the html tags in the original text, and not remove them (Despite them )
+Be sure to perserve the html tags in the original text, and not remove them.
