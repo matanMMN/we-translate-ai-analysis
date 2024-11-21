@@ -242,7 +242,7 @@ class ApiClient {
     public async login(email: string, password: string): Promise<User> {
         const body = {email, password};
         console.log(body)
-        // return this._request<any>('/login', 'POST', body);
+        // return this._request<any>('/auth', 'POST', body);
         return user as unknown as User
     }
 

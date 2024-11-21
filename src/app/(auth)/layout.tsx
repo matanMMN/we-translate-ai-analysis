@@ -4,6 +4,7 @@ import {ReactNode} from "react";
 import {StoreProvider} from "@/components/StoreProvider";
 import AuthProviders from "@/components/AuthProviders";
 import {protectLogin} from "@/lib/AuthGuard";
+import {Grid} from "@mui/material";
 
 
 export const metadata: Metadata = {
@@ -12,16 +13,20 @@ export const metadata: Metadata = {
 
 export interface ChildrenProps {
     children: ReactNode;
+    logo: ReactNode
 }
 
-export default async function RootAuthLayout({children}: ChildrenProps): Promise<ReactNode> {
+export default async function RootAuthLayout({children, logo}: ChildrenProps): Promise<ReactNode> {
 
     await protectLogin();
 
     return (
         <AuthProviders>
             <StoreProvider>
-                {children}
+                <Grid container component="main" sx={{height: '100vh'}}>
+                    {logo}
+                    {children}
+                </Grid>
             </StoreProvider>
         </AuthProviders>
     );

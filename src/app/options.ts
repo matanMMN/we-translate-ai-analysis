@@ -14,7 +14,7 @@ export const authOptions: NextAuthOptions = {
         CredentialsProvider({
             id: "credentials",
             type: "credentials",
-            name: 'credentials login',
+            name: 'credentials auth',
             credentials: {
                 email: {label: "Email", type: "email"},
                 password: {label: "Password", type: "password"}
@@ -29,7 +29,7 @@ export const authOptions: NextAuthOptions = {
                         throw new Error('Invalid credentials');
                     }
 
-                    // const res: User = await ApiClient.login(email, password);
+                    // const res: User = await ApiClient.auth(email, password);
                     console.log(email, password)
                     const data = await fetch(`${serverUrl}/auth/token`, {
                         method: 'POST',
@@ -84,7 +84,7 @@ export const authOptions: NextAuthOptions = {
         }),
     ],
     pages: {
-        signIn: '/login',
+        signIn: '/auth',
     },
     callbacks: {
         async session({session, token}) {

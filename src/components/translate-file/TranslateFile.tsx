@@ -138,7 +138,7 @@ export default function TranslateFile() {
             <div className="container mx-auto p-4 max-w-4xl text-center space-y-6">
                 <h2 className="text-2xl font-semibold">Translating your file...</h2>
                 <p className="text-muted-foreground">
-                    This process could take up to 5 minutes. You must not leave this page.
+                    This process could take up to 10 minutes. You must not leave this page.
                 </p>
                 <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
                     <div className="h-full bg-primary animate-pulse" style={{width: '100%'}}/>

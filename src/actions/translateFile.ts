@@ -269,66 +269,42 @@ export async function translateFile(formData: FormData, detectedLanguage: string
     if (isUpdateSuccess && isUpdateSuccess.status_code !== 200)
         return {success: false, error: 'Failed to process the file'}
 
-    // #3 Ask for the translated version - CURRENTLY DOESNT WORK
-    // const translationRes = await fetch(`${serverUrl}/translations/file/${srcFileData.data.id}`, {
-    //     headers: {
-    //         'Content-Type': 'application/json',
-    //         'Authorization': `Bearer ${session.accessToken}`,
-    //     },
-    //     method: 'POST',
-    //     body: JSON.stringify({
-    //         translation_job_id: isUpdateSuccess.data.id,
-    //         source_language: detectedLanguage,
-    //         target_language: targetLanguage,
-    //         target_file_format: fileExt.slice(1)
-    //     })
-    // })
+    // #3 Ask for the translated version
+    const translationRes = await fetch(`${serverUrl}/translations/file/${srcFileData.data.id}`, {
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.accessToken}`,
+        },
+        method: 'POST',
+        body: JSON.stringify({
+            translation_job_id: isUpdateSuccess.data.id,
+            source_language: detectedLanguage,
+            target_language: targetLanguage,
+            target_file_format: fileExt.slice(1)
+        })
+    })
 
-    // const isTranslationSuccess = await translationRes.json()
-    //
-    // if (isTranslationSuccess && isTranslationSuccess?.status_code !== 200)
-    //     return {success: false, error: 'Failed to process the file'}
+    const isTranslationSuccess = await translationRes.json()
 
+    if (isTranslationSuccess && isTranslationSuccess?.status_code === 422)
+        return {success: false, error: 'File does not contain significant medical/pharmacological context'}
+
+    if (isTranslationSuccess && isTranslationSuccess?.status_code !== 200)
+        return {success: false, error: 'Failed to process the file'}
+
+    // #4 Get the translated file
+    const translatedFileRes = await fetch(`${serverUrl}/files/download/${isTranslationSuccess.data.id}`, {
+        headers: {
+            'Authorization': `Bearer ${session.accessToken}`,
+        },
+    })
+
+    if (!translatedFileRes)
+        return {success: false, error: 'Failed to process the file'}
     try {
-        // let buffer: Buffer;
+        const arrayBuffer = await translatedFileRes.arrayBuffer();
+        const encodedString = Buffer.from(arrayBuffer).toString('base64');
 
-        // switch (type) {
-        // case 'application/pdf':
-        //     const pdfBlob = await decodePdfFile(fileCopy);
-        //     content = await pdfBlob.text();
-        //     break;
-        // case 'text/plain':
-        // const txtBlob = await decodeTxtFile(fileCopy);
-        // const content = await txtBlob.text();
-        // break;
-        // default:
-        //     buffer = Buffer.from(await file.arrayBuffer());
-        //     const docxContent = await extractDocxContentPreservingStructure(buffer);
-        //     content = docxContent.text;
-        //     const translatedContent = await translateWithLLM(content);
-        //     const newDocxBuffer = await createDocxWithPreservedStructure(buffer, translatedContent);
-        //     console.log(translatedContent)
-        //     return {
-        //         success: true,
-        //         fileId: mockFileId,
-        //         mockBlob: newDocxBuffer.toString('base64'),
-        //         blobType: type
-        //     };
-
-        // }
-
-
-        // const translatedContent = await translateWithLLM(content);
-        // console.log(translatedContent)
-        // let encodedString: Blob | string;
-        // if (type === 'text/plain' || type === 'application/pdf') {
-        //     encodedString = new Blob([translatedContent], {type});
-        // } else {
-
-        // const newDocxBuffer = await createNewDocx(translatedContent);
-        // encodedString = newDocxBuffer.toString('base64');
-        // }
-        const encodedString = Buffer.from(await fileCopy.arrayBuffer()).toString('base64');
 
         revalidatePath(`/${projectId}/editor`);
 
