@@ -1,7 +1,7 @@
 from http import HTTPStatus
 from typing import List, Dict, Any
 
-from anthropic import AsyncAnthropic
+from anthropic import AsyncAnthropic, APIStatusError
 
 from meditranslate.app.configurations import config
 from meditranslate.app.errors import AppError, ErrorSeverity, ErrorType
@@ -95,6 +95,18 @@ class AnthropicClient:
 
             return response
 
+        except APIStatusError as e:
+            raise AppError(
+                error=e,
+                error_class=AppError,
+                title="Error from Anthropic API",
+                description="Some error has occured when utilizing Anthropic API.",
+                http_status=HTTPStatus(e.status_code),
+                context="translation engine",
+                severity=ErrorSeverity.HIGH_MAJOR_ISSUE,
+                operable=False,
+                error_type=ErrorType.TRANSLATION_ERROR,
+            )
         except Exception as e:
             logger.error(f"Some error has occurred when sending a message to the underlying client.")
             logger.error(f"System Prompt=\n{system_prompt}")
@@ -126,6 +138,7 @@ class AnthropicClient:
         stop_token = "[TRANSLATION_SUCCESSFUL]"
         wrap_tokens = ["<eng_text>", "</eng_text>"]
 
+        # TODO - return partial output in here
         for token in [stop_token] + wrap_tokens:
             if token not in translation:
                 raise AppError(

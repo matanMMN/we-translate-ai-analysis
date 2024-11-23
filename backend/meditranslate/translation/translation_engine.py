@@ -1,7 +1,6 @@
-from meditranslate.app.configurations import config
 from meditranslate.app.errors import AppError,ErrorSeverity,HTTPStatus,ErrorType
 
-from meditranslate.translation.text_processor import TextProcessor
+from meditranslate.translation.text_processing.text_processor import TextProcessor
 from meditranslate.translation.translation_input import FileTranslationInput, TextTranslationInput
 from meditranslate.translation.translation_output import FileTranslationOutput, TextTranslationOutput
 from meditranslate.translation.prompt_loader import get_sysprompt_construct
@@ -31,8 +30,8 @@ class TranslationEngine:
                 })
 
             return translation_output
-        except AppError as ae:  # Already handled.
-            raise ae
+        except AppError as e:  # Already handled - propagate.
+            raise e
         except Exception as e:
             raise AppError(
                 error=e,
