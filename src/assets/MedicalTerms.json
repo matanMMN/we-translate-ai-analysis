@@ -1,5 +1,4 @@
-{
-"MedicalTerms":[
+[
  {
   "name": "תותב",
   "englishName": "prosthesis, prosthetic device"
@@ -7,10 +6,6 @@
  {
   "name": "סרקומה על-שם אווינג",
   "englishName": "Ewing's sarcoma, endothelial myeloma"
- },
- {
-  "name": "עמותת הקרן ע״ש רות ורובל",
-  "englishName": "The Ruth Vrobel Foundation"
  },
  {
   "name": "תסמונת הלם רעלני",
@@ -43,10 +38,6 @@
  {
   "name": "אתר",
   "englishName": "ether, ethoxyethane"
- },
- {
-  "name": "חתול",
-  "englishName": "Cat"
  },
  {
   "name": "סיבון שרירי",
@@ -16197,4 +16188,3 @@
   "englishName": "joint"
  }
 ]
-}

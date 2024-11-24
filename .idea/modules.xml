@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/meditranslate-next.iml" filepath="$PROJECT_DIR$/.idea/meditranslate-next.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/meditranslate.iml" filepath="$PROJECT_DIR$/.idea/meditranslate.iml" />
     </modules>
   </component>
 </project>

@@ -1,7 +1,8 @@
-import Register from "@/components/auth/Register";
+// import Register from "@/components/auth/Register";
 
 export default async function RegisterPage() {
     return (
-        <Register/>
+        <h1>Register is under development</h1>
+        // <Register/>
     )
 }

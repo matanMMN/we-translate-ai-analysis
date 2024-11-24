@@ -23,7 +23,7 @@ export default function LogoComponent() {
                 }}
             >
                 <Box sx={{display: 'flex', alignItems: 'center'}}>
-                    <Image src={Logo} alt="MediTranslate AI" style={{width: '150px', marginRight: '20px'}}/>
+                    <Image src={Logo} alt="WeTranslate AI" style={{width: '150px', marginRight: '20px'}}/>
                     <Typography component="h1" variant="h1" align="center" style={{
                         userSelect: "none"
                     }}>

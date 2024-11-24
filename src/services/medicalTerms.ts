@@ -89,9 +89,6 @@ export async function fetchMedicalTerms({
     search = '',
     limit = 9,
 }: FetchParams) {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-
     // Filter terms based on search
     let filteredTerms = mockTerms.filter(term => {
         const searchLower = search.toLowerCase();

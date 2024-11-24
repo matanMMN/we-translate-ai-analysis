@@ -8,7 +8,7 @@ import {Grid} from "@mui/material";
 
 
 export const metadata: Metadata = {
-    title: "MediTranslate AI",
+    title: "WeTranslate AI",
 };
 
 export interface ChildrenProps {
