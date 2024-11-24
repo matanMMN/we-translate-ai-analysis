@@ -79,7 +79,7 @@ class TranslationService(BaseService[Translation]):
             src_file_pointer: File,
             src_file_stream: BytesIO,
             ref_file_stream: BytesIO,
-            translation_file_schema: TranslationFileSchema) -> Tuple[BytesIO, str, str]:
+            translation_file_schema: TranslationFileSchema) -> Tuple[BytesIO, str, str, str]:
         src_file_extension = src_file_pointer.file_format_type
         src_file_name = src_file_pointer.file_name
         dst_file_extension = translation_file_schema.target_file_format
@@ -130,7 +130,7 @@ class TranslationService(BaseService[Translation]):
                          + f"_{translation_file_schema.target_language}"
                          + f".{src_file_format_type.value}")
 
-        return new_file_stream, new_file_name, content_type
+        return new_file_stream, new_file_name, content_type, translation_output.translation_metadata["complete"]
 
 
     async def translate_text(

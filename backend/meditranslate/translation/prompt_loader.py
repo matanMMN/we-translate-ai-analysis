@@ -20,7 +20,7 @@ class PromptConstruct:
         return self.raw_prompt.format(**kwargs)
 
 
-def get_sysprompt_construct(version: int = 1) -> PromptConstruct:
+def get_sysprompt_construct(version: int = 3) -> PromptConstruct:
     fname = f"./prompts/params_v{version}.json"
 
     with open(fname, "r", encoding="utf-8") as f:

@@ -53,7 +53,7 @@ class TranslationController(BaseController[Translation]):
         ref_file = await self.file_service.fetch_file_entity(translation_job.reference_file_id)
         ref_file_stream, _, _ = await self.file_service.download_file_sync(file_id=ref_file.id)
 
-        translated_file_stream, new_file_name, content_type = await self.translation_service.translate_file(
+        translated_file_stream, new_file_name, content_type, complete = await self.translation_service.translate_file(
             current_user,
             src_file,
             src_file_stream,
@@ -78,7 +78,7 @@ class TranslationController(BaseController[Translation]):
             update_translation_job_data=TranslationJobUpdateSchema(target_file_id=result_file.get("id"))
         )
 
-        return result_file
+        return result_file, complete
 
     @Transactional(propagation=Propagation.REQUIRED_NEW)
     async def translate_text(self,current_user: User, translation_text_schema: TranslationTextSchema):

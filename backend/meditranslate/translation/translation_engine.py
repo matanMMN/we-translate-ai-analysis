@@ -9,7 +9,7 @@ from meditranslate.translation.llm_access import AnthropicClient
 class TranslationEngine:
     def __init__(self):
         self.anthropic_client = AnthropicClient()
-        self.sysprompt_con = get_sysprompt_construct(version=2)
+        self.sysprompt_con = get_sysprompt_construct(version=3)
         self.text_processor = TextProcessor()
 
     async def translate_file(self, translation_input: FileTranslationInput) -> FileTranslationOutput:
@@ -18,7 +18,7 @@ class TranslationEngine:
             ref = await self.text_processor.preprocess_ref_file(translation_input.reference_bytes)
 
             system_prompt = self.sysprompt_con(ref_text=ref)
-            translation = await self.anthropic_client.translation(
+            translation, complete = await self.anthropic_client.translation(
                 system_prompt=system_prompt,
                 file_contents=src)
 
@@ -26,7 +26,8 @@ class TranslationEngine:
             translation_output = FileTranslationOutput(
                 output_bytes=dst,
                 translation_metadata={
-                    "service":"none"
+                    "service":"none",
+                    "complete": str(complete)
                 })
 
             return translation_output
@@ -50,14 +51,15 @@ class TranslationEngine:
             ref = await self.text_processor.preprocess_ref_file(translation_input.reference_bytes)
 
             system_prompt = self.sysprompt_con(ref_text=ref)
-            translation = await self.anthropic_client.translation(
+            translation, complete = await self.anthropic_client.translation(
                 system_prompt=system_prompt,
                 file_contents=translation_input.input_text)
 
             translation_output = TextTranslationOutput(
                 output_text=translation,
                 translation_metadata={
-                    "service": "none"
+                    "service": "none",
+                    "complete": str(complete)
                 })
             return translation_output
         except AppError as ae:  # Already handled.

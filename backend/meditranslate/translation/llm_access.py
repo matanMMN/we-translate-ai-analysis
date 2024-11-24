@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Tuple, Optional
 
 from anthropic import AsyncAnthropic, APIStatusError
 
@@ -25,7 +25,7 @@ class AnthropicClient:
 
         self.client = AsyncAnthropic(api_key=self.api_key)
 
-    async def translation(self, system_prompt: str, file_contents: str, **params: Any) -> str:
+    async def translation(self, system_prompt: str, file_contents: str, **params: Any) -> Tuple[str, bool]:
         """
         Sends a message to a Claude LLM, and then repeatedly asks for responses until the LLM responds with either:
             - "end_turn" -          The LLM has reached the end of its response.
@@ -35,6 +35,9 @@ class AnthropicClient:
         for a response of up to 4096 tokens, which is not enough for full file translation. Therefore, we request a
         response multiple times, with the old generated response preceeding the current response, to continue
         the translation generation process.
+
+        Returns the output, and a boolean specifying whether the expected tokens appeared and were stripped from the
+        output.
         """
         # Set up parameters for call:
         sent_params = dict(
@@ -65,26 +68,24 @@ class AnthropicClient:
                 **sent_params)
 
             reps += 1
-            output_text += self._parse_response(response)
+            output_text += self._parse_response(response).rstrip()
             stop_reason = response.stop_reason
+
+        # Finalize the translation and return:
+        result  = self._finalize_translation(output_text)
+        success = True
 
         # Verify that "end_turn" or "stop_sequences" was indeed reached.
         if stop_reason not in ["end_turn", "stop_sequences"]:
-            logger.error(f"Anthropic could not finish generation before max_reps={self.max_reps} - {stop_reason=}")
-            logger.error(f"Generated output: '''\n{output_text}\n'''")
+            logger.warning(f"Anthropic could not finish generation before max_reps={self.max_reps} - {stop_reason=}")
+            logger.warning(f"Generated output: '''\n{output_text}\n'''")
+            success = False
 
-            raise AppError(
-                title="Developer Error: Unfinished Translation",
-                description=f"Anthropic client could not finish translation before reaching max_reps={self.max_reps}",
-                operable=False,
-                severity=ErrorSeverity.HIGH_MAJOR_ISSUE,
-                error_type=ErrorType.TRANSLATION_ERROR,
-                http_status=HTTPStatus.INTERNAL_SERVER_ERROR,
-                user_message="Something went wrong during file translation.")
+        if result is None:
+            result = output_text
+            success = False
 
-        # Finalize the translation and return:
-        output_text = self._finalize_translation(output_text)
-        return output_text
+        return result, success
 
     async def _send_message(self, system_prompt: str, built_message_seq: List[Dict[str, Any]], **params: Any):
         try:
@@ -100,7 +101,7 @@ class AnthropicClient:
                 error=e,
                 error_class=AppError,
                 title="Error from Anthropic API",
-                description="Some error has occured when utilizing Anthropic API.",
+                description=f"Some error has occured when utilizing Anthropic API: {e.message}",
                 http_status=HTTPStatus(e.status_code),
                 context="translation engine",
                 severity=ErrorSeverity.HIGH_MAJOR_ISSUE,
@@ -134,21 +135,22 @@ class AnthropicClient:
         return response.content[0].text
 
     @staticmethod
-    def _finalize_translation(translation: str) -> str:
+    def _finalize_translation(translation: str) -> Optional[str]:
+        """
+        Attempts to finalize the translation by stripping stop and wrapping tokens. If any token was not found, returns
+        `None` to indicate a token was missing.
+        """
         stop_token = "[TRANSLATION_SUCCESSFUL]"
         wrap_tokens = ["<eng_text>", "</eng_text>"]
+        missing_token = False
 
-        # TODO - return partial output in here
         for token in [stop_token] + wrap_tokens:
             if token not in translation:
-                raise AppError(
-                    title="Developer Error: Missing Token in Translation",
-                    description=f"Anthropic response is missing the token: {token}",
-                    operable=False,
-                    severity=ErrorSeverity.HIGH_MAJOR_ISSUE,
-                    error_type=ErrorType.TRANSLATION_ERROR,
-                    http_status=HTTPStatus.INTERNAL_SERVER_ERROR,
-                    user_message="Something went wrong during file translation.")
+                logger.warning(f"Missing token from LLM output: {token}.")
+                missing_token = True
+
+        if missing_token:
+            return None
 
         translation = translation[:translation.index(stop_token)]
         translation = translation[
