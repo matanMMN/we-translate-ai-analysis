@@ -1,0 +1,70 @@
+services:
+
+#  frontend:
+#    container_name: frontend
+#    build:
+#      context: ../../frontend  # Adjust the context to your frontend directory
+#      dockerfile: Dockerfile.frontend  # Specify the Dockerfile for the frontend if needed
+#    ports:
+#      - "3000:3000"  # Expose the frontend port
+#    volumes:
+#      - ../../frontend:/frontend  # Mount the frontend directory
+#    command: [ "npm", "start" ]  # Command to run the frontend
+#    working_dir: /frontend  # Set the working directory to /frontend
+#    environment:
+#      - NEXTAUTH_SECRET=SUPER_SECRET
+#      - NODE_DEV=development
+#      - SYNCFUSION_LICENSE_KEY=ORg4AjUWIQA/Gnt2UlhhQlVMfV5AQmFNYVF2R2dJfVRydF9HZEwxOX1dQl9nSH9RckRnW35ed3xWRWQ=
+#      - PORT=3000
+#      - NEXT_PUBLIC_SERVER_URL=http://localhost:8000
+#      - HOSTNAME=localhost
+
+
+
+  backend:
+    ports:
+      - ${APP_PORT}:${APP_PORT}
+    volumes:
+      - ..:/code
+    environment:
+      - DEBUG_ON_INIT=False
+    command: [ "python3", "-m","uvicorn", "main:app", "--reload","--host", "${APP_HOST}", "--port", "${APP_PORT}","--lifespan","on" ]
+
+  # celery_worker:
+  #   volumes:
+  #     - ..:/code
+  #   environment:
+  #     - DEBUG_ON_INIT=False
+  #   command: ["python", "./meditranslate/app/worker/worker.py", "worker", "--loglevel=info"]
+
+  # celery_beat:
+  #   build:
+  #     context: .
+  #     dockerfile: ./compose/local/fastapi/Dockerfile
+  #   image: fastapi_celery_example_celery_beat
+  #   command: /start-celerybeat
+  #   volumes:
+  #     - .:/app
+  #   env_file:
+  #     - .env/.dev-sample
+  #   depends_on:
+  #     - redis
+  #     - db
+
+  # flower:
+  #   build:
+  #     context: .
+  #     dockerfile: ./compose/local/fastapi/Dockerfile
+  #   image: fastapi_celery_example_celery_flower
+  #   command: /start-flower
+  #   volumes:
+  #     - .:/app
+  #   env_file:
+  #     - .env/.dev-sample
+  #   ports:
+  #     - 5557:5555
+  #   depends_on:
+  #     - redis
+  #     - db
+
+#python3 -m uvicorn main:app --reload --host 0.0.0.0 --port 8001 --lifespan on

@@ -1,0 +1,57 @@
+fastapi[all]
+uvicorn[standard]
+
+celery
+celery[redis,rabbitmq]
+redis
+aioredis
+
+Authlib               # OAuth and JWT for authentication
+passlib[bcrypt]       # Password hashing
+bcrypt
+cryptography          # Cryptographic recipes and primitives
+fastapi-csrf-protect  # CSRF protection
+python-jose
+
+# Session and Request Management
+user_agents           # Parsing user agent strings
+fastapi-sessions      # Session management (Redis-backed sessions)
+fastapi-limiter       # Rate limiting
+
+# Performance Monitoring
+prometheus-fastapi-instrumentator  # Monitoring and metrics for Prometheus
+
+# Database and Migrations
+alembic               # Database migrations (for SQLAlchemy)
+sqlmodel
+sqlalchemy[asyncio]            # ORM for database access
+asyncpg               # Asynchronous PostgreSQL client
+psycopg[binary] # for sync operations like create all
+
+
+loguru
+async-timeout
+
+
+pycountry # countries
+pytz # timezones
+python-magic          # For MIME type detection (useful in file uploads)
+
+
+
+# file storage
+pymongo
+
+python-multipart
+aiofiles
+boto3
+numpy
+
+
+# file management
+pypandoc_binary
+pdfplumber
+python-docx
+
+# llm api
+anthropic

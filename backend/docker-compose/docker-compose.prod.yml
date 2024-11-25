@@ -1,0 +1,15 @@
+services:
+  backend:
+    build:
+      args:
+        - COPY_FILES=true
+    ports:
+      - 8000:8000
+      - 5678:5678
+    volumes:
+      - ../server:/app
+      - /app/__pycache__
+    environment:
+      - PYDEVD_DISABLE_FILE_VALIDATION=0 # 1 for disabling "-Xfrozen_modules=off error
+      - DEBUG_ON_INIT=True
+    command: ["socketify","python3","-Xfrozen_modules=off", "-m", "debugpy", "--listen", "0.0.0.0:5678", "-m","uvicorn", "main:app", "--reload","--host", "0.0.0.0", "--port", "8001"]

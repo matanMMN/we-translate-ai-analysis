@@ -1,0 +1,32 @@
+[tool.poetry]
+name = "${APP_NAME}"
+version = "${RELEASE_VERSION}"
+description = "${APP_DESCRIPTION}"
+authors = ["cohenyuval315 <cohenyuval315@gmail.com>"]
+maintainers = [
+    "Yuval Cohen <cohenyuval315@gmail.com>"
+]
+repository = "https://github.com/"
+keywords = ["packaging", "poetry"]
+classifiers = [
+    "Topic :: Software Development :: Build Tools",
+    "Topic :: Software Development :: Libraries :: Python Modules"
+]
+readme = "README.md"
+package-mode = false
+license= "LICENSE"
+packages = [
+    { include = "." },
+]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+[tool.black]
+line-length = 88
+target-version = ['py311']
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

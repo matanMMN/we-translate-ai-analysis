@@ -1,0 +1,28 @@
+services:
+  backend:
+    container_name: ${APP_CONTAINER_NAME}-testing
+    build:
+      context: ..
+      dockerfile: ./.docker/Dockerfile.base
+      args:
+        ENVIRONMENT: testing
+    env_file:
+      - ../environments/.env.testing
+    ports:
+    - "8000:8000"
+    volumes:
+      - ..:/code
+      - /code/meditranslate/later
+    command: ["python" , "-m", "pytest"]
+    # command: ["pytest", "tests/test_runner.py"]
+    # command: ["sleep", "infinity"]
+    # command: ["sleep", "infinity"]
+
+    # command: ["pytest", "tests/test_api_client.py"]
+    # networks:
+    #   - backend_network
+
+
+  # locust:
+
+

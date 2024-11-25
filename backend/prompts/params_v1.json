@@ -1,0 +1,7 @@
+{
+    "raw_prompt_fname": "prompt_v1.txt",
+    "defaults": {
+        "success": "[TRANSLATION_SUCCESSFUL]",
+        "fail": "[TRANSLATION_FAILED]"
+    }
+}
