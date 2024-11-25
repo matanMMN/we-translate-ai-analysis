@@ -68,7 +68,7 @@ class AnthropicClient:
                 **sent_params)
 
             reps += 1
-            output_text += self._parse_response(response).rstrip()
+            output_text += self._parse_response(response)
             stop_reason = response.stop_reason
 
         # Finalize the translation and return:
@@ -132,7 +132,7 @@ class AnthropicClient:
 
     @staticmethod
     def _parse_response(response: Any) -> str:
-        return response.content[0].text
+        return response.content[0].text.rstrip()
 
     @staticmethod
     def _finalize_translation(translation: str) -> Optional[str]:
