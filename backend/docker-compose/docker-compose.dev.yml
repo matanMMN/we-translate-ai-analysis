@@ -3,12 +3,12 @@ services:
 #  frontend:
 #    container_name: frontend
 #    build:
-#      context: ../../  # Adjust the context to your frontend directory
+#      context: ../../frontend  # Adjust the context to your frontend directory
 #      dockerfile: Dockerfile.frontend  # Specify the Dockerfile for the frontend if needed
 #    ports:
 #      - "3000:3000"  # Expose the frontend port
 #    volumes:
-#      - ../../:/frontend  # Mount the frontend directory
+#      - ../../frontend:/frontend  # Mount the frontend directory
 #    command: [ "npm", "start" ]  # Command to run the frontend
 #    working_dir: /frontend  # Set the working directory to /frontend
 #    environment:
