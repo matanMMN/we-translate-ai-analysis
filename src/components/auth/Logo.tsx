@@ -27,7 +27,7 @@ export default function LogoComponent() {
                     <Typography component="h1" variant="h1" align="center" style={{
                         userSelect: "none"
                     }}>
-                        MediTranslate AI
+                        WeTranslate AI
                     </Typography>
                 </Box>
             </Grid>

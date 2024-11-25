@@ -17,6 +17,7 @@ export default function DocumentContainer({
             zIndex={3000}
             enableToolbar={true}
             height={"780px"}
+            // height={"1180px%"}
             showPropertiesPane={!isView}
             enableTrackChanges={true}
             layoutType={"Pages"}

@@ -1,3 +1,4 @@
+
 # After each FROM instruction, all previously defined ARG values are discarded , redefine for reuse.
 ARG BASE_IMAGE
 FROM $BASE_IMAGE

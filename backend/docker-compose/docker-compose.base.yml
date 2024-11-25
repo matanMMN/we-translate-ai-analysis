@@ -1,4 +1,26 @@
 services:
+
+#  frontend:
+#    container_name: frontend
+#    build:
+#      context: ../../  # Adjust the context to your frontend directory
+#      dockerfile: Dockerfile.frontend  # Specify the Dockerfile for the frontend if needed
+#    ports:
+#      - "3000:3000"  # Expose the frontend port
+#    volumes:
+#      - ../../:/frontend  # Mount the frontend directory
+#    command: [ "npm", "start" ]  # Command to run the frontend
+#    working_dir: /frontend  # Set the working directory to /frontend
+#    environment:
+#      - NEXTAUTH_SECRET=SUPER_SECRET
+#      - NODE_DEV=development
+#      - SYNCFUSION_LICENSE_KEY=ORg4AjUWIQA/Gnt2UlhhQlVMfV5AQmFNYVF2R2dJfVRydF9HZEwxOX1dQl9nSH9RckRnW35ed3xWRWQ=
+#      - PORT=3000
+#      - NEXT_PUBLIC_SERVER_URL=http://localhost:8000
+#      - HOSTNAME=localhost
+
+
+
   backend:
     container_name: ${APP_CONTAINER_NAME}
     stop_signal: SIGTERM

@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Search } from 'lucide-react'
 import { cn } from "@/lib/utils"
 import { useDebounce } from 'use-debounce'
@@ -23,7 +22,7 @@ export function  MedicalTerms() {
     const [loading, setLoading] = useState(false)
     const [hasMore, setHasMore] = useState(true)
     const [searchQuery, setSearchQuery] = useState('')
-    const [language, setLanguage] = useState<'hebrew' | 'english'>('english')
+    const [language] = useState<'hebrew' | 'english'>('english')
     const observer = useRef<IntersectionObserver>()
     const [debouncedQuery] = useDebounce(searchQuery, 100)
     const [searchResults, setSearchResults] = useState<MedicalTerm[]>([])

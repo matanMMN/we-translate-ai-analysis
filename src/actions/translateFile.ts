@@ -4,6 +4,7 @@ import {revalidatePath} from 'next/cache'
 import {Session} from "next-auth";
 import path from "path";
 import {serverUrl} from "@/lib/functions";
+import axios from 'axios';
 
 interface TranslationResponse {
     success: boolean
@@ -124,6 +125,7 @@ interface TranslationResponse {
 
 const determineType = (fileExt: string) => {
     // Determine MIME type
+
     const mimeTypes: Record<string, string> = {
         '.txt': 'text/plain',
         '.pdf': 'text/plain',
@@ -248,7 +250,6 @@ export async function translateFile(formData: FormData, detectedLanguage: string
         body: formData
     });
     const srcFileData = await srcFileRes.json();
-
     if (srcFileData && srcFileData.status_code !== 201)
         return {success: false, error: 'Failed to process the file'}
 
@@ -269,23 +270,23 @@ export async function translateFile(formData: FormData, detectedLanguage: string
     if (isUpdateSuccess && isUpdateSuccess.status_code !== 200)
         return {success: false, error: 'Failed to process the file'}
 
+
     // #3 Ask for the translated version
-    const translationRes = await fetch(`${serverUrl}/translations/file/${srcFileData.data.id}`, {
+    const isTranslationRes = await axios.post(`${serverUrl}/translations/file/${srcFileData.data.id}`, {
+        translation_job_id: isUpdateSuccess.data.id,
+        source_language: detectedLanguage,
+        target_language: targetLanguage,
+        target_file_format: fileExt.slice(1)
+    }, {
+        timeout: 600000,
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${session.accessToken}`,
-        },
-        method: 'POST',
-        body: JSON.stringify({
-            translation_job_id: isUpdateSuccess.data.id,
-            source_language: detectedLanguage,
-            target_language: targetLanguage,
-            target_file_format: fileExt.slice(1)
-        })
-    })
+        }
+    });
 
-    const isTranslationSuccess = await translationRes.json()
-
+    const isTranslationSuccess = isTranslationRes.data;
+    console.log(isTranslationSuccess)
     if (isTranslationSuccess && isTranslationSuccess?.status_code === 422)
         return {success: false, error: 'File does not contain significant medical/pharmacological context'}
 
@@ -298,13 +299,12 @@ export async function translateFile(formData: FormData, detectedLanguage: string
             'Authorization': `Bearer ${session.accessToken}`,
         },
     })
-
+    console.log(translatedFileRes)
     if (!translatedFileRes)
         return {success: false, error: 'Failed to process the file'}
     try {
         const arrayBuffer = await translatedFileRes.arrayBuffer();
         const encodedString = Buffer.from(arrayBuffer).toString('base64');
-
 
         revalidatePath(`/${projectId}/editor`);
 
@@ -317,7 +317,7 @@ export async function translateFile(formData: FormData, detectedLanguage: string
 
     } catch
         (error) {
-        console.error('Translation error:', error)
+        console.log('Translation error:', error)
         return {
             success: false,
             error: error instanceof Error ? error.message : 'Translation failed'
