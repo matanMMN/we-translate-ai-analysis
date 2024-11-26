@@ -1,7 +1,7 @@
 import React, {ReactNode} from "react";
 import {FormControl, FormField, FormItem, FormMessage} from "@/components/ui/form";
 import {InputAdornment, TextField} from "@mui/material";
-import LockIcon from "@mui/icons-material/Lock";
+import {LockIcon} from 'lucide-react'
 import {UseFormReturn} from "react-hook-form";
 
 

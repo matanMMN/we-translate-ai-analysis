@@ -1,6 +1,6 @@
 "use client"
 import {openDrawer, selectDrawer} from "@/store/slices/drawerSlice";
-import MenuIcon from "@mui/icons-material/Menu";
+import {MenuIcon} from 'lucide-react'
 import AppLogo from "@/components/header/AppLogo";
 import LanguageButton from "@/components/header/LanguageButton";
 import {Toolbar} from "@mui/material";

@@ -1,5 +1,5 @@
 import React from "react";
-import HomeIcon from "@mui/icons-material/Home";
+import {HomeIcon} from 'lucide-react'
 import RouterLink from "@/components/drawer/RouterLink";
 import {log} from "@/lib/log";
 import HugeIcon from "@/assets/HugeIcon";

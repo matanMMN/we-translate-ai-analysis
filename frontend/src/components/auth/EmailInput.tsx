@@ -1,7 +1,7 @@
 import React, {ReactNode} from "react";
 import {FormControl, FormField, FormItem, FormMessage} from "@/components/ui/form";
 import {InputAdornment, TextField} from "@mui/material";
-import MailOutlineIcon from "@mui/icons-material/MailOutline";
+import {Mail} from 'lucide-react'
 import {UseFormReturn} from "react-hook-form";
 
 export default function EmailInput({form}: { form: UseFormReturn<{ email: string; password: string; }>; }): ReactNode {
@@ -25,7 +25,7 @@ export default function EmailInput({form}: { form: UseFormReturn<{ email: string
                                 input: {
                                     startAdornment: (
                                         <InputAdornment position="start">
-                                            <MailOutlineIcon/>
+                                            <Mail/>
                                         </InputAdornment>
                                     ),
                                 },

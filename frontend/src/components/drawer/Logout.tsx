@@ -1,5 +1,6 @@
 "use client"
-import ExitToAppIcon from "@mui/icons-material/ExitToApp";
+
+import {LogOut} from 'lucide-react'
 import React, {useCallback} from "react";
 import {signOut} from "next-auth/react";
 import {useState} from "react"
@@ -33,7 +34,7 @@ export default function Logout() {
                     className={getButtonStyles({isActive: false, isLogout: true})}
                 >
                     <ListItemIcon className={getIconStyles({isActive: false, isLogout: true})}>
-                        <ExitToAppIcon/>
+                        <LogOut/>
                     </ListItemIcon>
                     <ListItemText
                         className={getTextStyles({isActive: false, isLogout: true})}

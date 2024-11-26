@@ -252,6 +252,7 @@ export async function translateFile(formData: FormData, detectedLanguage: string
     const srcFileData = await srcFileRes.json();
     if (srcFileData && srcFileData.status_code !== 201)
         return {success: false, error: 'Failed to process the file'}
+    console.log(projectData)
 
     // #2 Inject src file ID into project
     const updateProject = await fetch(`${serverUrl}/jobs/${projectId}/`, {

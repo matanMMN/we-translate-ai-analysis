@@ -30,7 +30,7 @@ export const authOptions: NextAuthOptions = {
                     }
 
                     // const res: User = await ApiClient.auth(email, password);
-                    console.log(email, password)
+                    console.log(email, password, serverUrl)
                     const data = await fetch(`${serverUrl}/auth/token`, {
                         method: 'POST',
                         headers: {
@@ -46,8 +46,10 @@ export const authOptions: NextAuthOptions = {
                             client_secret: 'string'
                         })
                     })
+                    console.log(serverUrl)
+                    console.log(data)
                     const res = await data.json()
-
+                    console.log(res)
                     if (!res.access_token) {
                         throw new Error('User not found');
                     }

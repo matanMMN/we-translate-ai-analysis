@@ -1,10 +1,26 @@
-Dockerfile.frontend
-.dockerignore
+# Ignore node_modules
 node_modules
-npm-debug.log
-README.md
-.next
-.gitignore
+frontend/node_modules
+
+# Ignore build output
+frontend/.next
+frontend/!.next/static
+frontend/!.next/standalone
+
+# Ignore version control files
 .git
-!.next/static
-!.next/standalone
+.gitignore
+
+# Ignore logs and temporary files
+*.log
+*.tmp
+
+# Ignore other unnecessary files
+README.md
+
+# Ignore Dockerfile and .dockerignore itself
+frontend/Dockerfile
+.dockerignore
+
+# Ignore IDE files
+.idea
