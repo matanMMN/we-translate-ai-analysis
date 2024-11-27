@@ -7,11 +7,12 @@ import * as z from "zod";
 import {useForm, UseFormReturn} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import EmailInput from "@/components/auth/EmailInput";
-import LoginSubmit from "@/components/auth/LoginSubmit";
+import AuthSubmit from "@/components/auth/AuthSubmit";
 import PasswordInput from "@/components/auth/PasswordInput";
 import {signIn, SignInResponse, useSession} from "next-auth/react";
 import {useRouter} from "next/navigation";
 import {writeToStorage} from "@/lib/storage";
+import Link from 'next/link'
 
 const FormSchema = z.object({
     // email: z.string().trim().email({message: "EmailInput is invalid"}), // Production validation
@@ -67,12 +68,12 @@ export default function LoginForm(): ReactNode {
                 <Grid container justifyContent="space-between">
                     <FormControlLabel control={<Checkbox value="remember" color="primary"/>}
                                       label="Remember me"/>
-                    <Typography className={"underline"} component="a" href="" variant="body2"
-                                sx={{alignSelf: 'center'}}>
-                        Forgot password?
-                    </Typography>
+                    <Link className="text-[#1F3B33] hover:underline content-center" href="/register">
+                        Not registered? Sign up
+                        {/*Forgot password?*/}
+                    </Link>
                 </Grid>
-                <LoginSubmit/>
+                <AuthSubmit/>
             </form>
         </Form>
     )

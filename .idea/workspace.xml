@@ -5,23 +5,33 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e031cfc7-51aa-4b30-aec7-a951c39c72e5" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/frontend/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.dockerignore" beforeDir="false" afterPath="$PROJECT_DIR$/.dockerignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/actions/signUp.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/app/(content)/[projectId]/source-file/page.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/auth/FullNameInput.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/source-file/SourceFile.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/docker-compose/docker-compose.base.yml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/docker-compose/docker-compose.base.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/docker-compose/docker-compose.dev.yml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/docker-compose/docker-compose.dev.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/Dockerfile.frontend" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/.localstack/cache/server.test.pem" beforeDir="false" afterPath="$PROJECT_DIR$/backend/.localstack/cache/server.test.pem" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/public/uploads/document.docx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/public/uploads/document.docx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/actions/translateFile.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/actions/translateFile.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/options.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/options.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/auth/EmailInput.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/auth/EmailInput.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/actions/fetchProjectFile.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/actions/fetchProjectFile.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/app/(auth)/register/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/(auth)/register/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/app/(content)/[projectId]/editor/data-default.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/(content)/[projectId]/editor/data-default.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/app/(content)/[projectId]/reference-file/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/(content)/[projectId]/reference-file/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/auth/LoginForm.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/auth/LoginForm.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/auth/LoginSubmit.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/auth/AuthSubmit.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/components/auth/PasswordInput.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/auth/PasswordInput.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/drawer/Logout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/drawer/Logout.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/drawer/MenuBar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/drawer/MenuBar.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/drawer/StaticMenu.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/drawer/StaticMenu.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/header/HeaderToolBar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/header/HeaderToolBar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/auth/Register.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/auth/Register.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/editor/handlers/menuHandler.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/editor/handlers/menuHandler.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/project/ProjectNavBar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/project/ProjectNavBar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/reference-file/ReferenceFile.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/reference-file/ReferenceFile.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/settings/Settings.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/settings/Settings.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/side-by-side/GlossaryList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/side-by-side/GlossaryList.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/side-by-side/GlossaryModal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/side-by-side/GlossaryModal.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/side-by-side/QuillEditor.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/side-by-side/QuillEditor.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/side-by-side/SectionNavigation.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/side-by-side/SectionNavigation.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/side-by-side/SideBySide.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/side-by-side/SideBySide.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/services/glossaryService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/services/glossaryService.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/services/translationService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/services/translationService.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/store/slices/sideBySideSlice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/store/slices/sideBySideSlice.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -58,21 +68,21 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Docker.frontend/Dockerfile runner.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
-    "ts.external.directory.path": "C:\\Users\\netan\\WebstormProjects\\WeTranslate-AI\\frontend\\node_modules\\typescript\\lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Docker.frontend/Dockerfile runner.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\netan\\WebstormProjects\\WeTranslate-AI\\frontend\\node_modules\\typescript\\lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\netan\WebstormProjects\WeTranslate-AI\frontend\src\actions" />
@@ -81,7 +91,9 @@
   </component>
   <component name="RunManager">
     <configuration default="true" type="docker-deploy" factoryName="dockerfile" temporary="true">
-      <deployment type="dockerfile" />
+      <deployment type="dockerfile">
+        <settings />
+      </deployment>
       <method v="2" />
     </configuration>
     <configuration name="frontend/Dockerfile runner" type="docker-deploy" factoryName="dockerfile" temporary="true" server-name="Docker">
@@ -130,6 +142,7 @@
       <workItem from="1732561480889" duration="808000" />
       <workItem from="1732617958556" duration="20359000" />
       <workItem from="1732639447486" duration="4168000" />
+      <workItem from="1732705034145" duration="14607000" />
     </task>
     <servers />
   </component>

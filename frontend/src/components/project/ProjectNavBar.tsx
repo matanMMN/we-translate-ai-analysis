@@ -18,6 +18,7 @@ export default function ProjectNavBar({project}: { project: Project }) {
         {name: 'Side by side', path: `/${projectId}/side-by-side`},
         {name: 'Translate file', path: `/${projectId}/translate-file`},
         {name: 'Reference file', path: `/${projectId}/reference-file`},
+        {name: 'Source file', path: `/${projectId}/source-file`},
     ]
 
     return (

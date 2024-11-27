@@ -49,13 +49,19 @@ export const syncWithBackend = createAsyncThunk(
         sections: Section[]
     }, {rejectWithValue}) => {
         try {
-
+            console.log(sections)
             const user = await getUser()
 
             if (!user) {
                 return rejectWithValue('User authentication failed')
             }
             const authToken = user.accessToken
+
+            const projectRes = await fetch(`${serverUrl}/jobs/${projectId}`, {headers: {'Authorization': `Bearer ${authToken}`}});
+            const project = await projectRes.json();
+            if (!project?.data) {
+                return rejectWithValue('Project data not found')
+            }
             const response = await fetch(`${serverUrl}/jobs/${projectId}`, {
                 method: 'PUT',
                 headers: {
@@ -64,6 +70,7 @@ export const syncWithBackend = createAsyncThunk(
                 },
                 body: JSON.stringify({
                     data: {
+                        ...project.data.data,
                         sideBySideSections: sections.map(section => ({
                             ...section,
                             lastModified: section.lastModified || new Date().toISOString()

@@ -1,20 +1,14 @@
 import React, {ReactNode} from "react";
 import {FormControl, FormField, FormItem, FormMessage} from "@/components/ui/form";
 import {InputAdornment, TextField} from "@mui/material";
-import {LockIcon} from 'lucide-react'
+import {User} from 'lucide-react'
 import {UseFormReturn} from "react-hook-form";
 
-
-export default function PasswordInput({form, isConfirmPassword}: {
-    form: UseFormReturn<{ name: string; email: string; password: string; confirmPassword: string}>, isConfirmPassword?: boolean;
-}): ReactNode {
-
-    const name = isConfirmPassword ? 'confirmPassword' : 'password';
-
+export default function FullNameInput({form}: { form: UseFormReturn<{ name?: string; email?: string; password?: string; confirmPassword?: string }>; }): ReactNode {
     return (
         <FormField
             control={form.control}
-            name={name}
+            name="name"
             render={({field}) => (
                 <FormItem>
                     <FormControl>
@@ -22,16 +16,16 @@ export default function PasswordInput({form, isConfirmPassword}: {
                             {...field}
                             margin="normal"
                             fullWidth
-                            name={name}
-                            label={`${isConfirmPassword ? 'Enter password again' : 'Enter password'}`}
-                            type="password"
-                            id={name}
-                            // autoComplete="current-password"
+                            id="name"
+                            label="Enter Full Name"
+                            name="name"
+                            autoComplete="name"
+                            autoFocus
                             slotProps={{
                                 input: {
                                     startAdornment: (
                                         <InputAdornment position="start">
-                                            <LockIcon/>
+                                            <User/>
                                         </InputAdornment>
                                     ),
                                 },

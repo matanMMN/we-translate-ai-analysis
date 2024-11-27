@@ -74,7 +74,7 @@ export default function SideBySide() {
     if (!activeSection) {
         return (
             <div className="flex items-center justify-center h-[calc(100vh-300px)]">
-                <p className="text-gray-500">No sections available. Copy text from the editor to get started.</p>
+                <p className="text-gray-500">No sections available. Copy text from the Source file to get started.</p>
             </div>
         );
     }
@@ -121,19 +121,19 @@ export default function SideBySide() {
                         >
                             {isTranslating ? 'Translating...' : 'Translate'}
                         </Button>
-                        {/*<Button*/}
-                        {/*    variant="secondary"*/}
-                        {/*    onClick={() => setIsGlossaryOpen(true)}*/}
-                        {/*>*/}
-                        {/*    Glossary*/}
-                        {/*</Button>*/}
+                        <Button
+                            variant="secondary"
+                            onClick={() => setIsGlossaryOpen(true)}
+                        >
+                            Glossary
+                        </Button>
                     </div>
                 </div>
             </div>
 
             <GlossaryModal
                 open={isGlossaryOpen}
-                onOpenChange={setIsGlossaryOpen}
+                onOpenChangeAction={setIsGlossaryOpen}
                 sourceLang={sourceLang || ''}
                 targetLang={targetLang!}
                 projectId={projectId}

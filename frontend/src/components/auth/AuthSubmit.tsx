@@ -5,7 +5,7 @@ import {Button} from "@mui/material";
 import {useFormStatus} from "react-dom";
 import LoadingLogoGif from "@/components/LoadingLogoGif";
 
-export default function LoginSubmit(): ReactNode {
+export default function AuthSubmit({isRegister}: { isRegister?: boolean }): ReactNode {
 
     const {pending} = useFormStatus();
 
@@ -17,7 +17,7 @@ export default function LoginSubmit(): ReactNode {
             fullWidth
             variant="contained"
             sx={{mt: 3, mb: 2, backgroundColor: '#1f3d39'}}
-        >Log in
+        >{`${isRegister ? "Sign up" : "Log in"}`}
         </Button>
 
 

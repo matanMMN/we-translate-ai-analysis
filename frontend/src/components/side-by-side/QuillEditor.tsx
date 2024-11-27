@@ -74,6 +74,10 @@ export function QuillEditor({id, content, readOnly = false, isRTL = false, proje
     ).current;
 
     useEffect(() => {
+        debouncedSync(sections, projectId);
+    }, [debouncedSync, projectId, sections])
+
+    useEffect(() => {
         setMounted(true);
     }, []);
 
@@ -85,9 +89,12 @@ export function QuillEditor({id, content, readOnly = false, isRTL = false, proje
         }));
 
         // Trigger sync with backend
-        if (projectId) {
-            debouncedSync(sections, projectId);
-        }
+        // if (projectId) {
+        //     if (readOnly)
+        //         debouncedSync(sections.map(s => s.id === id ?), projectId);
+        //     else
+        //         debouncedSync(sections.map(s => s.id === id ?), projectId);
+        // }
     };
 
     if (!mounted) {

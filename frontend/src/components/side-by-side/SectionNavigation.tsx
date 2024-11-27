@@ -22,7 +22,7 @@ export function SectionNavigation({projectId}: { projectId: string }) {
             toast.error("Cannot delete the last section");
             return;
         }
-        dispatch(deleteSectionAndSync({ id, projectId }));
+        dispatch(deleteSectionAndSync({id, projectId}));
 
     };
 
@@ -33,6 +33,16 @@ export function SectionNavigation({projectId}: { projectId: string }) {
         <div className="w-12 border-r bg-background flex flex-col items-center py-4 space-y-2">
             {sections.map((section, index) => (
                 <div key={section.id} className="relative group">
+                    {sections.length > 1 && (
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="absolute -left-10 -top-1 group-hover:flex"
+                            onClick={() => handleDeleteSection(section.id)}
+                        >
+                            <Trash2 className="h-4 w-4"/>
+                        </Button>
+                    )}
                     <Button
                         variant={activeSection === section.id ? "default" : "ghost"}
                         className={`${activeSection === section.id && 'text-white'} w-8 h-8 rounded-full`}
@@ -40,16 +50,6 @@ export function SectionNavigation({projectId}: { projectId: string }) {
                     >
                         {index + 1}
                     </Button>
-                    {sections.length > 1 && (
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="absolute -right-8 top-0 hidden group-hover:flex"
-                            onClick={() => handleDeleteSection(section.id)}
-                        >
-                            <Trash2 className="h-4 w-4"/>
-                        </Button>
-                    )}
                 </div>
             ))}
             {/*<Button*/}

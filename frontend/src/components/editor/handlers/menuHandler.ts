@@ -2,7 +2,7 @@ import {DocumentEditorContainerComponent} from '@syncfusion/ej2-react-documented
 import {RefObject} from 'react';
 import {MenuItemModel} from '@syncfusion/ej2-navigations';
 import {AppDispatch} from '@/store/store.types';
-import {copyTextToSideBySide} from '@/services/editorService';
+// import {copyTextToSideBySide} from '@/services/editorService';
 import {toast} from 'sonner';
 
 interface SetupContextMenuProps {
@@ -15,10 +15,10 @@ interface SetupContextMenuProps {
 
 export const setupContextMenu = ({
                                      container,
-                                     dispatch,
-                                     navigate,
+                                     // dispatch,
+                                     // navigate,
                                      projectId,
-                                     sourceLanguage
+                                     // sourceLanguage
                                  }: SetupContextMenuProps) => {
     if (!container.current) return;
 
@@ -28,11 +28,11 @@ export const setupContextMenu = ({
             id: 'search_in_google',
             iconCss: 'e-icons e-de-ctnr-find',
         },
-        {
-            text: `Copy to 'Side by side'`,
-            id: 'copy_to_side',
-            iconCss: 'e-icons e-copy',
-        },
+        // {
+        //     text: `Copy to 'Side by side'`,
+        //     id: 'copy_to_side',
+        //     iconCss: 'e-icons e-copy',
+        // },
     ];
 
     container.current.documentEditor.contextMenu.addCustomMenu(menuItems, false);
@@ -53,34 +53,34 @@ export const setupContextMenu = ({
                     window.open(`http://google.com/search?q=${selectedText}`);
                 }
                 break;
-            case `${id}copy_to_side`:
-                if (!container.current.documentEditor.selection.isEmpty && /\S/.test(selectedText)) {
-                    try {
-                        // Trigger auto-save before navigation
-                        await container.current.documentEditor.saveAsBlob("Docx");
-
-                        // Copy the selected text to side-by-side
-                        const success = await copyTextToSideBySide({
-                            text: selectedText,
-                            sourceLanguage,
-                            dispatch,
-                            projectId
-                        });
-                        if (success) {
-                            toast.success('Text copied to Side by Side');
-                            // Navigate to side-by-side page
-                            navigate('side-by-side');
-                        } else {
-                            toast.error('Failed to copy text');
-                        }
-                    } catch (error) {
-                        console.error('Error in copy to side-by-side:', error);
-                        toast.error('Failed to copy text');
-                    }
-                } else {
-                    toast.error('Please select some text first');
-                }
-                break;
+            // case `${id}copy_to_side`:
+            //     if (!container.current.documentEditor.selection.isEmpty && /\S/.test(selectedText)) {
+            //         try {
+            //             // Trigger auto-save before navigation
+            //             await container.current.documentEditor.saveAsBlob("Docx");
+            //
+            //             // Copy the selected text to side-by-side
+            //             const success = await copyTextToSideBySide({
+            //                 text: selectedText,
+            //                 sourceLanguage,
+            //                 dispatch,
+            //                 projectId
+            //             });
+            //             if (success) {
+            //                 toast.success('Text copied to Side by Side');
+            //                 // Navigate to side-by-side page
+            //                 navigate('side-by-side');
+            //             } else {
+            //                 toast.error('Failed to copy text');
+            //             }
+            //         } catch (error) {
+            //             console.error('Error in copy to side-by-side:', error);
+            //             toast.error('Failed to copy text');
+            //         }
+            //     } else {
+            //         toast.error('Please select some text first');
+            //     }
+            //     break;
         }
     };
 };

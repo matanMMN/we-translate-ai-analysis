@@ -3,6 +3,7 @@ import {toast} from 'sonner';
 // import {updateFileMetadata} from '@/store/slices/projectSlice';
 // import {serverUrl} from "@/lib/functions";
 import {Session} from "next-auth";
+import {serverUrl} from "@/lib/functions";
 
 interface TranslateOptions {
     text: string;
@@ -20,10 +21,10 @@ interface TranslationResponse {
 }
 
 export async function translateText({
-                                        // text,
-                                        // sourceLang,
-                                        // targetLang,
-                                        // projectId,
+                                        text,
+                                        sourceLang,
+                                        targetLang,
+                                        projectId,
                                         userSession
                                     }: TranslateOptions): Promise<TranslationResponse> {
 
@@ -31,40 +32,34 @@ export async function translateText({
         throw new Error('User authentication failed');
     }
 
-    await new Promise(resolve => setTimeout(resolve, 1000));
+
     try {
-        // const response = await fetch(`${serverUrl}/text`, {
-        //     method: 'POST',
-        //     headers: {
-        //         'Content-Type': 'application/json',
-        //         'Authorization': `Bearer ${userSession.accessToken}`
-        //     },
-        //     body: JSON.stringify({
-        //         source_language: sourceLang,
-        //         target_language: targetLang,
-        //         translation_job_id: projectId,
-        //         input_text: text
-        //     })
-        // });
-        //
-        // if (!response.ok) {
-        //     throw new Error('Translation failed');
+        // return {
+        //     translatedText: 'This is a test translation'
         // }
+        const response = await fetch(`${serverUrl}/translations/text`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${userSession.accessToken}`
+            },
+            body: JSON.stringify({
+                source_language: sourceLang,
+                target_language: targetLang,
+                translation_job_id: projectId,
+                input_text: text
+            })
+        });
 
-        // const output = await response.json();
-        const output = {
-            translatedText: 'This is a test translation'
+        if (!response.ok) {
+            throw new Error('Translation failed');
         }
-        // If we get file metadata from the translation, update the project state
-        // if (result.fileId && result.docxHash) {
-        //     store.dispatch(updateFileMetadata({
-        //         docxHash: result.docxHash,
-        //         commentsHash: result.commentsHash || null,
-        //         lastModified: Date.now()
-        //     }));
-        // }
 
-        return output;
+        const output = await response.json();
+        return {
+            translatedText: output.data.output_text
+        }
+
     } catch (error) {
         toast.error('Translation failed. Please try again.');
         throw error;

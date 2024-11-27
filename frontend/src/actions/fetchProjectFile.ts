@@ -8,7 +8,7 @@ import {getUser} from "@/lib/AuthGuard";
 //     lastModified: number
 // }
 
-export async function fetchProjectFile(projectId: string): Promise<File | null> {
+export async function fetchProjectFile(projectId: string, fileType: string): Promise<File | null> {
     const user = await getUser()
     if (!user) {
         throw new Error('User authentication failed')
@@ -21,7 +21,22 @@ export async function fetchProjectFile(projectId: string): Promise<File | null> 
             }
         })
         const project = await projectRes.json();
-        const fileId = project.data.reference_file_id
+        let fileId: string
+
+        switch (fileType) {
+            case 'reference':
+                fileId = project.data.reference_file_id
+                break;
+            case 'source':
+                fileId = project.data.source_file_id
+                break;
+            default:
+                throw new Error('Invalid file type')
+        }
+
+        if (!fileId) {
+            return null;
+        }
         const fileRes = await fetch(`${serverUrl}/files/download/${fileId}`, {
             headers: {
                 Authorization: `Bearer ${user?.accessToken}`,
