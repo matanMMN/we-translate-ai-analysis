@@ -5,33 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e031cfc7-51aa-4b30-aec7-a951c39c72e5" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/frontend/src/actions/signUp.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/app/(content)/[projectId]/source-file/page.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/auth/FullNameInput.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/source-file/SourceFile.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/.localstack/cache/server.test.pem" beforeDir="false" afterPath="$PROJECT_DIR$/backend/.localstack/cache/server.test.pem" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/public/uploads/document.docx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/public/uploads/document.docx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/actions/fetchProjectFile.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/actions/fetchProjectFile.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/(auth)/register/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/(auth)/register/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/(content)/[projectId]/editor/data-default.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/(content)/[projectId]/editor/data-default.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/(content)/[projectId]/reference-file/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/(content)/[projectId]/reference-file/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/auth/LoginForm.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/auth/LoginForm.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/auth/LoginSubmit.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/auth/AuthSubmit.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/auth/PasswordInput.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/auth/PasswordInput.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/auth/Register.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/auth/Register.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/editor/handlers/menuHandler.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/editor/handlers/menuHandler.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/project/ProjectNavBar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/project/ProjectNavBar.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/reference-file/ReferenceFile.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/reference-file/ReferenceFile.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/settings/Settings.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/settings/Settings.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/side-by-side/GlossaryList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/side-by-side/GlossaryList.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/components/side-by-side/GlossaryModal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/side-by-side/GlossaryModal.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/side-by-side/QuillEditor.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/side-by-side/QuillEditor.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/side-by-side/SectionNavigation.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/side-by-side/SectionNavigation.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/side-by-side/SideBySide.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/side-by-side/SideBySide.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/services/glossaryService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/services/glossaryService.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/services/translationService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/services/translationService.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/store/slices/sideBySideSlice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/store/slices/sideBySideSlice.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -143,6 +119,7 @@
       <workItem from="1732617958556" duration="20359000" />
       <workItem from="1732639447486" duration="4168000" />
       <workItem from="1732705034145" duration="14607000" />
+      <workItem from="1732789346463" duration="2759000" />
     </task>
     <servers />
   </component>

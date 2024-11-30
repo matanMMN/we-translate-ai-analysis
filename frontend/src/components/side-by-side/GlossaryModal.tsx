@@ -78,7 +78,7 @@ export function GlossaryModal({
 
             // Refresh entries
             await loadGlossaryEntries();
-            setEntries(entries => [...entries, {sourceText, targetText}]);
+            setEntries(entries => [...(entries ?? []), {sourceText, targetText}]);
             // Reset form
             setSourceText('');
             setTargetText('');
