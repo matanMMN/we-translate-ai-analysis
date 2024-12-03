@@ -6,20 +6,18 @@ from meditranslate.src.auth.auth_controller import AuthController
 from meditranslate.src.files.file_controller import FileController
 from meditranslate.src.files.file_service import FileService
 from meditranslate.src.files.file_repository import FileRepository
-
 from meditranslate.src.translations.translation_controller import TranslationController
 from meditranslate.src.translations.translation_service import TranslationService
 from meditranslate.src.translations.translation_repository import TranslationRepository
-
+from meditranslate.src.webhooks.webhook_repository import WebhookRepository
+from meditranslate.src.webhooks.webhook_service import WebhookService
+from meditranslate.src.webhooks.webhook_controller import WebhookController
 from meditranslate.src.translation_jobs.translation_job_controller import TranslationJobController
 from meditranslate.src.translation_jobs.translation_job_service import TranslationJobService
 from meditranslate.src.translation_jobs.translation_job_repository import TranslationJobRepository
 from meditranslate.app.storage import file_storage_service
 from meditranslate.translation import translation_engine
-
-
 from meditranslate.src.users.user_controller import UserController
-
 from meditranslate.app.db import get_session
 
 class Factory:
@@ -28,6 +26,12 @@ class Factory:
     repositories which can be accessed by the rest of the application.
     """
 
+
+    @staticmethod
+    def get_webhook_controller(db_session=Depends(get_session)) -> WebhookController:
+        return WebhookController(
+            WebhookService(WebhookRepository(db_session), TranslationJobRepository(db_session)))
+    
     @staticmethod
     def get_user_controller(db_session=Depends(get_session)) -> UserController:
         return UserController(UserService(UserRepository(db_session)))
@@ -49,7 +53,8 @@ class Factory:
         return TranslationController(
             TranslationService(TranslationRepository(db_session=db_session),translation_engine),
             FileService(FileRepository(db_session=db_session),storage_service=file_storage_service),
-            TranslationJobService(TranslationJobRepository(db_session=db_session))
+            TranslationJobService(TranslationJobRepository(db_session=db_session)),
+            WebhookService(WebhookRepository(db_session), TranslationJobRepository(db_session))
         )
 
 

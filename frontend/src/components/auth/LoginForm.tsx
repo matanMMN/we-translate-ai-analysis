@@ -2,7 +2,7 @@
 
 import React, {ReactNode, useEffect, useState} from "react";
 import {Form} from "@/components/ui/form";
-import {Checkbox, FormControlLabel, Grid, Typography} from "@mui/material";
+import {Checkbox, FormControlLabel, Grid} from "@mui/material";
 import * as z from "zod";
 import {useForm, UseFormReturn} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";

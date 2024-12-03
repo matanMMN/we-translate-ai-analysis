@@ -23,6 +23,8 @@ from meditranslate.utils.files.file_format_type import FileFormatType
 from meditranslate.app.loggers import logger
 from meditranslate.utils.files.formats.file_format_handler import FileFormatHandler
 
+
+
 class TranslationService(BaseService[Translation]):
     def __init__(self, translation_repository: TranslationRepository,translation_engine:TranslationEngine):
         super().__init__(model=Translation, repository=translation_repository)
@@ -122,6 +124,7 @@ class TranslationService(BaseService[Translation]):
                 http_status=HTTPStatus.INTERNAL_SERVER_ERROR
             )
 
+
         new_file_stream = translation_output.output_bytes
         new_file_stream.seek(0)
         content_type = FileFormatHandler().get_content_type(src_file_format_type)
@@ -151,7 +154,7 @@ class TranslationService(BaseService[Translation]):
                     translation_job_id=translation_text_schema.translation_job_id,
                     translation_metadata=translation_output.translation_metadata,
                     output_text=translation_output.output_text))
-
+        
         return self._to_public_translation(created_translation)
 
 

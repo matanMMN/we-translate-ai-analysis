@@ -6,6 +6,7 @@ from meditranslate.src.files.file_service import FileService
 from meditranslate.src.translation_jobs.translation_job_schemas import TranslationJobUpdateSchema
 from meditranslate.src.translation_jobs.translation_job_service import TranslationJobService
 from meditranslate.src.translations.translation_service import TranslationService
+
 from meditranslate.src.translations.translation_schemas import (
     TranslationCreateSchema,
     GetManySchema,
@@ -16,6 +17,7 @@ from meditranslate.app.db.models import Translation
 from meditranslate.app.db.transaction import Transactional,Propagation
 from meditranslate.src.users.user import User
 from meditranslate.app.loggers import logger
+from meditranslate.src.webhooks.webhook_service import WebhookService
 
 
 class TranslationController(BaseController[Translation]):
@@ -23,11 +25,14 @@ class TranslationController(BaseController[Translation]):
             self,
             translation_service: TranslationService,
             file_service: FileService,
-            translation_job_service: TranslationJobService) -> None:
+            translation_job_service: TranslationJobService,
+            webhook_service: WebhookService) -> None:
         super().__init__(Translation,translation_service)
         self.translation_service: TranslationService = translation_service
         self.file_service: FileService = file_service
         self.translation_job_service: TranslationJobService = translation_job_service
+        self.webhook_service: WebhookService = webhook_service
+
 
     @Transactional(propagation=Propagation.REQUIRED_NEW)
     async def create_translation(self,current_user:User,translation_create_schema:TranslationCreateSchema) -> Translation:
@@ -78,6 +83,15 @@ class TranslationController(BaseController[Translation]):
             update_translation_job_data=TranslationJobUpdateSchema(target_file_id=result_file.get("id"))
         )
 
+        await self.webhook_service.notify_translation_complete(
+            translation_job.id,
+            {
+                    "event_type": "file_translation_complete",
+                    "file_id": result_file.get("id"),
+                    "file_name": new_file_name,
+                    "content_type": content_type
+            }
+        )
         return result_file, complete
 
     @Transactional(propagation=Propagation.REQUIRED_NEW)
@@ -87,7 +101,19 @@ class TranslationController(BaseController[Translation]):
         ref_file = await self.file_service.fetch_file_entity(translation_job.reference_file_id)
         ref_file_stream, _, _ = await self.file_service.download_file_sync(file_id=ref_file.id)
 
-        return await self.translation_service.translate_text(
+        translation_result = await self.translation_service.translate_text(
             current_user,
             ref_file_stream,
-            translation_text_schema)
+            translation_text_schema
+        )
+        await self.webhook_service.notify_translation_complete(
+            translation_job.id,
+            {
+                "event_type": "text_translation_complete",
+                "translation_job_id": translation_job.id,
+                "translation_result": translation_result,
+                "is_complete": True   
+            }
+        )
+
+        return translation_result
