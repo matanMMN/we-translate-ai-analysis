@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3000",
-    "prebuild": "syncfusion-license activate",
+    "prebuild": "npx syncfusion-license activate",
     "build": "next build",
     "start": "next start -p 3000",
     "lint": "next lint"

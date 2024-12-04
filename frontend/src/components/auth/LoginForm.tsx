@@ -63,7 +63,7 @@ export default function LoginForm(): ReactNode {
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className={"w-full"}>
                 <EmailInput form={form}/>
-                <PasswordInput form={form}/>
+                <PasswordInput form={form as any}/>
                 <div className="flex font-bold text-red-500">{error || ""}</div>
                 <Grid container justifyContent="space-between">
                     <FormControlLabel control={<Checkbox value="remember" color="primary"/>}
