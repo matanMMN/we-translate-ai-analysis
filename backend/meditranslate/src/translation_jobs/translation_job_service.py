@@ -70,6 +70,7 @@ class TranslationJobService(BaseService[TranslationJob]):
 
     async def delete_translation_job(self,current_user:User,translation_job_id: str) -> None:
         translation_job = await self.translation_job_repository.get_by("id",translation_job_id,unique=True)
+        logger.debug(translation_job, translation_job_id)
         if not translation_job:
             raise AppError(
                 title="delete translation job endpoint",

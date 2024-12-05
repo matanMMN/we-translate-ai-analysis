@@ -1,22 +1,43 @@
 export const dynamic = "force-dynamic";
 
+let clients: any[] = []
+
 export async function POST(request: Request) {
-    console.log("SSE REQUEST")
-    console.log(request)
+    const data = await request.json()
+    console.log("Received data from webhook:", data)
+
+    console.log(clients)
+    // sends to all clients instead of the specific one the project belongs to.
+    clients.forEach(c => {
+        try {
+            console.log("Sending data to client", c.id)
+            c.controller.enqueue(new TextEncoder().encode(`data: ${JSON.stringify(data)}\n\n`))
+        } catch (e) {
+            console.error(`Error sending data to client ${c.id}`, e)
+            clients = clients.filter(cl => c.id !== cl.id)
+        }
+    })
+    return new Response("Data received", {status: 200})
+
+}
+
+export async function GET() {
     const encoder = new TextEncoder()
-    // Create a streaming response
+    const clientId = crypto.randomUUID()
+
     const customReadable = new ReadableStream({
         start(controller) {
-            const message = "A sample message."
-            controller.enqueue(encoder.encode(`data: ${message}\n\n`))
+            clients.push({id: clientId, controller})
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify({type: 'connected'})}\n\n`))
         },
+        cancel() {
+            clients = clients.filter(c => c.id !== clientId);
+            console.log(`Client ${clientId} disconnected. total clients: ${clients.length}`)
+        }
     })
-    // Return the stream response and keep the connection alive
     return new Response(customReadable, {
-        // Set the headers for Server-Sent Events (SSE)
         headers: {
             Connection: "keep-alive",
-            "Content-Encoding": "none",
             "Cache-Control": "no-cache, no-transform",
             "Content-Type": "text/event-stream; charset=utf-8",
         },

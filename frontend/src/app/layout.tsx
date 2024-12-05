@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import type {Metadata} from "next";
 import "@/app/globals.css"
 import {Toaster} from "sonner";
+import SSEListener from "@/components/SSEListener";
 
 
 const geistSans = localFont({
@@ -17,7 +18,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-    title: "WeTranslate AI",
+    title: "MediTranslate AI",
 };
 
 export interface ChildrenProps {
@@ -31,7 +32,9 @@ export default function DefaultLayout({children}: { children: ReactNode }) {
         <html lang="en">
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <Toaster/>
-        {children}
+        <SSEListener>
+            {children}
+        </SSEListener>
         </body>
         </html>
     )

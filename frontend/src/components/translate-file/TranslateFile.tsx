@@ -1,21 +1,21 @@
 'use client'
 
-import {useState} from 'react'
-import {toast} from 'sonner'
-import {FileText, XCircle} from 'lucide-react'
-import {Button} from '@/components/ui/button'
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select'
-import {FileUploadZone} from './FileUploadZone'
-import {ConfirmDialog} from './ConfirmDialog'
-import {detectFileLanguage} from '@/actions/detectLanguage'
-import {translateFile} from '@/actions/translateFile'
-import {useAppDispatch} from '@/hooks/useAppDispatch'
-import {useAppSelector} from '@/hooks/useAppSelector'
-import {setTranslatedFile} from '@/store/slices/projectSlice'
-import {useRouter} from 'next/navigation'
-import {useSession} from "next-auth/react";
-import {selectSession} from "@/store/slices/sessionSlice";
-import {clearAllLocalStorage} from "@/store/slices/projectCacheSlice";
+import { useState } from 'react'
+import { toast } from 'sonner'
+import { FileText, XCircle } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { FileUploadZone } from './FileUploadZone'
+import { ConfirmDialog } from './ConfirmDialog'
+import { detectFileLanguage } from '@/actions/detectLanguage'
+import { translateFile } from '@/actions/translateFile'
+import { useAppDispatch } from '@/hooks/useAppDispatch'
+import { useAppSelector } from '@/hooks/useAppSelector'
+import { setTranslatedFile } from '@/store/slices/projectSlice'
+import { useRouter } from 'next/navigation'
+import { useSession } from "next-auth/react";
+import { selectPath, selectSession } from "@/store/slices/sessionSlice";
+import { clearAllLocalStorage } from "@/store/slices/projectCacheSlice";
 
 const ACCEPTED_FILE_TYPES = {
     // 'application/pdf': ['.pdf'],
@@ -28,9 +28,9 @@ type TranslationState = 'idle' | 'uploading' | 'translating' | 'completed' | 'er
 
 export default function TranslateFile() {
     const dispatch = useAppDispatch()
-    const {data: session} = useSession()
+    const { data: session } = useSession()
     const router = useRouter()
-    const {projectId, project} = useAppSelector(selectSession)
+    const { projectId, project } = useAppSelector(selectSession)
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
     const [detectedLanguage, setDetectedLanguage] = useState<string | null>(null)
     const [targetLanguage, setTargetLanguage] = useState('')
@@ -88,10 +88,7 @@ export default function TranslateFile() {
                 }
 
                 setTranslationState('completed')
-                dispatch(clearAllLocalStorage({projectId}))
-                setTimeout(() => {
-                    router.push('editor')
-                }, 1250)
+                dispatch(clearAllLocalStorage({ projectId }))
             } else {
                 throw new Error(response.error || 'Translation failed')
             }
@@ -106,7 +103,7 @@ export default function TranslateFile() {
         return (
             <div className="container mx-auto p-4 max-w-4xl">
                 <div className="text-center p-6 bg-destructive/10 rounded-lg space-y-4">
-                    <XCircle className="h-12 w-12 mx-auto text-destructive"/>
+                    <XCircle className="h-12 w-12 mx-auto text-destructive" />
                     <h2 className="text-2xl font-semibold text-destructive">Translation Failed</h2>
                     <p className="text-muted-foreground">
                         {error || 'An unexpected error occurred during translation.'}
@@ -138,14 +135,14 @@ export default function TranslateFile() {
             <div className="container mx-auto p-4 max-w-4xl text-center space-y-6">
                 <h2 className="text-2xl font-semibold">Translating your file...</h2>
                 <p className="text-muted-foreground">
-                    This process could take up to 10 minutes. You must not leave this page.
+                    This process could take up to 10 minutes.
                 </p>
                 <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
-                    <div className="h-full bg-primary animate-pulse" style={{width: '100%'}}/>
+                    <div className="h-full bg-primary animate-pulse" style={{ width: '100%' }} />
                 </div>
                 <p className="text-sm text-muted-foreground">
                     Your translated file will be available in the editor once completed.
-                    You will be redirected automatically.
+                    You can browse away and you will be notified once it's done.
                 </p>
             </div>
         )
@@ -155,16 +152,16 @@ export default function TranslateFile() {
         return (
             <div className="container mx-auto p-4 max-w-4xl">
                 <div className="text-center p-6 bg-muted/10 rounded-lg space-y-4">
-                    <FileText className="h-12 w-12 mx-auto text-green-600"/>
+                    <FileText className="h-12 w-12 mx-auto text-green-600" />
                     <h2 className="text-2xl font-semibold">Translation Complete!</h2>
                     <p className="text-muted-foreground">
                         Your file has been translated and is now available in the editor.
                     </p>
                     <Button
                         variant="outline"
-                        onClick={() => setTranslationState('idle')}
+                        onClick={() => router.push(`editor`)}
                     >
-                        Translate another file
+                        View Translated File
                     </Button>
                 </div>
             </div>
@@ -197,7 +194,7 @@ export default function TranslateFile() {
                         onOpenChange={() => setError(null)} // Clear error when user tries again
                     >
                         <SelectTrigger>
-                            <SelectValue placeholder="Select target language"/>
+                            <SelectValue placeholder="Select target language" />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="en">English</SelectItem>
@@ -214,7 +211,7 @@ export default function TranslateFile() {
                             setError(null) // Clear error when file is removed
                         }}
                         acceptedTypes={ACCEPTED_FILE_TYPES}
-                        // error={error} // Pass error to FileUploadZone
+                    // error={error} // Pass error to FileUploadZone
                     />
 
                     <Button

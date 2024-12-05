@@ -4,6 +4,10 @@ import store from "@/store/store";
 import {ReactNode} from "react";
 
 export const StoreProvider = ({children}: { children: ReactNode }): ReactNode => {
+
+
+
+
     return (
         <Provider store={store}>
             {children}

@@ -21,7 +21,7 @@ class WebhookService(BaseService[Webhook]):
 
     async def register_webhook(self, webhook_data: Dict) -> Webhook:
         # Validate that required fields are present
-        required_fields = ["user_id", "translation_job_id", "callback_url"]
+        required_fields = ["user_id", "translation_job_id"]
         for field in required_fields:
             if field not in webhook_data:
                 raise AppError(
@@ -66,7 +66,7 @@ class WebhookService(BaseService[Webhook]):
             )
         # Add created_at timestamp
         webhook_data["created_at"] = datetime.now()
-        webhook_data["callback_url"] = str(webhook_data["callback_url"])
+        # webhook_data["callback_url"] = str(webhook_data["callback_url"])
         webhook_data.update({
             "is_triggered": False,
             "triggered_at": None
@@ -105,7 +105,7 @@ class WebhookService(BaseService[Webhook]):
                 try:
                     async with httpx.AsyncClient() as client:
                             response = await client.post(
-                                str(webhook.callback_url),
+                                str("http://app:3000/api/stream"),
                                 json={
                                     "event": "translation_complete",
                                     "translation_job_id": translation_job_id,

@@ -115,6 +115,7 @@ export default function SourceFile({file}: { file: File | null }) {
             <CardContent>
                 <ScrollArea className="h-[calc(100vh-12rem)] max-h-[calc(100dvh-400px)] rounded-md border p-4">
                     <div
+                        dir="rtl"
                         dangerouslySetInnerHTML={{__html: htmlContent}}
                         className="prose prose-sm sm:prose lg:prose-lg xl:prose-xl max-w-none"
                     />

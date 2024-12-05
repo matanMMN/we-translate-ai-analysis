@@ -1,0 +1,157 @@
+{
+    "projects": [
+      {
+        "id": "1",
+        "title": "Paracetamol",
+        "description": "Medical documentation translation for Paracetamol usage, dosage guidelines, and side effects",
+        "source_language": "Hebrew",
+        "target_language": "English",
+        "priority": 1,
+        "status": "in_progress"
+      },
+      {
+        "id": "2",
+        "title": "Ibuprofen",
+        "description": "Translation of clinical guidelines and patient information for Ibuprofen treatment",
+        "source_language": "English",
+        "target_language": "Hebrew",
+        "priority": 3,
+        "status": "pending"
+      },
+      {
+        "id": "3",
+        "title": "Amoxicillin",
+        "description": "Translation of research findings and clinical trials for Amoxicillin antibiotics",
+        "source_language": "Hebrew",
+        "target_language": "Arabic",
+        "priority": 1,
+        "status": "completed"
+      },
+      {
+        "id": "4",
+        "title": "Simvastatin",
+        "description": "Medical protocol translation for Simvastatin cholesterol medication",
+        "source_language": "English",
+        "target_language": "Arabic",
+        "priority": 2,
+        "status": "in_progress"
+      },
+      {
+        "id": "5",
+        "title": "Omeprazole",
+        "description": "Translation of clinical study results for Omeprazole acid reflux treatment",
+        "source_language": "Arabic",
+        "target_language": "Hebrew",
+        "priority": 1,
+        "status": "pending"
+      },
+      {
+        "id": "6",
+        "title": "Metformin",
+        "description": "Comprehensive translation of Metformin diabetes medication documentation",
+        "source_language": "Hebrew",
+        "target_language": "English",
+        "priority": 2,
+        "status": "completed"
+      },
+      {
+        "id": "7",
+        "title": "Aspirin",
+        "description": "Translation of updated guidelines for Aspirin dosage and preventive use",
+        "source_language": "Arabic",
+        "target_language": "Hebrew",
+        "priority": 3,
+        "status": "in_progress"
+      },
+      {
+        "id": "8",
+        "title": "Albuterol",
+        "description": "Translation of research papers on Albuterol asthma medication",
+        "source_language": "Hebrew",
+        "target_language": "English",
+        "priority": 2,
+        "status": "pending"
+      },
+      {
+        "id": "9",
+        "title": "Lisinopril",
+        "description": "Medical study translation for Lisinopril blood pressure medication",
+        "source_language": "English",
+        "target_language": "Hebrew",
+        "priority": 1,
+        "status": "completed"
+      },
+      {
+        "id": "10",
+        "title": "Cetirizine",
+        "description": "Translation of patient information and clinical documentation for Cetirizine allergy medication",
+        "source_language": "Hebrew",
+        "target_language": "Arabic",
+        "priority": 2,
+        "status": "in_progress"
+      },
+      {
+        "id": "11",
+        "title": "Ritalin",
+        "description": "Translation of prescription guidelines and safety information for Ritalin ADHD medication",
+        "source_language": "Hebrew",
+        "target_language": "English",
+        "priority": 3,
+        "status": "pending"
+      },
+      {
+        "id": "12",
+        "title": "Attent",
+        "description": "Translation of clinical research and patient guidelines for Attent ADHD treatment",
+        "source_language": "English",
+        "target_language": "Arabic",
+        "priority": 2,
+        "status": "in_progress"
+      },
+      {
+        "id": "13",
+        "title": "Sertraline",
+        "description": "Translation of clinical guidelines and patient information for Sertraline antidepressant medication",
+        "source_language": "English",
+        "target_language": "Hebrew",
+        "priority": 2,
+        "status": "pending"
+      },
+      {
+        "id": "14",
+        "title": "Escitalopram",
+        "description": "Medical documentation translation for Escitalopram anxiety and depression treatment",
+        "source_language": "Hebrew",
+        "target_language": "Arabic",
+        "priority": 1,
+        "status": "in_progress"
+      },
+      {
+        "id": "15",
+        "title": "Pantoprazole",
+        "description": "Translation of research findings and usage guidelines for Pantoprazole acid reflux medication",
+        "source_language": "Arabic",
+        "target_language": "English",
+        "priority": 3,
+        "status": "completed"
+      },
+      {
+        "id": "16",
+        "title": "Loratadine",
+        "description": "Translation of patient information and side effects for Loratadine allergy medication",
+        "source_language": "Hebrew",
+        "target_language": "English",
+        "priority": 2,
+        "status": "pending"
+      },
+      {
+        "id": "17",
+        "title": "Metoprolol",
+        "description": "Comprehensive translation of Metoprolol blood pressure medication documentation",
+        "source_language": "English",
+        "target_language": "Arabic",
+        "priority": 1,
+        "status": "in_progress"
+      }
+    ]
+  }

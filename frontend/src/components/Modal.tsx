@@ -9,7 +9,7 @@ export default function Modal({children}: Readonly<{ children: React.ReactNode }
     const router = useRouter();
     const path = usePathname();
     const [state] = useState(path);
-    console.log(state, path)
+
     const onDismiss = useCallback(() => {
         router.back();
     }, [router]);

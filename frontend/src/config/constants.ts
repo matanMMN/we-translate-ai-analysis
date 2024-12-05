@@ -1,7 +1,7 @@
 import {ILanguages, IStatus, PriorityObject, PriorityProps, StatusObject} from "@/config/constants.interface";
 
 
-export const AppName: string = "WeTranslate AI"
+export const AppName: string = "MediTranslate AI"
 
 export const Status: IStatus = {
     PENDING: "pending",
