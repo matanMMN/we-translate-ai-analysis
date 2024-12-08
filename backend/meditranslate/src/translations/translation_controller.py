@@ -80,7 +80,10 @@ class TranslationController(BaseController[Translation]):
         await self.translation_job_service.update_translation_job(
             current_user=current_user,
             translation_job_id=translation_job.id,
-            update_translation_job_data=TranslationJobUpdateSchema(target_file_id=result_file.get("id"))
+            update_translation_job_data=TranslationJobUpdateSchema(
+                target_file_id=result_file.get("id"),
+                is_translating=False
+            )
         )
 
         await self.webhook_service.notify_translation_complete(
@@ -92,6 +95,7 @@ class TranslationController(BaseController[Translation]):
                     "content_type": content_type
             }
         )
+
         return result_file, complete
 
     @Transactional(propagation=Propagation.REQUIRED_NEW)

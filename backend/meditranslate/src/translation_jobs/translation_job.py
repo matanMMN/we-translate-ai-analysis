@@ -1,11 +1,14 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
+
+from pygments.lexer import default
+
 if TYPE_CHECKING:
     from meditranslate.app.db import File,User,Translation
 
 from typing import Optional, TYPE_CHECKING,List
 from uuid import uuid4
-from sqlalchemy import Integer, String, Text, DateTime, ForeignKey, JSON, UUID,UniqueConstraint
+from sqlalchemy import Integer, String, Text, DateTime, ForeignKey, JSON, UUID, UniqueConstraint, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 from meditranslate.app.db import Base
@@ -18,11 +21,7 @@ class TranslationJob(Base):
     __table_args__ = (
         UniqueConstraint('title', 'source_language','target_language', name='_title_langs_uc'),
     )
-    webhooks: Mapped[List["Webhook"]] = relationship(
-        'Webhook',
-        back_populates="translation_job",
-        cascade="all, delete-orphan"
-    )
+
     title: Mapped[str] = mapped_column(String, nullable=False)
     description: Mapped[str] = mapped_column(String, nullable=True, default="")
     source_language: Mapped[str] = mapped_column(String, nullable=False)
@@ -32,6 +31,7 @@ class TranslationJob(Base):
 
     status: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     current_step_index: Mapped[int] = mapped_column(Integer, default=0)
+    is_translating: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
     reference_file_id: Mapped[Optional[str]] = mapped_column(ForeignKey('files.id'),nullable=True)
     source_file_id: Mapped[Optional[str]] = mapped_column(ForeignKey('files.id'),nullable=True)
@@ -65,3 +65,9 @@ class TranslationJob(Base):
     approved_by_user: Mapped[Optional["User"]] = relationship('User',  foreign_keys=[approved_by], lazy='select', remote_side='User.id')
     archived_by_user: Mapped[Optional["User"]] = relationship('User',  foreign_keys=[archived_by], lazy='select', remote_side='User.id')
     deleted_by_user: Mapped[Optional["User"]] = relationship('User',  foreign_keys=[deleted_by], lazy='select', remote_side='User.id')
+
+    webhooks: Mapped[List["Webhook"]] = relationship(
+        'Webhook',
+        back_populates="translation_job",
+        cascade="all, delete-orphan"
+    )
