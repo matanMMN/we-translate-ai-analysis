@@ -31,10 +31,11 @@ export default function TranslateFile() {
     const { data: session } = useSession()
     const router = useRouter()
     const { projectId, project } = useAppSelector(selectSession)
+    console.log("PROJECT: ", project)
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
     const [detectedLanguage, setDetectedLanguage] = useState<string | null>(null)
     const [targetLanguage, setTargetLanguage] = useState('')
-    const [translationState, setTranslationState] = useState<TranslationState>('idle')
+    const [translationState, setTranslationState] = useState<TranslationState>(project?.is_translating? 'translating' : 'idle')
     const [showConfirmDialog, setShowConfirmDialog] = useState(false)
     const [error, setError] = useState<string | null>(null)
 

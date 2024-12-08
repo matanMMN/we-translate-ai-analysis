@@ -30,42 +30,44 @@ export const handleFileLoad = async (
         // Check localStorage first
         const savedContent = localStorage.getItem(`editorContent-${projectId}`);
         const lastSaveTime = localStorage.getItem(`lastSaveTime-${projectId}`);
+        console.log(lastSaveTime)
         // If we have a lastModified timestamp from the backend/translation
-        if (currentFile.lastModified) {
-            // Check if localStorage is newer than our last known modification
-            if (savedContent && lastSaveTime && parseInt(lastSaveTime) > currentFile.lastModified) {
-                console.log('Using newer localStorage content');
-                container.current.documentEditor.open(savedContent);
-                return;
-            }
-            // If localStorage is older or doesn't exist, try to fetch from backend
-            if (projectId) {
-                try {
-                    console.log('Fetching newer content from backend');
+        // if (currentFile.lastModified) {
+        //     // Check if localStorage is newer than our last known modification
+        //     if (savedContent && lastSaveTime && parseInt(lastSaveTime) > currentFile.lastModified) {
+        //         console.log('Using newer localStorage content');
+        //         container.current.documentEditor.open(savedContent);
+        //         return;
+        //     }
+        // If localStorage is older or doesn't exist, try to fetch from backend
+        if (projectId) {
+            try {
+                console.log('Fetching newer content from backend');
 
-                    const res = { blob: currentFile.blob, type: currentFile.type }
-                    console.log(res)
-                    if (res?.type && res.blob) {
-                        await loadFileContent(container, res.blob, res.type);
+                const res = { blob: currentFile.blob, type: currentFile.type }
+                console.log(res)
+                if (res?.type && res.blob) {
+                    await loadFileContent(container, res.blob, res.type);
+                    return;
+                } else {
+                    const backendProjectSave = await fetchProjectFile(projectId);
+                    console.log(backendProjectSave)
+                    if (backendProjectSave) {
+                        await loadFileContent(container, backendProjectSave.blob as unknown as Blob, backendProjectSave.type);
                         return;
-                    } else {
-                        const backendProjectSave = await fetchProjectFile(projectId);
-                        console.log(backendProjectSave)
-                        if (backendProjectSave) {
-                            await loadFileContent(container, backendProjectSave.blob as unknown as Blob, backendProjectSave.type);
-                            return;
-                        }
                     }
-                } catch (error) {
-                    console.error('Error fetching file:', error);
                 }
+            } catch (error) {
+                console.error('Error fetching file:', error);
             }
-        } else if (savedContent) {
-            // If we don't have a lastModified timestamp but have localStorage content
-            console.log('Using localStorage content (no lastModified timestamp)');
-            container.current.documentEditor.open(savedContent);
-            return;
         }
+        // } 
+        // else if (savedContent) {
+        //     // If we don't have a lastModified timestamp but have localStorage content
+        //     console.log('Using localStorage content (no lastModified timestamp)');
+        //     container.current.documentEditor.open(savedContent);
+        //     return;
+        // }
 
         // Fallback to default content
         console.log('Using default content');

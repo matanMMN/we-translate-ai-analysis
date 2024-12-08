@@ -1,4 +1,4 @@
-from fastapi import APIRouter,Request,Query,Body, Response, status
+from fastapi import APIRouter,Request,Query,Body, Response, status, BackgroundTasks
 from meditranslate.app.dependancies.auth import AuthenticationRequired
 from meditranslate.app.dependancies.user import CurrentUserDep
 from meditranslate.app.shared.factory import Factory
@@ -80,13 +80,14 @@ async def translation_text(
 )
 async def translation_file(
         current_user: CurrentUserDep,
+        background_tasks: BackgroundTasks,
         file_id: str,
         response: Response,
         translation_file_schema: Annotated[TranslationFileSchema,Body()],
         translation_controller: TranslationController = Depends(Factory.get_translation_controller),
 ) -> FilePointerResponseSchema:
     """
-    Create a new translation.
+    Create a new translation.   
     """
     file, complete = await translation_controller.translate_file(current_user,file_id,translation_file_schema)
     ret_status = status.HTTP_200_OK

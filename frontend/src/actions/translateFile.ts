@@ -264,13 +264,18 @@ export async function translateFile(formData: FormData, detectedLanguage: string
         method: 'PUT',
         body: JSON.stringify({
             source_file_id: srcFileData.data.id,
-            data: {...projectData, sideBySideSections: []}
+            is_translating: true,
+            data: {
+                ...projectData,
+                sideBySideSections: [],
+            }
         })
     })
     const isUpdateSuccess = await updateProject.json()
+
+
     if (isUpdateSuccess && isUpdateSuccess.status_code !== 200)
         return {success: false, error: 'Failed to process the file'}
-
 
     // #3 Ask for the translated version
     const isTranslationRes = await axios.post(`${serverUrl}/translations/file/${srcFileData.data.id}`, {
@@ -303,9 +308,32 @@ export async function translateFile(formData: FormData, detectedLanguage: string
     // console.log(translatedFileRes)
     if (!translatedFileRes)
         return {success: false, error: 'Failed to process the file'}
+
+
+    // #5 Return the translated file but first let the client know that the file is done translating
+    const updateIsTranslatingRes = await fetch(`${serverUrl}/jobs/${projectId}/`, {
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.accessToken}`,
+            'accept': 'application/json'
+        },
+        method: 'PUT',
+        body: JSON.stringify({
+            source_file_id: srcFileData.data.id,
+            data: {
+                ...projectData,
+                sideBySideSections: [],
+            }
+        })
+    })
+    const isUpdateIsTranslatingSuccess = await updateIsTranslatingRes.json()
+    if (isUpdateIsTranslatingSuccess && isUpdateIsTranslatingSuccess.status_code !== 200)
+        return {success: false, error: 'Failed to process isTranslating change'}
+
     try {
         const arrayBuffer = await translatedFileRes.arrayBuffer();
         const encodedString = Buffer.from(arrayBuffer).toString('base64');
+
 
         revalidatePath(`/${projectId}/editor`);
 

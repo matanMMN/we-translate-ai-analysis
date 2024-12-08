@@ -101,12 +101,12 @@ class WebhookService(BaseService[Webhook]):
             unique=True
         )
 
-        if webhook and not webhook.is_triggered:
+        if webhook: # and not webhook.is_triggered:
             try:
                 async with httpx.AsyncClient() as client:
                     response = await client.post(
-                        str("http://app:3000/api/stream"),
-                        # str("http://host.docker.internal:3000/api/stream"),
+                        # str("http://app:3000/api/stream"),
+                        str("http://host.docker.internal:3000/api/stream"),
                         json={
                             "event": "translation_complete",
                             "translation_job_id": translation_job_id,

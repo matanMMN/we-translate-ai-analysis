@@ -1,7 +1,7 @@
+"use server"
 import {toast} from 'sonner';
 // import store from '@/store/store';
 // import {updateFileMetadata} from '@/store/slices/projectSlice';
-// import {serverUrl} from "@/lib/functions";
 import {Session} from "next-auth";
 import {serverUrl} from "@/lib/functions";
 

@@ -268,6 +268,7 @@ export interface Project {
     reference_file_id?: number | string;
     title: string;
     source_language: string;
+    is_translating: boolean;
     target_language: string;
     priority: number | string;
     status?: string;

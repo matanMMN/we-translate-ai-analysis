@@ -6,10 +6,11 @@
   <component name="ChangeListManager">
     <list default="true" id="e031cfc7-51aa-4b30-aec7-a951c39c72e5" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/meditranslate/src/translation_jobs/translation_job_router.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/meditranslate/src/translation_jobs/translation_job_router.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/meditranslate/src/translation_jobs/translation_job_schemas.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/meditranslate/src/translation_jobs/translation_job_schemas.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/meditranslate/src/webhooks/webhook_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/meditranslate/src/webhooks/webhook_service.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/.env" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/.env" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/project-details/ProjectDetails.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/project-details/ProjectDetails.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/actions/translateFile.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/actions/translateFile.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/SSEListener.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/SSEListener.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/translate-file/TranslateFile.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/translate-file/TranslateFile.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,7 +51,7 @@
   "keyToString": {
     "Docker.frontend/Dockerfile runner.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "Merging master",
+    "git-widget-placeholder": "master",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -125,7 +126,7 @@
       <workItem from="1733305836601" duration="2266000" />
       <workItem from="1733337709765" duration="12426000" />
       <workItem from="1733672206561" duration="204000" />
-      <workItem from="1733681112576" duration="3186000" />
+      <workItem from="1733681112576" duration="7002000" />
     </task>
     <servers />
   </component>
