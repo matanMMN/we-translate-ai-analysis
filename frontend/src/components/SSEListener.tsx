@@ -13,7 +13,7 @@ export default function SSEListener({ children }: { children: ReactNode }) {
         eventSource.onmessage = async function (event) {
             const response = JSON.parse(event.data)
             console.log("Received data from server:", response);
-            toast.success(`New data received from server! ${response?.translation_data ? response.translation_data : ''}`)
+            toast.success(`New data received from server! ${response?.translation_data ? 'Translated file is ready!' : ''}`)
             console.log("All clients: ", clients)
             if (response?.translation_data)
                 try {

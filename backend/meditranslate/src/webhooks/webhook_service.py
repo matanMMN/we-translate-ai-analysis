@@ -9,11 +9,12 @@ from datetime import datetime
 import httpx
 from meditranslate.app.loggers import logger
 
+
 class WebhookService(BaseService[Webhook]):
     def __init__(
-        self,
-        webhook_repository: WebhookRepository,
-        translation_job_repository: TranslationJobRepository
+            self,
+            webhook_repository: WebhookRepository,
+            translation_job_repository: TranslationJobRepository
     ):
         super().__init__(model=Webhook, repository=webhook_repository)
         self.webhook_repository = webhook_repository
@@ -29,21 +30,21 @@ class WebhookService(BaseService[Webhook]):
                     message=f"Missing required field: {field}",
                     http_status=HTTPStatus.BAD_REQUEST
                 )
-        
+
         # Verify that the translation job exists and belongs to the user
         translation_job = await self.translation_job_repository.get_by(
-            "id", 
+            "id",
             webhook_data["translation_job_id"],
             unique=True
         )
-        
+
         if not translation_job:
             raise AppError(
                 title="webhook registration",
                 message="Translation job not found",
                 http_status=HTTPStatus.NOT_FOUND
             )
-            
+
         if translation_job.created_by != webhook_data["user_id"]:
             raise AppError(
                 title="webhook registration",
@@ -57,7 +58,7 @@ class WebhookService(BaseService[Webhook]):
             webhook_data["translation_job_id"],
             unique=True
         )
-        
+
         if existing_webhook:
             raise AppError(
                 title="webhook registration",
@@ -75,7 +76,6 @@ class WebhookService(BaseService[Webhook]):
         webhook = await self.webhook_repository.create(webhook_data)
         return webhook.as_dict()
 
-
     async def get_webhook(self, webhook_id: str) -> Webhook:
         """Get a webhook by its ID"""
         webhook = await self.webhook_repository.get_by(
@@ -83,51 +83,51 @@ class WebhookService(BaseService[Webhook]):
             webhook_id,
             unique=True
         )
-        
+
         if not webhook:
             raise AppError(
                 title="get webhook",
                 message="Webhook not found",
                 http_status=HTTPStatus.NOT_FOUND
             )
-            
-        return webhook.as_dict() 
+
+        return webhook.as_dict()
 
     async def notify_translation_complete(self, translation_job_id: str, translation_data: Dict) -> None:
-            """Send webhook notification when translation is complete"""
-            webhook = await self.webhook_repository.get_by(
-                "translation_job_id",
-                translation_job_id,
-                unique=True
-            )
-            
-            if webhook and not webhook.is_triggered:
-                try:
-                    async with httpx.AsyncClient() as client:
-                            response = await client.post(
-                                # str("http://app:3000/api/stream"),
-                                str("http://host.docker.internal:3000/api/stream"),
-                                json={
-                                    "event": "translation_complete",
-                                    "translation_job_id": translation_job_id,
-                                    "translation_data": translation_data
-                                },
-                                timeout=10.0
-                            )
-                            response.raise_for_status()
-                    await self.webhook_repository.update(
-                        webhook,
-                        {
-                            "file_id": translation_data.get("file_id"),
-                            "is_triggered": True,
-                            "triggered_at": datetime.now()
-                        }
-                    )
+        """Send webhook notification when translation is complete"""
+        webhook = await self.webhook_repository.get_by(
+            "translation_job_id",
+            translation_job_id,
+            unique=True
+        )
 
-                except Exception as e:
-                        # Log the error but don't raise it - webhook failures shouldn't affect the main flow
-                    logger.error(f"Failed to send webhook notification: {str(e)}")
-    
+        if webhook and not webhook.is_triggered:
+            try:
+                async with httpx.AsyncClient() as client:
+                    response = await client.post(
+                        str("http://app:3000/api/stream"),
+                        # str("http://host.docker.internal:3000/api/stream"),
+                        json={
+                            "event": "translation_complete",
+                            "translation_job_id": translation_job_id,
+                            "translation_data": translation_data
+                        },
+                        timeout=10.0
+                    )
+                    response.raise_for_status()
+                await self.webhook_repository.update(
+                    webhook,
+                    {
+                        "file_id": translation_data.get("file_id"),
+                        "is_triggered": True,
+                        "triggered_at": datetime.now()
+                    }
+                )
+
+            except Exception as e:
+                # Log the error but don't raise it - webhook failures shouldn't affect the main flow
+                logger.error(f"Failed to send webhook notification: {str(e)}")
+
     async def get_user_webhooks(self, user_id: str) -> List[Webhook]:
         """Get all webhooks for a user"""
         filters = [Filter("user_id", user_id)]
@@ -141,21 +141,19 @@ class WebhookService(BaseService[Webhook]):
             translation_job_id,
             unique=True
         )
-        
+
         if not webhook:
             raise AppError(
                 title="get webhook",
                 message="No webhook found for this translation job",
                 http_status=HTTPStatus.NOT_FOUND
             )
-            
+
         if webhook.user_id != user_id:
             raise AppError(
                 title="get webhook",
                 message="Webhook not found",
                 http_status=HTTPStatus.NOT_FOUND
             )
-            
+
         return webhook.as_dict()
-
-

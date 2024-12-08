@@ -3,7 +3,6 @@
 import {useState} from "react";
 import {useSelector} from "react-redux";
 import {selectSession, setSessionSlice} from "@/store/slices/sessionSlice";
-// import dynamic from 'next/dynamic';
 import {toast} from "sonner"
 import ProjectInfo from "./sections/ProjectInfo";
 import ProjectDescription from "./sections/ProjectDescription";
@@ -14,7 +13,7 @@ import {UnsavedChangesDialog} from "@/components/project-details/UnsavedChangesD
 import {Project} from "@/lib/userData";
 import {useAppDispatch} from "@/hooks/useAppDispatch";
 import EditOrViewGrid from "@/components/editor/EditOrViewGrid"
-import {serverUrl} from "@/lib/functions";
+import {updateProjectData} from "@/actions/updateProject";
 // const EditOrViewGrid = dynamic(
 //     () => import("@/components/editor/EditOrViewGrid"),
 //     {
@@ -54,35 +53,22 @@ export default function ProjectDetails() {
         if (editedProject.due_date !== new Date(editedProject.due_date!).toISOString())
             editedProject.due_date = new Date(editedProject.due_date!).toISOString();
 
-        try {
-            const response = await fetch(`${serverUrl}/jobs/${project.id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${userSession?.accessToken}`,
-                },
-                body: JSON.stringify(editedProject),
-            });
+        const updatedProject = await updateProjectData({
+            projectId: project.id,
+            editedProject
+        });
+        setIsEditing(false);
 
-            if (!response.ok)
-                throw new Error('Failed to update project');
-            const updatedProject = await response.json();
-            setIsEditing(false);
-            toast("Project updated successfully");
-            console.log(updatedProject, editedProject)
-            dispatch(setSessionSlice({
-                ...session, project: {
-                    ...updatedProject.data,
-                    due_date: updatedProject.data.due_date ? new Date(updatedProject.data.due_date).toLocaleDateString("en") : new Date(Date.now()).toLocaleDateString("en"),
-                    created_at: updatedProject.data.created_at ? new Date(updatedProject.data.created_at).toLocaleDateString("en") : new Date(Date.now()).toLocaleDateString("en"),
-                    updated_at: updatedProject.data.updated_at ? new Date(updatedProject.data.updated_at).toLocaleDateString("en") : new Date(Date.now()).toLocaleDateString("en"),
-                }
-            }));
-
-        } catch (error) {
-            console.error(error)
-            toast("Failed to update project. Please try again.");
-        }
+        toast("Project updated successfully");
+        console.log(updatedProject, editedProject)
+        dispatch(setSessionSlice({
+            ...session, project: {
+                ...updatedProject.data,
+                due_date: updatedProject.data.due_date ? new Date(updatedProject.data.due_date).toLocaleDateString("en") : new Date(Date.now()).toLocaleDateString("en"),
+                created_at: updatedProject.data.created_at ? new Date(updatedProject.data.created_at).toLocaleDateString("en") : new Date(Date.now()).toLocaleDateString("en"),
+                updated_at: updatedProject.data.updated_at ? new Date(updatedProject.data.updated_at).toLocaleDateString("en") : new Date(Date.now()).toLocaleDateString("en"),
+            }
+        }));
     };
 
     const handleCancelClick = () => {
