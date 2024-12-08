@@ -55,6 +55,7 @@ export default function ProjectDetails() {
             editedProject.due_date = new Date(editedProject.due_date!).toISOString();
 
         try {
+            console.log(project)
             const response = await fetch(`${serverUrl}/jobs/${project.id}`, {
                 method: 'PUT',
                 headers: {

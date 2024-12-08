@@ -88,6 +88,7 @@ async def update_translation_job(
     """
     Update a translation_job's information.
     """
+    logger.error(translation_job_update_schema)
     await translation_job_controller.update_translation_job(current_user,translation_job_id, translation_job_update_schema)
     updated_translation_job = await translation_job_controller.get_translation_job(translation_job_id)
     logger.error(updated_translation_job)

@@ -174,11 +174,11 @@ class TranslationJobUpdateSchema(BaseSchema):
     source_file_id :Optional[IdentifierStr] = Field(None, title="source file id", description="")
     reference_file_id :Optional[IdentifierStr] = Field(None, title="reference file id", description="")
     target_file_id :Optional[IdentifierStr] = Field(None, title="target file id", description="")
-    priority : Optional[int]= Field(0, title="priority", description="",ge=0)
+    priority : Optional[int]= Field(None, title="priority", description="",ge=0)
     due_date : Optional[datetime] = Field(None, title="due date", description="")
     status : Optional[StatusStr] = Field(None, title="status", description="")
     data : Optional[dict] = Field(None, title="data", description="Unique identifier for the user")
-    current_step_index : Optional[int] = Field(0, title="current_step_index", description="",ge=0)
+    current_step_index : Optional[int] = Field(None, title="current_step_index", description="",ge=0)
     current_user_id :Optional[IdentifierStr] = Field(None, title="current_user_id", description="")
 
 
