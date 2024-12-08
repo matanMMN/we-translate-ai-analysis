@@ -5,7 +5,27 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e031cfc7-51aa-4b30-aec7-a951c39c72e5" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/meditranslate/src/translation_jobs/translation_job.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/meditranslate/src/translation_jobs/translation_job.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/meditranslate/src/translation_jobs/translation_job_schemas.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/meditranslate/src/translation_jobs/translation_job_schemas.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/meditranslate/src/translation_jobs/translation_job_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/meditranslate/src/translation_jobs/translation_job_service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/meditranslate/src/webhooks/webhook.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/meditranslate/src/webhooks/webhook.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/meditranslate/src/webhooks/webhook_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/meditranslate/src/webhooks/webhook_service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/.env" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/.env" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/public/uploads/document.docx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/public/uploads/document.docx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/actions/demoTest.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/actions/demoTest.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/actions/fetchProjectFile.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/actions/fetchProjectFile.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/app/(auth)/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/(auth)/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/app/(content)/[projectId]/reference-file/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/(content)/[projectId]/reference-file/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/app/(content)/[projectId]/source-file/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/(content)/[projectId]/source-file/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/app/(content)/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/(content)/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/app/api/stream/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/api/stream/route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/app/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/SSEListener.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/SSEListener.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/editor/handlers/fileHandler.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/editor/handlers/fileHandler.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/reference-file/ReferenceFile.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/reference-file/ReferenceFile.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/translate-file/TranslateFile.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/translate-file/TranslateFile.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/use-toast.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/use-toast.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -21,12 +41,12 @@
     &quot;assignee&quot;: &quot;natikozel&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/natikozel/WeTranslate-AI.git",
-    "accountId": "510fd76b-58ba-4129-9fd3-1815ec2b6468"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/natikozel/WeTranslate-AI.git&quot;,
+    &quot;accountId&quot;: &quot;510fd76b-58ba-4129-9fd3-1815ec2b6468&quot;
   }
-}]]></component>
+}</component>
   <component name="KubernetesApiPersistence">{}</component>
   <component name="KubernetesApiProvider">{
   &quot;isMigrated&quot;: true
@@ -42,21 +62,21 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Docker.frontend/Dockerfile runner.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.lookFeel",
-    "ts.external.directory.path": "C:\\Users\\netan\\WebstormProjects\\WeTranslate-AI\\frontend\\node_modules\\typescript\\lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Docker.frontend/Dockerfile runner.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;testing&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\netan\\WebstormProjects\\WeTranslate-AI\\frontend\\node_modules\\typescript\\lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\netan\WebstormProjects\WeTranslate-AI\frontend\src\actions" />
@@ -119,6 +139,8 @@
       <workItem from="1732705034145" duration="14607000" />
       <workItem from="1732789346463" duration="2759000" />
       <workItem from="1733305836601" duration="2266000" />
+      <workItem from="1733337709765" duration="12426000" />
+      <workItem from="1733672206561" duration="123000" />
     </task>
     <servers />
   </component>

@@ -12,16 +12,16 @@ from meditranslate.app.db import Base
 class Webhook(Base):
     __tablename__ = 'webhooks'
 
-    callback_url: Mapped[str] = mapped_column(
-        String, 
-        nullable=False
-    )    
+    # callback_url: Mapped[str] = mapped_column(
+    #     String, 
+    #     nullable=False
+    # )    
     user_id: Mapped[str] = mapped_column(
-        ForeignKey('users.id', onupdate="CASCADE"),
+        ForeignKey('users.id', onupdate="CASCADE", ondelete="CASCADE"),
         nullable=False
     )
     translation_job_id: Mapped[str] = mapped_column(
-        ForeignKey('translation_jobs.id', onupdate="CASCADE"),
+        ForeignKey('translation_jobs.id', onupdate="CASCADE", ondelete="CASCADE"),
         nullable=False
     )
 

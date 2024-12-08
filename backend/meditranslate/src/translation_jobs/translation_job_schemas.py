@@ -114,45 +114,7 @@ class TranslationJobSchema(ObjectIdSchema,UserIdentifiersModificationSchema,User
     current_step_index : int = Field(..., title="current_step_index", description="",ge=0)
     current_user_id : Optional[IdentifierStr] = Field(None, title="", description="")
     current_user :Optional[Union[NameStr,FullNameStr]] = Field(None, title="current_user_ name", description="")
-    # approved_at: Optional[datetime]= Field(None, title="", description="")
-    # approved_by : Annotated[
-    #                 Optional[str],
-    #                 StringConstraints(
-    #                     strip_whitespace=True,
-    #                     to_upper=None,
-    #                     to_lower=None,
-    #                     strict=None,
-    #                     max_length=None,
-    #                     min_length=None,
-    #                     pattern=None,
-    #                 ),
-    #             ] = Field(None, title="", description="")
-    # archived_at: Optional[datetime]= Field(None, title="", description="")
-    # archived_by : Annotated[
-    #                 Optional[str],
-    #                 StringConstraints(
-    #                     strip_whitespace=True,
-    #                     to_upper=None,
-    #                     to_lower=None,
-    #                     strict=None,
-    #                     max_length=None,
-    #                     min_length=None,
-    #                     pattern=None,
-    #                 ),
-    #             ] = Field(None, title="", description="")
-    # deleted_at: Optional[datetime]= Field(None, title="", description="")
-    # deleted_by : Annotated[
-    #                 Optional[str],
-    #                 StringConstraints(
-    #                     strip_whitespace=True,
-    #                     to_upper=None,
-    #                     to_lower=None,
-    #                     strict=None,
-    #                     max_length=None,
-    #                     min_length=None,
-    #                     pattern=None,
-    #                 ),
-    #             ] = Field(None, title="", description="")
+
 
 class TranslationJobCreateSchema(TranslationLanguagesSchema):
     title :TitleStr = Field(..., title="User ID", description="Unique identifier for the user")
@@ -181,6 +143,46 @@ class TranslationJobUpdateSchema(BaseSchema):
     current_step_index : Optional[int] = Field(None, title="current_step_index", description="",ge=0)
     current_user_id :Optional[IdentifierStr] = Field(None, title="current_user_id", description="")
 
+# class TranslationJobUpdateSchema(BaseSchema):
+#     # Basic fields
+#     title: Optional[TitleStr] = Field(None, title="", description="")
+#     description: Optional[DescriptionStr] = Field(None, title="", description="")
+#     source_language: Optional[LanguageStr] = Field(None, title="Source language", description="")
+#     target_language: Optional[LanguageStr] = Field(None, title="Target language", description="")
+#     priority: Optional[int] = Field(None, title="priority", description="", ge=0)
+#     due_date: Optional[datetime] = Field(None, title="due date", description="")
+#     status: Optional[StatusStr] = Field(None, title="status", description="")
+#     data: Optional[dict] = Field(None, title="data", description="")
+#     current_step_index: Optional[int] = Field(None, title="current_step_index", description="", ge=0)
+
+#     # File references
+#     source_file_id: Optional[IdentifierStr] = Field(None, title="source file id", description="")
+#     reference_file_id: Optional[IdentifierStr] = Field(None, title="reference file id", description="")
+#     target_file_id: Optional[IdentifierStr] = Field(None, title="target file id", description="")
+
+#     # User references and timestamps
+#     current_user_id: Optional[IdentifierStr] = Field(None, title="", description="")
+#     created_by: Optional[IdentifierStr] = Field(None, title="", description="")
+#     updated_by: Optional[IdentifierStr] = Field(None, title="", description="")
+#     created_at: Optional[datetime] = Field(None, title="", description="")
+#     updated_at: Optional[datetime] = Field(None, title="", description="")
+
+#     # Approval fields
+#     approved_at: Optional[datetime] = Field(None, title="", description="")
+#     approved_by: Optional[IdentifierStr] = Field(None, title="", description="")
+
+#     # Archive fields
+#     archived_at: Optional[datetime] = Field(None, title="", description="")
+#     archived_by: Optional[IdentifierStr] = Field(None, title="", description="")
+
+#     # Deletion fields
+#     deleted_at: Optional[datetime] = Field(None, title="", description="")
+#     deleted_by: Optional[IdentifierStr] = Field(None, title="", description="")
+
+#     # User names (from UserFullNamesModificationSchema)
+#     created_by_user: Optional[Union[NameStr, FullNameStr]] = Field(None, title="creator name", description="")
+#     updated_by_user: Optional[Union[NameStr, FullNameStr]] = Field(None, title="updater name", description="")
+#     current_user: Optional[Union[NameStr, FullNameStr]] = Field(None, title="current user name", description="")
 
 class TranslationJobResponseSchema(BaseResponseSchema):
     data: TranslationJobSchema

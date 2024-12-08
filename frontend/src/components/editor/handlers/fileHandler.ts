@@ -1,14 +1,15 @@
 'use client'
 
-import {DocumentEditorContainerComponent} from '@syncfusion/ej2-react-documenteditor';
-import {RefObject} from 'react';
-import {Session} from 'next-auth';
-import {TitleBar} from '../TitleBar';
-import {containsRTL} from '@/lib/utils/textUtils';
-import {createSfdtContent} from '@/lib/utils/documentUtils';
+import { DocumentEditorContainerComponent } from '@syncfusion/ej2-react-documenteditor';
+import { RefObject } from 'react';
+import { Session } from 'next-auth';
+import { TitleBar } from '../TitleBar';
+import { containsRTL } from '@/lib/utils/textUtils';
+import { createSfdtContent } from '@/lib/utils/documentUtils';
 import * as defaultData from '@/app/(content)/[projectId]/editor/data-default.json';
 import store from '@/store/store';
-import {selectCurrentFile} from '@/store/slices/projectSlice';
+import { selectCurrentFile } from '@/store/slices/projectSlice';
+import { fetchProjectFile } from '@/actions/fetchProjectFile';
 
 
 export const handleFileLoad = async (
@@ -21,10 +22,11 @@ export const handleFileLoad = async (
     if (!container.current) return;
     // Set current user
     container.current.documentEditor.currentUser = userSession?.user?.name as string
-
     try {
         const state = store.getState();
         const currentFile = selectCurrentFile(state);
+        console.log(currentFile)
+
         // Check localStorage first
         const savedContent = localStorage.getItem(`editorContent-${projectId}`);
         const lastSaveTime = localStorage.getItem(`lastSaveTime-${projectId}`);
@@ -40,12 +42,19 @@ export const handleFileLoad = async (
             if (projectId) {
                 try {
                     console.log('Fetching newer content from backend');
-                    // const res = await fetchProjectFile(projectId, projectFiles.srcFileId);
-                    const res = {blob: currentFile.blob, type: currentFile.type}
+
+                    const res = { blob: currentFile.blob, type: currentFile.type }
                     console.log(res)
                     if (res?.type && res.blob) {
                         await loadFileContent(container, res.blob, res.type);
                         return;
+                    } else {
+                        const backendProjectSave = await fetchProjectFile(projectId);
+                        console.log(backendProjectSave)
+                        if (backendProjectSave) {
+                            await loadFileContent(container, backendProjectSave.blob as unknown as Blob, backendProjectSave.type);
+                            return;
+                        }
                     }
                 } catch (error) {
                     console.error('Error fetching file:', error);

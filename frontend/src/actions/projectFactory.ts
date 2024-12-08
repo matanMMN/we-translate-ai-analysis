@@ -74,6 +74,20 @@ export const createNewProject = async (data: NewProjectData) => {
         })
         const projectData = await injectFileIdRes.json()
         console.log(projectData)
+
+        // attach source file webhook listener
+        const webhookRes = await fetch(`${serverUrl}/webhooks/register`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${data.accessToken}`
+            },
+            body: JSON.stringify({translation_job_id: projectData.data.id})
+        })
+        const webhookData = await webhookRes.json()
+        console.log(webhookData)
+
+
         return {
             ...projectData.data,
             due_date: project.data.dueDate ? new Date(projectData.data.dueDate).toLocaleDateString("en") : new Date(Date.now()).toLocaleDateString("en"),

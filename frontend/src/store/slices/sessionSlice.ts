@@ -7,12 +7,14 @@ export interface ProjectState {
     projectId: string | null;
     project: Project | null;
     userSession: Session | null;
+    curPath?: string;
 }
 
 const initialState: ProjectState = {
     projectId: null,
     project: null,
     userSession: null,
+    curPath: ''
 };
 
 const sessionSlice = createSlice({
@@ -24,9 +26,13 @@ const sessionSlice = createSlice({
             state.project = action.payload.project;
             state.userSession = action.payload.userSession;
         },
+        setPath: (state, action: PayloadAction<string>) => {
+            state.curPath = action.payload;
+        }
     },
 });
 
-export const {setSessionSlice} = sessionSlice.actions;
+export const {setSessionSlice, setPath} = sessionSlice.actions;
 export const selectSession = (state: RootState) => state.session;
+export const selectPath = (state: RootState) => state.session.curPath;
 export default sessionSlice.reducer;

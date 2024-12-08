@@ -70,6 +70,7 @@ class TranslationJobService(BaseService[TranslationJob]):
 
     async def delete_translation_job(self,current_user:User,translation_job_id: str) -> None:
         translation_job = await self.translation_job_repository.get_by("id",translation_job_id,unique=True)
+        
         if not translation_job:
             raise AppError(
                 title="delete translation job endpoint",
@@ -80,6 +81,14 @@ class TranslationJobService(BaseService[TranslationJob]):
         #     return await self.translation_job_repository.update(translation_job, {"deleted_at":datetime.now(), "deleted_by":current_user.id})
         # else:
         #     return await self.translation_job_repository.delete(translation_job)
+
+        # await self.translation_job_repository.execute(
+        #     """
+        #     DELETE FROM webhooks 
+        #     WHERE translation_job_id = :translation_job_id
+        #     """,
+        #     {"translation_job_id": translation_job_id}
+    # )
 
         return await self.translation_job_repository.delete(translation_job)
 

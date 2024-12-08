@@ -29,7 +29,7 @@ async def register_webhook(
     current_user: CurrentUserDep,
     webhook_data: Annotated[WebhookCreateSchema, Body(example={
         "translation_job_id": "123e4567-e89b-12d3-a456-426614174000",
-        "callback_url": "https://example.com/webhook"
+        # "callback_url": "https://example.com/webhook"
     })],
     webhook_controller: WebhookController = Depends(Factory.get_webhook_controller)
 ) -> WebhookResponseSchema:
@@ -37,8 +37,9 @@ async def register_webhook(
     Register a webhook to be notified when a translation job is completed.
     
     - **translation_job_id**: ID of the translation job to monitor
-    - **callback_url**: URL that will receive the webhook POST request
     """
+        # - **callback_url**: URL that will receive the webhook POST request
+
     webhook_data_dict = webhook_data.model_dump()
     webhook_data_dict["user_id"] = current_user.id
     

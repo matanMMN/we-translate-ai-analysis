@@ -1,4 +1,4 @@
-import {fetchProjectFile} from "@/actions/fetchProjectFile";
+import {fetchProjectRefOrSrc} from "@/actions/fetchProjectFile";
 import SourceFile from "@/components/source-file/SourceFile";
 
 export default async function ReferenceFilePage({params}: {
@@ -6,7 +6,7 @@ export default async function ReferenceFilePage({params}: {
 }) {
 
     const {projectId} = await params
-    const refFile: File | null = await fetchProjectFile(projectId, 'source')
+    const refFile: File | null = await fetchProjectRefOrSrc(projectId, 'source')
 
     return (
         <div className="max-h-[calc(100dvh-300px)]">

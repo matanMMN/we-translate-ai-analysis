@@ -287,7 +287,7 @@ export async function translateFile(formData: FormData, detectedLanguage: string
     });
 
     const isTranslationSuccess = isTranslationRes.data;
-    console.log(isTranslationSuccess)
+    // console.log(isTranslationSuccess)
     if (isTranslationSuccess && isTranslationSuccess?.status_code === 422)
         return {success: false, error: 'File does not contain significant medical/pharmacological context'}
 
@@ -300,7 +300,7 @@ export async function translateFile(formData: FormData, detectedLanguage: string
             'Authorization': `Bearer ${session.accessToken}`,
         },
     })
-    console.log(translatedFileRes)
+    // console.log(translatedFileRes)
     if (!translatedFileRes)
         return {success: false, error: 'Failed to process the file'}
     try {
