@@ -31,7 +31,7 @@ export default function TranslateFile() {
     const { data: session } = useSession()
     const router = useRouter()
     const { projectId, project } = useAppSelector(selectSession)
-    console.log("PROJECT: ", project)
+    // console.log("PROJECT: ", project)
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
     const [detectedLanguage, setDetectedLanguage] = useState<string | null>(null)
     const [targetLanguage, setTargetLanguage] = useState('')

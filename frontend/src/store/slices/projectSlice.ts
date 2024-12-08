@@ -69,7 +69,7 @@ export const projectSlice = createSlice({
             // docxHash?: string,
             // commentsHash?: string | null
         }>) => {
-            console.log("set")
+            console.log("set settings: ", action)
             // state.files.srcFileId = action.payload.fileId
             state.currentFile.blob = action.payload.blob
             state.currentFile.type = action.payload.type

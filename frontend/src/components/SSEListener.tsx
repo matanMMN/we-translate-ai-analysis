@@ -3,13 +3,13 @@
 import { getFileMetaData } from "@/actions/updateProject";
 import { ReactNode, useEffect } from "react";
 import { toast } from "sonner";
-import { useAppDispatch } from "@/hooks/useAppDispatch";
-import { setTranslatedFile } from "@/store/slices/projectSlice";
+// import { useAppDispatch } from "@/hooks/useAppDispatch";
+// import { setTranslatedFile } from "@/store/slices/projectSlice";
 
 export default function SSEListener({ children }: { children: ReactNode }) {
 
 
-    const dispatch = useAppDispatch()
+    // const dispatch = useAppDispatch()
 
     useEffect(() => {
         const eventSource = new EventSource("/api/stream");
@@ -22,16 +22,19 @@ export default function SSEListener({ children }: { children: ReactNode }) {
 
             if (!response?.translation_data)
                 return
+            console.log("response")
+            console.log(response)
             const data = await getFileMetaData(response.translation_job_id)
-
-            if (data.success && data.mockBlob && data.blobType) {
-                dispatch(setTranslatedFile({
-                    blob: data.mockBlob as unknown as Blob,
-                    type: data.blobType
-                }))
-            } else {
-                toast.error("Data couldn't be extracted")
-            }
+            console.log("data")
+            console.log(data)
+            // if (data.success && data.mockBlob && data.blobType) {
+            //     dispatch(setTranslatedFile({
+            //         blob: data.mockBlob as unknown as Blob,
+            //         type: data.blobType
+            //     }))
+            // } else {
+            //     toast.error("Data couldn't be extracted")
+            // }
             // console.log("All clients: ", clients)
             // if (response?.translation_data)
             //     try {

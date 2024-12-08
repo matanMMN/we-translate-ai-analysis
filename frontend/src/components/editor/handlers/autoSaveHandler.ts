@@ -7,6 +7,7 @@ import { handleEditorChanges } from '@/actions/EditorChanges';
 // import { updateFileMetadata } from '@/store/slices/projectSlice';
 import { useSelector } from "react-redux";
 import { selectSession } from "@/store/slices/sessionSlice";
+import { createHash } from 'crypto';
 
 const LOCAL_SAVE_INTERVAL = 1000;   // 1 second
 const BACKEND_SAVE_INTERVAL = 30000; // 30 seconds
@@ -29,8 +30,12 @@ export const useAutoSave = (
 
     useEffect(() => {
         const saveToLocalStorage = (content: string) => {
-            localStorage.setItem(`editorContent-${projectId}`, content);
-            localStorage.setItem(`lastSaveTime-${projectId}`, Date.now().toString());
+            const hash = createHash('md5').update(content).digest('hex');
+            console.log(hash)
+            if (hash !== '32d459f17c479075db3ddc7e1adc482c') {
+                localStorage.setItem(`editorContent-${projectId}`, content);
+                localStorage.setItem(`lastSaveTime-${projectId}`, Date.now().toString());
+            }
             localChanges.current = false;
         };
 
