@@ -9,6 +9,7 @@ from sqlalchemy import Integer, String, Text, DateTime, ForeignKey, JSON, UUID,U
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 from meditranslate.app.db import Base
+from meditranslate.src.webhooks.webhook import Webhook
 from datetime import datetime
 
 
@@ -17,7 +18,11 @@ class TranslationJob(Base):
     __table_args__ = (
         UniqueConstraint('title', 'source_language','target_language', name='_title_langs_uc'),
     )
-
+    webhooks: Mapped[List["Webhook"]] = relationship(
+        'Webhook',
+        back_populates="translation_job",
+        cascade="all, delete-orphan"
+    )
     title: Mapped[str] = mapped_column(String, nullable=False)
     description: Mapped[str] = mapped_column(String, nullable=True, default="")
     source_language: Mapped[str] = mapped_column(String, nullable=False)
@@ -60,4 +65,3 @@ class TranslationJob(Base):
     approved_by_user: Mapped[Optional["User"]] = relationship('User',  foreign_keys=[approved_by], lazy='select', remote_side='User.id')
     archived_by_user: Mapped[Optional["User"]] = relationship('User',  foreign_keys=[archived_by], lazy='select', remote_side='User.id')
     deleted_by_user: Mapped[Optional["User"]] = relationship('User',  foreign_keys=[deleted_by], lazy='select', remote_side='User.id')
-

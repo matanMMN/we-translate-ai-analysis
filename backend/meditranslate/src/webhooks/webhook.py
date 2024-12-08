@@ -17,11 +17,11 @@ class Webhook(Base):
     #     nullable=False
     # )    
     user_id: Mapped[str] = mapped_column(
-        ForeignKey('users.id', onupdate="CASCADE"),
+        ForeignKey('users.id', onupdate="CASCADE", ondelete="CASCADE"),
         nullable=False
     )
     translation_job_id: Mapped[str] = mapped_column(
-        ForeignKey('translation_jobs.id', onupdate="CASCADE"),
+        ForeignKey('translation_jobs.id', onupdate="CASCADE", ondelete="CASCADE"),
         nullable=False
     )
 

@@ -1,10 +1,8 @@
-import type {Metadata} from "next";
+import type { Metadata } from "next";
 import "@/app/globals.css";
-import {ReactNode} from "react";
-import {StoreProvider} from "@/components/StoreProvider";
-import AuthProviders from "@/components/AuthProviders";
-import {protectLogin} from "@/lib/AuthGuard";
-import {Grid} from "@mui/material";
+import { ReactNode } from "react";
+import { protectLogin } from "@/lib/AuthGuard";
+import { Grid } from "@mui/material";
 // import Test from "@/components/testui";
 
 export const metadata: Metadata = {
@@ -16,19 +14,17 @@ export interface ChildrenProps {
     logo: ReactNode
 }
 
-export default async function RootAuthLayout({children, logo}: ChildrenProps): Promise<ReactNode> {
+export default async function RootAuthLayout({ children, logo }: ChildrenProps): Promise<ReactNode> {
 
     await protectLogin();
 
     return (
-        <AuthProviders>
-            <StoreProvider>
-                <Grid container component="main" sx={{height: '100vh'}}>
-                    {/* <Test/> */}
-                    {logo}
-                    {children}
-                </Grid>
-            </StoreProvider>
-        </AuthProviders>
+
+        <Grid container component="main" sx={{ height: '100vh' }}>
+            {/* <Test/> */}
+            {logo}
+            {children}
+        </Grid>
+
     );
 }

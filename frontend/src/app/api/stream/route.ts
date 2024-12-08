@@ -1,13 +1,13 @@
 export const dynamic = "force-dynamic";
 
-let clients: any[] = []
+export let clients: any[] = []
 
 export async function POST(request: Request) {
     const data = await request.json()
     console.log("Received data from webhook:", data)
 
     console.log(clients)
-    // sends to all clients instead of the specific one the project belongs to.
+    // BUG -> currently sends to all clients instead of the specific one the project belongs to.
     clients.forEach(c => {
         try {
             console.log("Sending data to client", c.id)
@@ -17,7 +17,7 @@ export async function POST(request: Request) {
             clients = clients.filter(cl => c.id !== cl.id)
         }
     })
-    return new Response("Data received", {status: 200})
+    return new Response("Data received", { status: 200 })
 
 }
 
@@ -27,11 +27,15 @@ export async function GET() {
 
     const customReadable = new ReadableStream({
         start(controller) {
-            clients.push({id: clientId, controller})
-            controller.enqueue(encoder.encode(`data: ${JSON.stringify({type: 'connected'})}\n\n`))
+            console.log("adding client")
+            clients.push({ id: clientId, controller })
+            console.log(clients)
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'connected' })}\n\n`))
         },
         cancel() {
+            console.log("filtering client")
             clients = clients.filter(c => c.id !== clientId);
+            console.log(clients)
             console.log(`Client ${clientId} disconnected. total clients: ${clients.length}`)
         }
     })
@@ -40,6 +44,8 @@ export async function GET() {
             Connection: "keep-alive",
             "Cache-Control": "no-cache, no-transform",
             "Content-Type": "text/event-stream; charset=utf-8",
+            "X-Accel-Buffering": "no",
+            "Access-Control-Allow-Origin": "*",
         },
     })
 }

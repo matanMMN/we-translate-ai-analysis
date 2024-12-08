@@ -14,7 +14,7 @@ import { useAppSelector } from '@/hooks/useAppSelector'
 import { setTranslatedFile } from '@/store/slices/projectSlice'
 import { useRouter } from 'next/navigation'
 import { useSession } from "next-auth/react";
-import { selectPath, selectSession } from "@/store/slices/sessionSlice";
+import { selectSession } from "@/store/slices/sessionSlice";
 import { clearAllLocalStorage } from "@/store/slices/projectCacheSlice";
 
 const ACCEPTED_FILE_TYPES = {
@@ -141,8 +141,8 @@ export default function TranslateFile() {
                     <div className="h-full bg-primary animate-pulse" style={{ width: '100%' }} />
                 </div>
                 <p className="text-sm text-muted-foreground">
-                    Your translated file will be available in the editor once completed.
-                    You can browse away and you will be notified once it's done.
+                    {`Your translated file will be available in the editor once completed.
+                    You can browse away and you will be notified once it's done.`}
                 </p>
             </div>
         )
