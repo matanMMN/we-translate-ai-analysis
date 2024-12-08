@@ -1,8 +1,9 @@
 "use server"
 
-import {getUser} from "@/lib/AuthGuard";
-import {serverUrl} from "@/lib/functions"
-import {toast} from "sonner";
+import { getUser } from "@/lib/AuthGuard";
+import { serverUrl } from "@/lib/functions"
+import { revalidatePath } from "next/dist/server/web/spec-extension/revalidate";
+import { toast } from "sonner";
 
 
 interface ProjectUpdateProps {
@@ -10,7 +11,7 @@ interface ProjectUpdateProps {
     targetFileId: string,
 }
 
-export async function updateProjectData({projectId, editedProject}: any) {
+export async function updateProjectData({ projectId, editedProject }: any) {
     const user = await getUser()
     if (!user)
         throw new Error("User authentication failed")
@@ -38,7 +39,33 @@ export async function updateProjectData({projectId, editedProject}: any) {
 }
 
 
-export async function updateTargetFile({projectId, targetFileId}: ProjectUpdateProps) {
+export async function getFileMetaData(fileId: string) {
+    const user = await getUser()
+    if (!user)
+        throw new Error("User authentication failed")
+    const translatedFileRes = await fetch(`${serverUrl}/files/download/${fileId}`, {
+        headers: {
+            'Authorization': `Bearer ${user.accessToken}`,
+        },
+    })
+
+    if (!translatedFileRes)
+        return { success: false, error: 'Failed to process the file' }
+
+    const arrayBuffer = await translatedFileRes.arrayBuffer();
+    const encodedString = Buffer.from(arrayBuffer).toString('base64');
+
+
+    revalidatePath(`/`);
+
+    return {
+        success: true,
+        mockBlob: encodedString,
+        blobType: "docx"
+    };
+}
+
+export async function updateTargetFile({ projectId, targetFileId }: ProjectUpdateProps) {
 
     const session = await getUser()
     console.log(projectId, targetFileId, session)
@@ -48,7 +75,7 @@ export async function updateTargetFile({projectId, targetFileId}: ProjectUpdateP
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${session!.accessToken}`,
         },
-        body: JSON.stringify({target_file_id: targetFileId})
+        body: JSON.stringify({ target_file_id: targetFileId })
     })
     const isUpdateSuccess = await res.json();
     console.log(isUpdateSuccess)

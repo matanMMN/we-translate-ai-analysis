@@ -1,11 +1,15 @@
 "use client"
 
-import { updateTargetFile } from "@/actions/updateProject";
+import { getFileMetaData } from "@/actions/updateProject";
 import { ReactNode, useEffect } from "react";
 import { toast } from "sonner";
-import { clients } from "@/app/api/stream/route"
+import { useAppDispatch } from "@/hooks/useAppDispatch";
+import { setTranslatedFile } from "@/store/slices/projectSlice";
 
 export default function SSEListener({ children }: { children: ReactNode }) {
+
+
+    const dispatch = useAppDispatch()
 
     useEffect(() => {
         const eventSource = new EventSource("/api/stream");
@@ -14,17 +18,31 @@ export default function SSEListener({ children }: { children: ReactNode }) {
             const response = JSON.parse(event.data)
             console.log("Received data from server:", response);
             toast.success(`${response?.translation_data ? 'New data received from server! Translated file is ready!' : 'Listening to server for incoming webhooks...'}`)
-            console.log("All clients: ", clients)
-            if (response?.translation_data)
-                try {
-                    await updateTargetFile({
-                        projectId: response.translation_job_id,
-                        targetFileId: response.translation_data.file_id,
 
-                    })
-                } catch (e) {
-                    console.error("SSE reaction failed: ", e)
-                }
+
+            if (!response?.translation_data)
+                return
+            const data = await getFileMetaData(response.translation_job_id)
+
+            if (data.success && data.mockBlob && data.blobType) {
+                dispatch(setTranslatedFile({
+                    blob: data.mockBlob as unknown as Blob,
+                    type: data.blobType
+                }))
+            } else {
+                toast.error("Data couldn't be extracted")
+            }
+            // console.log("All clients: ", clients)
+            // if (response?.translation_data)
+            //     try {
+            //         await updateTargetFile({
+            //             projectId: response.translation_job_id,
+            //             targetFileId: response.translation_data.file_id,
+
+            //         })
+            //     } catch (e) {
+            //         console.error("SSE reaction failed: ", e)
+            //     }
 
         };
 

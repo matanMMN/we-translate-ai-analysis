@@ -25,38 +25,35 @@ export const handleFileLoad = async (
     try {
         const state = store.getState();
         const currentFile = selectCurrentFile(state);
-        console.log(currentFile)
 
         // Check localStorage first
         const savedContent = localStorage.getItem(`editorContent-${projectId}`);
         const lastSaveTime = localStorage.getItem(`lastSaveTime-${projectId}`);
-        console.log(lastSaveTime)
-        // If we have a lastModified timestamp from the backend/translation
-        // if (currentFile.lastModified) {
-        //     // Check if localStorage is newer than our last known modification
-        //     if (savedContent && lastSaveTime && parseInt(lastSaveTime) > currentFile.lastModified) {
-        //         console.log('Using newer localStorage content');
-        //         container.current.documentEditor.open(savedContent);
-        //         return;
-        //     }
+        console.log(currentFile)
+        if (currentFile.lastModified && currentFile.blob && currentFile.type) {
+            // Check if localStorage is newer than our last known modification
+            // if (savedContent && lastSaveTime && parseInt(lastSaveTime) > currentFile.lastModified) {
+            console.log("Using recent dispatch data")
+            await loadFileContent(container, currentFile.blob, currentFile.type);
+            return;
+        }
+        if (savedContent && lastSaveTime) {
+            console.log('Using newer localStorage content');
+            container.current.documentEditor.open(savedContent)
+            return;
+        }
         // If localStorage is older or doesn't exist, try to fetch from backend
         if (projectId) {
             try {
                 console.log('Fetching newer content from backend');
 
-                const res = { blob: currentFile.blob, type: currentFile.type }
-                console.log(res)
-                if (res?.type && res.blob) {
-                    await loadFileContent(container, res.blob, res.type);
+                const backendProjectSave = await fetchProjectFile(projectId);
+
+                if (backendProjectSave) {
+                    await loadFileContent(container, backendProjectSave.blob as unknown as Blob, backendProjectSave.type);
                     return;
-                } else {
-                    const backendProjectSave = await fetchProjectFile(projectId);
-                    console.log(backendProjectSave)
-                    if (backendProjectSave) {
-                        await loadFileContent(container, backendProjectSave.blob as unknown as Blob, backendProjectSave.type);
-                        return;
-                    }
                 }
+
             } catch (error) {
                 console.error('Error fetching file:', error);
             }
@@ -99,7 +96,6 @@ async function loadFileContent(
     fileType: string
 ) {
     if (!container.current) return;
-    console.log(fileType)
     switch (fileType) {
         case 'application/pdf':
             await handlePdfContent(container, fileBlob);

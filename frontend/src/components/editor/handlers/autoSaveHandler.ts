@@ -1,12 +1,12 @@
 'use client'
 
-import {DocumentEditorContainerComponent} from '@syncfusion/ej2-react-documenteditor';
-import {RefObject, useRef, useEffect} from 'react';
-import {handleEditorChanges} from '@/actions/EditorChanges';
-import store from '@/store/store';
-import {updateFileMetadata} from '@/store/slices/projectSlice';
-import {useSelector} from "react-redux";
-import {selectSession} from "@/store/slices/sessionSlice";
+import { DocumentEditorContainerComponent } from '@syncfusion/ej2-react-documenteditor';
+import { RefObject, useRef, useEffect } from 'react';
+import { handleEditorChanges } from '@/actions/EditorChanges';
+// import store from '@/store/store';
+// import { updateFileMetadata } from '@/store/slices/projectSlice';
+import { useSelector } from "react-redux";
+import { selectSession } from "@/store/slices/sessionSlice";
 
 const LOCAL_SAVE_INTERVAL = 1000;   // 1 second
 const BACKEND_SAVE_INTERVAL = 30000; // 30 seconds
@@ -24,7 +24,7 @@ export const useAutoSave = (
     const localSaveIntervalId = useRef<NodeJS.Timeout>();
     const backendSaveIntervalId = useRef<NodeJS.Timeout>();
     const isFirstSave = useRef(true);
-    const {projectId} = useSelector(selectSession)
+    const { projectId } = useSelector(selectSession)
 
 
     useEffect(() => {
@@ -48,13 +48,13 @@ export const useAutoSave = (
 
                 console.log(result)
                 if (result.success) {
-                    const newMetadata = {
-                        docxHash: result.docxHash || null,
-                        commentsHash: result.commentsHash || null,
-                        lastModified: Date.now()
-                    }
+                    // const newMetadata = {
+                    //     docxHash: result.docxHash || null,
+                    //     commentsHash: result.commentsHash || null,
+                    //     lastModified: Date.now()
+                    // }
 
-                    store.dispatch(updateFileMetadata(newMetadata));
+                    // store.dispatch(updateFileMetadata(newMetadata));
 
                     if (result.docxHash) setDocxHash(result.docxHash);
                     if (result.commentsHash) setCommentsHash(result.commentsHash);

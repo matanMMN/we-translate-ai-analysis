@@ -63,13 +63,14 @@ export const projectSlice = createSlice({
         },
 
         setTranslatedFile: (state, action: PayloadAction<{
-            fileId: string,
+            fileId?: string,
             blob: Blob,
             type: string, //txt, pdf, docx
             // docxHash?: string,
             // commentsHash?: string | null
         }>) => {
-            state.files.srcFileId = action.payload.fileId
+            console.log("set")
+            // state.files.srcFileId = action.payload.fileId
             state.currentFile.blob = action.payload.blob
             state.currentFile.type = action.payload.type
             state.currentFile.lastModified = Date.now()

@@ -7,7 +7,7 @@ import {getUser} from "@/lib/AuthGuard";
 import {useProjectCache} from "@/hooks/useProjectCache";
 import {useProjectRevalidation} from "@/hooks/useProjectRevalidation";
 import {Project} from "@/lib/userData";
-import {setCurrentFileMetadata} from "@/store/slices/projectSlice";
+// import {setCurrentFileMetadata} from "@/store/slices/projectSlice";
 
 interface ProjectProviderProps {
     children: ReactNode;
@@ -41,11 +41,11 @@ export default function ProjectProvider({
                     const cachedProject = await getProjectFromCache(projectId);
                     newDispatch.project = cachedProject || initialProject;
                     newDispatch.projectId = projectId;
-                    dispatch(setCurrentFileMetadata({
-                        docxHash: null,
-                        commentsHash: null,
-                        lastModified: Date.parse("2024-10-31")
-                    }))
+                    // dispatch(setCurrentFileMetadata({
+                    //     docxHash: null,
+                    //     commentsHash: null,
+                    //     lastModified: Date.parse("2024-10-31")
+                    // }))
                     // await fetchProjectData(projectId);
                 }
 
