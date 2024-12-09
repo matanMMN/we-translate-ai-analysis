@@ -91,7 +91,8 @@ export default function ProjectInfo({
                                 selected={editProject?.due_date ? new Date(editProject?.due_date) : project.due_date ? new Date(project.due_date) : undefined}
                                 onSelect={(date) => {
                                     if (date) {
-                                        onChangeAction({due_date: date!.toISOString()})
+                                        const adjustedDate = new Date(date.setHours(12, 0, 0, 0));
+                                        onChangeAction({due_date: adjustedDate.toISOString()})
                                         setIsCalendarOpen(false)
                                     }
                                 }}
