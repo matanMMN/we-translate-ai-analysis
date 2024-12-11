@@ -18,7 +18,7 @@ import { selectSession } from "@/store/slices/sessionSlice";
 import { clearAllLocalStorage } from "@/store/slices/projectCacheSlice";
 
 const ACCEPTED_FILE_TYPES = {
-    // 'application/pdf': ['.pdf'],
+    'application/pdf': ['.pdf'],
     // 'application/msword': ['.doc'],
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
     // 'text/plain': ['.txt']

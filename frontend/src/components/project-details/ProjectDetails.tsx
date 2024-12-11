@@ -50,8 +50,10 @@ export default function ProjectDetails() {
     };
 
     const handleSave = async () => {
-        if (editedProject.due_date !== new Date(editedProject.due_date!).toISOString())
-            editedProject.due_date = new Date(editedProject.due_date!).toISOString();
+        if (editedProject.due_date !== new Date(editedProject.due_date!).toISOString()) {
+            const adjustedDate = new Date(new Date(editedProject.due_date!).setHours(12, 0, 0, 0));
+            editedProject.due_date = adjustedDate.toISOString();
+        }
 
         const updatedProject = await updateProjectData({
             projectId: project.id,

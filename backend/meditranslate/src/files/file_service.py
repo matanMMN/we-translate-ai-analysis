@@ -1,4 +1,6 @@
 from io import BytesIO
+import io
+import os
 from typing import Any,Dict,List,Optional,Tuple
 from meditranslate.app.storage.base_storage_service import BaseStorageService
 from meditranslate.src.files.file_repository import FileRepository
@@ -11,6 +13,8 @@ from meditranslate.utils.files.formats.file_format_handler import FileFormatHand
 from meditranslate.utils.language.utils import get_language_from_text
 from meditranslate.utils.security.password import hash_password
 from meditranslate.app.errors import AppError,ErrorSeverity,ErrorType,HTTPStatus
+from tempfile import NamedTemporaryFile
+from meditranslate.utils.files.formats.pdf_to_docx import pdf_to_docx_bytes
 from meditranslate.src.files.file_schemas import (
     FilePointerCreateSchema,
     FilePointerUpdateSchema,
@@ -113,18 +117,20 @@ class FileService(BaseService[File]):
             raise AppError(
                 title="invalid file upload type",
                 error_class=AppError,
-                user_message=f"{extension.value} files  are not allowed",
+                user_message=f"{extension.value} files are not allowed",
                 http_status=HTTPStatus.BAD_REQUEST
             )
 
-        # content_type = FileFormatHandler().get_content_type(extension)
-        # if file.content_type != content_type:
-        #     raise AppError(
-        #         title="invalid content type",
-        #         error_class=AppError,
-        #         user_message=f"invalid content type recv:{file.content_type} expected: {content_type} for file type {extension.value}",
-        #         http_status=HTTPStatus.BAD_REQUEST
-        #     )
+        if extension == FileFormatType.PDF:
+                docx_bytes, new_filename = await pdf_to_docx_bytes(file, config.OPENAI_API_KEY)
+                # Create new UploadFile from converted DOCX
+                file = UploadFile(
+                    filename=new_filename,
+                    file=io.BytesIO(docx_bytes),
+                )
+                extension = FileFormatType.DOCX
+                original_file_name = new_filename           
+                new_file_name = f"{original_file_name}{str(uuid4())}"
 
         file_data = await file.read()
         file_stream = BytesIO(file_data)

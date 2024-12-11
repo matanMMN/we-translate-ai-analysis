@@ -55,3 +55,10 @@ python-docx
 
 # llm api
 anthropic
+
+
+openai
+docx
+python-docx      
+PyMuPDF==1.23.8      
+Pillow 
