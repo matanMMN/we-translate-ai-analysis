@@ -69,6 +69,7 @@ def batch_process_images(client, images, batch_size=3):
         )
         
         content = response.choices[0].message.content
+        
         pages = [page.strip() for page in content.split('===PAGE_BREAK===')]
         # Filter out empty pages
         pages = [page for page in pages if page.strip()]
@@ -146,10 +147,10 @@ def create_docx_from_markdown(markdown_content, doc):
         if line.strip():
             doc.add_paragraph(line.strip())
 
-async def pdf_to_docx_bytes(pdf_file: UploadFile, api_key: str) -> Tuple[bytes, str]:
-    """Convert PDF to DOCX while maintaining structure and formatting"""
+def pdf_to_docx_bytes(pdf_bytes: bytes, api_key: str) -> Tuple[bytes, str]:
+    """Convert PDF bytes to DOCX bytes while maintaining structure and formatting"""
     client = OpenAI(api_key=api_key)    
-    pdf_bytes = await pdf_file.read()
+    
     images = convert_pdf_bytes_to_images(pdf_bytes)
     doc = Document()
     markdown_contents = batch_process_images(client, images)
@@ -160,13 +161,9 @@ async def pdf_to_docx_bytes(pdf_file: UploadFile, api_key: str) -> Tuple[bytes, 
         print(f"Converting page {i+1} to DOCX format...")
         create_docx_from_markdown(markdown_content.strip(), doc)
     
-    # Save to bytes buffer instead of file
+    # Save to bytes buffer
     docx_buffer = io.BytesIO()
     doc.save(docx_buffer)
     docx_buffer.seek(0)
     
-    # Generate new filename
-    original_filename = pdf_file.filename
-    new_filename = original_filename.rsplit('.', 1)[0] + '.docx'
-    
-    return docx_buffer.getvalue(), new_filename
+    return docx_buffer.getvalue()

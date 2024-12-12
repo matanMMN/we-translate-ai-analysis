@@ -1,4 +1,5 @@
 from typing import Any
+from sqlalchemy import Enum
 from sqlalchemy.orm import DeclarativeBase,declared_attr
 from sqlalchemy.ext.asyncio import AsyncAttrs
 from .mixins.timestamp_mixin import TimestampMixin
@@ -45,6 +46,8 @@ class Base(AsyncAttrs,DeclarativeBase, IdMixin, TimestampMixin):
             elif isinstance(value, (int, float, bool)):
                 # Convert basic types (int, float, bool) to string
                 return str(value)
+            elif isinstance(value, Enum):  # Add handling for Enum types
+                return value.value
             else:
                 # Handle other types by converting to string
                 return str(value) if value is not None else None

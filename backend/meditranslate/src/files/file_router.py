@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends,Request,Query,UploadFile,File,Form
+from fastapi import APIRouter, Depends,Request,Query,UploadFile,File,BackgroundTasks
 
 from meditranslate.app.shared.factory import Factory
 from meditranslate.app.shared.schemas import MetaSchema, PaginationSchema
@@ -54,13 +54,15 @@ async def update_file(
 @file_router.post("/upload/", response_model=FilePointerResponseSchema,status_code=201)
 async def upload_file(
     current_user: CurrentUserDep,
+    background_tasks: BackgroundTasks,
     file: Annotated[UploadFile, File(description="A file read as UploadFile")],
     file_controller: FileController = Depends(Factory.get_file_controller),
 )-> FilePointerResponseSchema:
     """
     Upload File
     """
-    file = await file_controller.upload_file(current_user,file)
+    file = await file_controller.upload_file(current_user, file, background_tasks)
+    print(file)
     return FilePointerResponseSchema(
         data=file,
         status_code=201,

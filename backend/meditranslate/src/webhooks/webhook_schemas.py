@@ -1,3 +1,4 @@
+from meditranslate.utils.files.file_format_type import FileFormatType
 from meditranslate.app.shared.schemas import BaseResponseSchema, BaseSchema
 from datetime import datetime
 from typing import Optional
@@ -20,3 +21,25 @@ class WebhookSchema(BaseSchema):
 
 class WebhookResponseSchema(BaseResponseSchema):
     data: WebhookSchema
+
+class FileConversionWebhookCreateSchema(BaseSchema):
+    file_id: str = Field(..., description="ID of the file being converted")
+    # source_format: FileFormatType = Field(..., description="Original file format")
+    # target_format: FileFormatType = Field(..., description="Target file format")
+
+class FileConversionWebhookSchema(BaseSchema):
+    id: str
+    user_id: str
+    # file_id: str
+    # source_format: FileFormatType
+    # target_format: FileFormatType
+    status: str  # 'pending', 'processing', 'completed', 'failed'
+    error_message: Optional[str] = None
+    file_id: Optional[str] = None
+    is_triggered: bool = False
+    triggered_at: Optional[datetime] = None
+    created_at: datetime
+    updated_at: datetime
+
+class FileConversionWebhookResponseSchema(BaseResponseSchema):
+    data: FileConversionWebhookSchema

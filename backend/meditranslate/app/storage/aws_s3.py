@@ -99,6 +99,7 @@ class AWSStorageService(BaseStorageService):
             logger.error(f"Error uploading file: {e}")
             raise Exception(f"Failed to upload file: {e}")
 
+
     def get_file(self,file_path:str):
         try:
             file_data = self.s3_resource.meta.client.head_object(Bucket=self.bucket_name, Key=file_path)
@@ -109,6 +110,9 @@ class AWSStorageService(BaseStorageService):
             else:
                 raise e
         return None
+
+
+
 
     def download_file(self, file_path:str):
         existing_file = self.get_file(file_path)

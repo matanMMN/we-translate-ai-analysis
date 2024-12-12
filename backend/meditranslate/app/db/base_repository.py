@@ -69,6 +69,7 @@ class BaseRepository(Generic[ModelType]):
         try:
             for key, value in attributes.items():
                 setattr(model_instance, key, value)
+                print(key, value)
             await self.session.flush()
         except SQLAlchemyError as e:
             raise AppError(
