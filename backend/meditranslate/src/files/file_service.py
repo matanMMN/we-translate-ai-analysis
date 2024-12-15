@@ -135,16 +135,7 @@ class FileService(BaseService[File]):
             self.storage_service.upload_file(file=pdf_file, file_path=storage_file_path)            
             # Return minimal metadata for immediate response
             return new_file_name, original_file_name, storage_file_path, "language", len(file_data), extension, FileStatus.PROCESSING.value
-        # if extension == FileFormatType.PDF:
-        #         docx_bytes, new_filename = await pdf_to_docx_bytes(file, config.OPENAI_API_KEY)
-        #         # Create new UploadFile from converted DOCX
-        #         file = UploadFile(
-        #             filename=new_filename,
-        #             file=io.BytesIO(docx_bytes),
-        #         )
-        #         extension = FileFormatType.DOCX
-        #         original_file_name = new_filename           
-        #         new_file_name = f"{original_file_name}{str(uuid4())}"
+
 
         file_data = await file.read()
         file_stream = BytesIO(file_data)
@@ -183,7 +174,7 @@ class FileService(BaseService[File]):
 
             pdf_bytes, original_filename, _ = await self.download_file_sync(file_id, is_bytes=True)
             
-            docx_bytes = pdf_to_docx_bytes(pdf_bytes, config.OPENAI_API_KEY)
+            docx_bytes = await pdf_to_docx_bytes(pdf_bytes, config.OPENAI_API_KEY)
 
 
             new_filename = original_filename.rsplit('.', 1)[0] + '.docx'

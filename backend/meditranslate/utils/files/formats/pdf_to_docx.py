@@ -147,7 +147,7 @@ def create_docx_from_markdown(markdown_content, doc):
         if line.strip():
             doc.add_paragraph(line.strip())
 
-def pdf_to_docx_bytes(pdf_bytes: bytes, api_key: str) -> Tuple[bytes, str]:
+async def pdf_to_docx_bytes(pdf_bytes: bytes, api_key: str) -> Tuple[bytes, str]:
     """Convert PDF bytes to DOCX bytes while maintaining structure and formatting"""
     client = OpenAI(api_key=api_key)    
     
