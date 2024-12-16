@@ -89,7 +89,7 @@ async def translation_file(
     """
     Create a new translation.   
     """
-    file, complete = await translation_controller.translate_file(current_user,file_id,translation_file_schema)
+    file, complete = await translation_controller.translate_file(current_user,file_id,translation_file_schema, background_tasks)
     ret_status = status.HTTP_200_OK
 
     if complete == "False":

@@ -1,6 +1,6 @@
 from typing import Any, List,Tuple
 
-from fastapi import UploadFile
+from fastapi import UploadFile, BackgroundTasks
 from meditranslate.app.shared.base_controller import BaseController
 from meditranslate.src.files.file_service import FileService
 from meditranslate.src.translation_jobs.translation_job_schemas import TranslationJobUpdateSchema
@@ -49,7 +49,7 @@ class TranslationController(BaseController[Translation]):
         return await self.translation_service.get_many_translations(get_many_schema)
 
     @Transactional(propagation=Propagation.REQUIRED_NEW)
-    async def translate_file(self,current_user:User,file_id:str,translation_file_schema:TranslationFileSchema):
+    async def translate_file(self,current_user:User,file_id:str,translation_file_schema:TranslationFileSchema, background_tasks: BackgroundTasks):
         src_file = await self.file_service.fetch_file_entity(file_id=file_id)
         src_file_stream, _ ,_ = await self.file_service.download_file_sync(file_id=file_id)
 
@@ -75,7 +75,7 @@ class TranslationController(BaseController[Translation]):
             }
         )
 
-        result_file = await self.file_service.upload_file(current_user,upload_file)
+        result_file = await self.file_service.upload_file(current_user,upload_file, background_tasks)
 
         await self.translation_job_service.update_translation_job(
             current_user=current_user,
