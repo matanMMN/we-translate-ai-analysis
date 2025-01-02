@@ -28,11 +28,16 @@ const sessionSlice = createSlice({
         },
         setPath: (state, action: PayloadAction<string>) => {
             state.curPath = action.payload;
+        },
+        setProjectTargetFileId: (state, action: PayloadAction<string | undefined>) => {
+            if (state.project && action.payload) {
+                state.project.target_file_id = action.payload;
+            }
         }
     },
 });
 
-export const {setSessionSlice, setPath} = sessionSlice.actions;
+export const {setSessionSlice, setPath, setProjectTargetFileId} = sessionSlice.actions;
 export const selectSession = (state: RootState) => state.session;
 export const selectPath = (state: RootState) => state.session.curPath;
 export default sessionSlice.reducer;

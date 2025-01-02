@@ -33,6 +33,9 @@ loguru
 async-timeout
 
 
+
+google-generativeai
+IPython
 pycountry # countries
 pytz # timezones
 python-magic          # For MIME type detection (useful in file uploads)

@@ -25,8 +25,7 @@ export const useAutoSave = (
     const localSaveIntervalId = useRef<NodeJS.Timeout>();
     const backendSaveIntervalId = useRef<NodeJS.Timeout>();
     const isFirstSave = useRef(true);
-    const { projectId } = useSelector(selectSession)
-
+    const { projectId, project } = useSelector(selectSession)
 
     useEffect(() => {
         const saveToLocalStorage = (content: string) => {
@@ -40,6 +39,7 @@ export const useAutoSave = (
         };
 
         const saveToBackend = async () => {
+
             if (!container.current) return;
 
             try {
@@ -49,7 +49,7 @@ export const useAutoSave = (
                     replies: JSON.parse(JSON.stringify(comment.replies))
                 }));
 
-                const result = await handleEditorChanges(blob, comments as unknown as string[], docxHash, commentsHash);
+                const result = await handleEditorChanges(blob, comments as unknown as string[], docxHash, commentsHash, project?.target_file_id);
 
                 console.log(result)
                 if (result.success) {

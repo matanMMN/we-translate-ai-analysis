@@ -1,12 +1,13 @@
 from typing import Any, List,Tuple
 
+from meditranslate.utils.files.file_status import FileStatus
 from fastapi import UploadFile, BackgroundTasks
 from meditranslate.app.shared.base_controller import BaseController
 from meditranslate.src.files.file_service import FileService
 from meditranslate.src.translation_jobs.translation_job_schemas import TranslationJobUpdateSchema
 from meditranslate.src.translation_jobs.translation_job_service import TranslationJobService
 from meditranslate.src.translations.translation_service import TranslationService
-
+from celery.result import AsyncResult
 from meditranslate.src.translations.translation_schemas import (
     TranslationCreateSchema,
     GetManySchema,
@@ -33,6 +34,41 @@ class TranslationController(BaseController[Translation]):
         self.translation_job_service: TranslationJobService = translation_job_service
         self.webhook_service: WebhookService = webhook_service
 
+    async def _wait_for_reference_file(self, file_id: str, task_id: str):
+        """
+        Wait for reference file processing task to complete using Celery's result backend
+        """
+        task_result = AsyncResult(task_id)
+        print("INITIAL TASK STATUS:", task_result.status)
+        print("TASK ID", task_id)
+        print("FILE ID", file_id)
+        
+        try:
+            wait_result = task_result.wait(timeout=None)
+
+            print("WAIT RESULT:", wait_result)
+            print("TASK STATUS AFTER WAIT:", task_result.status)
+            print("TASK READY:", task_result.ready())
+            print("TASK SUCCESSFUL:", task_result.successful())
+            
+            if task_result.ready() and task_result.successful():
+                file = await self.file_service.file_repository.get_by("id", file_id, unique=True)
+                await self.file_service.file_repository.session.refresh(file)
+                print("FILE", file)
+                return await self.file_service.fetch_file_entity(file_id)
+            else:
+                logger.error(f"Reference file {file_id} processing failed: {task_result.result}")
+                return None
+
+                
+        except Exception as e:
+            print("ERROR WAITING FOR REFERENCE FILE", e)
+            logger.error(f"Error waiting for reference file {file_id} task {task_id}: {str(e)}")
+            return None
+        finally:
+            print("FORGETTING TASK RESULT")
+            task_result.forget()
+
 
     @Transactional(propagation=Propagation.REQUIRED_NEW)
     async def create_translation(self,current_user:User,translation_create_schema:TranslationCreateSchema) -> Translation:
@@ -56,6 +92,11 @@ class TranslationController(BaseController[Translation]):
         translation_job = await self.translation_job_service.get_translation_job(
             translation_file_schema.translation_job_id, to_public=False)
         ref_file = await self.file_service.fetch_file_entity(translation_job.reference_file_id)
+        print("REF FILE", ref_file)
+        if FileStatus(ref_file.status) == FileStatus.PROCESSING:
+            print("WAITING FOR REFERENCE FILE")
+            ref_file = await self._wait_for_reference_file(file_id=translation_job.reference_file_id, task_id=ref_file.processing_task_id)
+        
         ref_file_stream, _, _ = await self.file_service.download_file_sync(file_id=ref_file.id)
 
         translated_file_stream, new_file_name, content_type, complete = await self.translation_service.translate_file(

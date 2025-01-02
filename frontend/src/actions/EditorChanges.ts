@@ -4,6 +4,7 @@ import {createHash} from 'crypto';
 import path from "path";
 import fs from "fs/promises";
 import {getUser} from "@/lib/AuthGuard";
+import { serverUrl } from '@/lib/functions';
 
 interface EditorChangesResult {
     success: boolean;
@@ -18,9 +19,14 @@ export const handleEditorChanges = async (
     comments: string[],
     currentDocxHash: string | null,
     currentCommentsHash: string | null,
+    targetFileId: string | null,
+    
 ): Promise<EditorChangesResult> => {
     try {
 
+        if (!targetFileId) {
+            return {success: false, error: 'No target file id'}
+        }
         const session = await getUser()
         if (!session) {
             return {success: false, error: 'Not authenticated'}
@@ -37,29 +43,44 @@ export const handleEditorChanges = async (
         const commentsString = JSON.stringify(comments);
         const newCommentsHash = createHash('md5').update(commentsString).digest('hex');
 
+
         // If nothing has changed, return early
         if (newDocxHash === currentDocxHash && newCommentsHash === currentCommentsHash) {
             return {success: true};
         }
 
         // Here you would typically send the changes to your backend
+
         if (newDocxHash !== currentDocxHash) {
+            
             const docxPath = path.join(process.cwd(), 'public', 'uploads', 'document.docx')
             await fs.writeFile(docxPath, buffer)
+
+            
+
             try {
+                // TODO = GET FILE NAME - TEMPORARY SOLUTION, FIND A WAY TO NOT SEND A REQUEST TO THE BACKEND
+                const oldFileRes = await fetch(`${serverUrl}/files/${targetFileId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${session?.accessToken}`,
+                    },
+                })
+                const oldFile = await oldFileRes.json()
+                const oldFileName = oldFile.data.file_name_id
+
                 const formData = new FormData();
-                const file = new File([buffer], 'document.docx', {type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
+                const file = new File([buffer], `${oldFileName}`, {type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
                 formData.append('file', file)
 
-                // const res = await fetch('', {
-                //     headers: {
-                //         'Authorization': `Bearer ${session?.accessToken}`,
-                //     },
-                //     method: 'PUT',
-                //     body: formData
-                // })
-                // const isUploaded = await res.json()
-                // console.log(isUploaded)
+                const res = await fetch(`${serverUrl}/files/${targetFileId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${session?.accessToken}`,
+                    },
+                    method: 'PUT',
+                    body: formData
+                })
+                const isUploaded = await res.json()
+                console.log(isUploaded)
             } catch (e) {
                 console.error(e)
             }

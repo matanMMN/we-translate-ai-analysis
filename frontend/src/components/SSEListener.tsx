@@ -1,15 +1,16 @@
 "use client"
 
 import { getFileMetaData } from "@/actions/updateProject";
+import { setTranslatedFile } from "@/store/slices/projectSlice";
 import { ReactNode, useEffect } from "react";
 import { toast } from "sonner";
-// import { useAppDispatch } from "@/hooks/useAppDispatch";
+import { useAppDispatch } from "@/hooks/useAppDispatch";
 // import { setTranslatedFile } from "@/store/slices/projectSlice";
 
 export default function SSEListener({ children }: { children: ReactNode }) {
 
 
-    // const dispatch = useAppDispatch()
+    const dispatch = useAppDispatch()
 
     useEffect(() => {
         const eventSource = new EventSource("/api/stream");
@@ -22,31 +23,18 @@ export default function SSEListener({ children }: { children: ReactNode }) {
 
             if (!response?.translation_data)
                 return
-            console.log("response")
-            console.log(response)
-            const data = await getFileMetaData(response.translation_job_id)
-            console.log("data")
+            const data = await getFileMetaData(response.translation_data.file_id)
             console.log(data)
-            // if (data.success && data.mockBlob && data.blobType) {
-            //     dispatch(setTranslatedFile({
-            //         blob: data.mockBlob as unknown as Blob,
-            //         type: data.blobType
-            //     }))
-            // } else {
-            //     toast.error("Data couldn't be extracted")
-            // }
-            // console.log("All clients: ", clients)
-            // if (response?.translation_data)
-            //     try {
-            //         await updateTargetFile({
-            //             projectId: response.translation_job_id,
-            //             targetFileId: response.translation_data.file_id,
 
-            //         })
-            //     } catch (e) {
-            //         console.error("SSE reaction failed: ", e)
-            //     }
-
+            if (data.success && data.mockBlob && data.blobType) {
+                dispatch(setTranslatedFile({
+                    fileId: response.translation_data.file_id || "1",
+                    blob: data.mockBlob as unknown as Blob,
+                    type: data.blobType
+                }))
+            } else {
+                toast.error("Data couldn't be extracted")
+            }
         };
 
         eventSource.onerror = function (event) {

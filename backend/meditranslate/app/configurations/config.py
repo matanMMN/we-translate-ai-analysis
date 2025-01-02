@@ -7,6 +7,7 @@ from datetime import datetime
 from meditranslate.app.configurations.base_config import BaseConfig
 from enum import Enum
 from meditranslate.utils.security.json_web_tokens import JWTAlgorithm
+from meditranslate.utils.files.file_format_type import FileFormatType
 
 LOG_LEVEL = Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
 
@@ -251,6 +252,48 @@ class Config(BaseConfig):
 
 
     SHOW_SQL_ALCHEMY_QUERIES: bool = Field(os.environ.get("SHOW_SQL_ALCHEMY_QUERIES",False),title="SHOW_SQL_ALCHEMY_QUERIES",description="")
+
+    GOOGLE_API_KEY: Annotated[
+        str,
+        StringConstraints(
+            strip_whitespace=True
+        )
+    ] = Field(os.environ.get("GOOGLE_API_KEY", ""), title="Google API Key", description="API key for Google services")
+    # Anthropic and Claude Configuration
+    ANTHROPIC_API_KEY: Annotated[
+        str,
+        StringConstraints(
+            strip_whitespace=True
+        )
+    ] = Field(os.environ.get("ANTHROPIC_API_KEY", ""), title="Anthropic API Key", description="API key for Anthropic services")
+
+    ANTHROPIC_MODEL_NAME: Annotated[
+        str,
+        StringConstraints(
+            strip_whitespace=True
+        )
+    ] = Field(os.environ.get("ANTHROPIC_MODEL_NAME", "claude-3-opus-20240229"), title="Anthropic Model Name", description="Model name for Anthropic API")
+
+    CLAUDE_MAX_TOKENS: int = Field(os.environ.get("CLAUDE_MAX_TOKENS", 4096), title="Claude Max Tokens", description="Maximum tokens for Claude model")
+    
+    CLAUDE_TEMPERATURE: float = Field(os.environ.get("CLAUDE_TEMPERATURE", 0.2), title="Claude Temperature", description="Temperature setting for Claude model")
+    
+    CLAUDE_MAX_REPS: int = Field(os.environ.get("CLAUDE_MAX_REPS", 5), title="Claude Max Repetitions", description="Maximum number of repetitions for Claude model")
+
+    # File upload configuration
+    ALLOWED_UPLOAD_FILE_EXTENSIONS: tuple = Field(
+        (
+            FileFormatType.PDF,
+            FileFormatType.DOCX,
+            FileFormatType.DOC,
+            FileFormatType.TXT
+        ),
+        title="Allowed Upload File Extensions",
+        description="List of allowed file extensions for upload"
+    )
+
+# Create and export the config instance after the class is defined
+config = Config()
 
 
 

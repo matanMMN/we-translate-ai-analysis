@@ -1,11 +1,13 @@
-from fastapi import APIRouter, Depends,Request,Query,UploadFile,File,BackgroundTasks
-
+from fastapi import APIRouter, Depends,Query,UploadFile,File,BackgroundTasks
+from meditranslate.app.shared.schemas import BaseResponseSchema
+from meditranslate.src.files.file_version_schemas import ListFilePointerResponseSchema
+from meditranslate.app.dependancies.user import CurrentUserDep
 from meditranslate.app.shared.factory import Factory
 from meditranslate.app.shared.schemas import MetaSchema, PaginationSchema
 from meditranslate.src.files.file_controller import FileController
 from meditranslate.app.dependancies.auth import AuthenticationRequired
 from meditranslate.app.dependancies.user import CurrentUserDep
-from typing import Any,List,Annotated,Optional
+from typing import Any,Annotated
 from meditranslate.src.files.file_schemas import (
     GetManySchema,
     FilePointerResponseSchema,
@@ -13,13 +15,9 @@ from meditranslate.src.files.file_schemas import (
 
 )
 
-from fastapi.responses import FileResponse,StreamingResponse
-import json
+from fastapi.responses import StreamingResponse
 
-file_router = APIRouter(
-    tags=["files"],
-    dependencies=[Depends(AuthenticationRequired)]
-)
+file_router = APIRouter(tags=["files"],dependencies=[Depends(AuthenticationRequired)])
 
 @file_router.get("/{file_id}", response_model=FilePointerResponseSchema,status_code=200)
 async def get_file(
@@ -139,4 +137,49 @@ async def get_many_files(
         status_code=200,
         meta=meta.model_dump(),
         message="Files retrieved successfully"
+    )
+@file_router.get("/{file_id}/versions", response_model=ListFilePointerResponseSchema)
+async def get_file_versions(
+    file_id: str,
+    file_controller: FileController = Depends(Factory.get_file_controller)
+) -> ListFilePointerResponseSchema:
+    """Get all versions of a specific file"""
+    versions = await file_controller.get_file_versions(file_id)
+    return ListFilePointerResponseSchema(data=versions,)
+
+@file_router.get("/{file_id}/versions/{version_number}")
+async def download_file_version(
+    file_id: str,
+    version_number: int,
+    file_controller: FileController = Depends(Factory.get_file_controller)
+
+):
+    """Download a specific version of a file"""
+    file_stream, filename, content_type = await file_controller.get_specific_version(
+        file_id=file_id,
+        version_number=version_number
+    )
+    return StreamingResponse(
+        file_stream,
+        media_type=content_type,
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"'
+        }
+    )
+
+@file_router.post("/{file_id}/restore/{version_number}")
+async def restore_file_version(
+    file_id: str,
+    version_number: int,
+    current_user: CurrentUserDep,
+    file_controller: FileController = Depends(Factory.get_file_controller)
+):
+    """Restore a specific version as the current version"""
+    await file_controller.restore_version(
+        file_id=file_id,
+        version_number=version_number,
+        current_user=current_user
+    )
+    return BaseResponseSchema(
+        message="File version restored successfully"
     )

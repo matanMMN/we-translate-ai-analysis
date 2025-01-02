@@ -14,7 +14,8 @@ from sqlalchemy.sql.expression import Delete, Insert, Update
 
 from meditranslate.app.configurations import config
 from meditranslate.app.loggers import logger
-
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
+from meditranslate.app.configurations.config import config
 
 
 # Context variable for session management; stores the current session context (e.g., session ID).
@@ -146,3 +147,33 @@ async def get_session():
         await AsyncScopedSession.close()
 
 
+async_engine = create_async_engine(
+    str(config.DATABASE_URL),
+    pool_pre_ping=True,
+    echo=False
+)
+
+# Create async session factory
+AsyncSessionLocal = async_sessionmaker(
+    async_engine,
+    class_=AsyncSession,
+    expire_on_commit=False,
+    autoflush=False,
+)
+
+# Add a new function for Celery tasks
+async def get_celery_session():
+    """Get a new async session for Celery tasks"""
+    async with AsyncSessionLocal() as session:
+        yield session
+
+async def get_task_session():
+    """Get a direct async session for Celery tasks (bypassing scoped session)"""
+    session = AsyncSession(
+        engines["writer"],
+        expire_on_commit=False,
+    )
+    try:
+        yield session
+    finally:
+        await session.close()

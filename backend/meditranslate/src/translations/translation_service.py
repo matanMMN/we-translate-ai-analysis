@@ -128,7 +128,7 @@ class TranslationService(BaseService[Translation]):
         new_file_stream = translation_output.output_bytes
         new_file_stream.seek(0)
         content_type = FileFormatHandler().get_content_type(src_file_format_type)
-        new_file_name = (f"{src_file_name}"
+        new_file_name = (f"{src_file_name.split('-', 1)[0]}"
                          + f"_{translation_file_schema.source_language}"
                          + f"_{translation_file_schema.target_language}"
                          + f".{src_file_format_type.value}")

@@ -4,11 +4,12 @@ from meditranslate.translation.text_processing.text_processor import TextProcess
 from meditranslate.translation.translation_input import FileTranslationInput, TextTranslationInput
 from meditranslate.translation.translation_output import FileTranslationOutput, TextTranslationOutput
 from meditranslate.translation.prompt_loader import get_sysprompt_construct
-from meditranslate.translation.llm_access import AnthropicClient
-
+# from meditranslate.translation.llm_access import AnthropicClient
+from meditranslate.translation.gemini_client import GeminiClient
 class TranslationEngine:
     def __init__(self):
-        self.anthropic_client = AnthropicClient()
+        # self.anthropic_client = AnthropicClient()
+        self.anthropic_client = GeminiClient()
         self.sysprompt_con = get_sysprompt_construct(version=3)
         self.text_processor = TextProcessor()
 
@@ -21,15 +22,14 @@ class TranslationEngine:
             translation, complete = await self.anthropic_client.translation(
                 system_prompt=system_prompt,
                 file_contents=src)
-
             dst = await self.text_processor.postprocess_result(translation)
+            
             translation_output = FileTranslationOutput(
                 output_bytes=dst,
                 translation_metadata={
                     "service":"none",
                     "complete": str(complete)
                 })
-
             return translation_output
         except AppError as e:  # Already handled - propagate.
             raise e

@@ -318,7 +318,7 @@ export async function translateFile(formData: FormData, detectedLanguage: string
 
         return {
             success: true,
-            fileId: srcFileData.data.id,
+            fileId: isTranslationSuccess.data.id,
             mockBlob: encodedString,
             blobType: type
         };

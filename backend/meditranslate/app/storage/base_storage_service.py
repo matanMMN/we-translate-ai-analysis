@@ -39,3 +39,18 @@ class BaseStorageService:
 
     def test_connection():
         raise NotImplementedError
+
+    def get_versioned_file_path(self, original_path: str, version: int) -> str:
+        """
+        Creates a versioned path for file storage
+        Example: 'folder/file.txt' -> 'folder/file.v2.txt'
+        """
+        path_parts = original_path.rsplit('.', 1)
+        if len(path_parts) == 2:
+            base, ext = path_parts
+            return f"{base}.v{version}.{ext}"
+        return f"{original_path}.v{version}"
+
+    def copy_to_version(self, source_path: str, version: int) -> str:
+        """Copy current file to a versioned path"""
+        raise NotImplementedError("Subclasses must implement copy_to_version")

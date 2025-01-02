@@ -30,6 +30,14 @@ services:
       - DEBUG_ON_INIT=False
     command: [ "python3", "-m","uvicorn", "main:app", "--reload","--host", "${APP_HOST}", "--port", "${APP_PORT}","--lifespan","on" ]
 
+  celery:
+    volumes:
+      - ..:/code
+    environment:
+      - DEBUG_ON_INIT=False
+      - PYTHONPATH=/code
+    command: ["celery", "-A", "meditranslate.app.celery_app.celery", "worker", "--loglevel=info", "--pool=prefork", "--concurrency=4"]
+
   # celery_worker:
   #   volumes:
   #     - ..:/code

@@ -55,8 +55,27 @@ class TranslationJob(Base):
 
     current_user: Mapped[Optional["User"]] = relationship('User',  foreign_keys=[current_user_id], lazy='select', remote_side='User.id')
 
-    reference_file: Mapped[Optional["File"]] = relationship('File',foreign_keys=[reference_file_id], lazy='select', remote_side='File.id')
-    source_file: Mapped[Optional["File"]] = relationship('File',foreign_keys=[source_file_id] ,lazy='select', remote_side='File.id')
+    reference_file: Mapped[Optional["File"]] = relationship(
+        'File',
+        foreign_keys=[reference_file_id],
+        lazy='select',
+        remote_side='File.id',
+        cascade="all, delete"  # This will cascade the delete operation
+    )
+    source_file: Mapped[Optional["File"]] = relationship(
+        'File',
+        foreign_keys=[source_file_id],
+        lazy='select',
+        remote_side='File.id',
+        cascade="all, delete"
+    )
+    target_file: Mapped[Optional["File"]] = relationship(
+        'File',
+        foreign_keys=[target_file_id],
+        lazy='select',
+        remote_side='File.id',
+        cascade="all, delete"
+    )
 
     translations: Mapped[List["Translation"]] = relationship('Translation', back_populates="translation_job", lazy='select')
 

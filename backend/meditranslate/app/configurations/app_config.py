@@ -103,6 +103,13 @@ class AppConfig(Config):
         )
     ] = Field(os.environ.get("ANTHROPIC_API_KEY"),title="ANTHROPIC_API_KEY",description="")
 
+    GOOGLE_API_KEY: Annotated[
+        str,
+        StringConstraints(
+            strip_whitespace=True
+        )
+    ] = Field(os.environ.get("GOOGLE_API_KEY", ""), title="GOOGLE_API_KEY", description="")  # Add default empty
+
     ANTHROPIC_MODEL_NAME: Annotated[
         str,
         StringConstraints(

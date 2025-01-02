@@ -37,4 +37,12 @@ class FileController(BaseController[File]):
     async def download_file(self,file_id:str):
         return await self.file_service.download_file(file_id=file_id)
 
+    async def get_file_versions(self, file_id: str):
+        return await self.file_service.get_file_versions(file_id=file_id)
+    
+    async def get_specific_version(self, file_id: str, version_number: int):
+        return await self.file_service.get_specific_version(file_id=file_id, version_number=version_number)
+    
+    async def restore_version(self, file_id: str, version_number: int, current_user: User):
+        return await self.file_service.restore_version(file_id=file_id, version_number=version_number, current_user=current_user)
 

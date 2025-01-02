@@ -266,6 +266,7 @@ export interface Project {
     destFileId?: number | string;
     description: string,
     reference_file_id?: number | string;
+    target_file_id?: number | string;
     title: string;
     source_language: string;
     is_translating: boolean;

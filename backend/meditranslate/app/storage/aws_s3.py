@@ -140,6 +140,7 @@ class AWSStorageService(BaseStorageService):
         return complete_file_io
 
     def delete_file(self, file_path:str):
+        print("DELETING FILE FROM S3")
         file_obj = self.get_file(file_path)
         if file_obj is None:
             raise Exception("file cannot be deleted , it does not exists")
@@ -151,3 +152,25 @@ class AWSStorageService(BaseStorageService):
         except ClientError as e:
             logger.error(f"Error deleting file: {e}")
             raise Exception(f"Failed to delete file: {e}")
+
+    def copy_to_version(self, source_path: str, version: int) -> str:
+        """
+        Creates a new version of a file by copying within S3
+        """
+        print("EXECUTING COPY TO VERSION")
+        try:
+            versioned_path = self.get_versioned_file_path(source_path, version)
+            copy_source = {
+                'Bucket': self.bucket_name,
+                'Key': source_path
+            }
+            
+            bucket = self.s3_resource.Bucket(self.bucket_name)
+            bucket.copy(copy_source, versioned_path)
+            
+            logger.info(f"Created version {version} at path {versioned_path}")
+            return versioned_path
+            
+        except ClientError as e:
+            logger.error(f"Error creating version {version} for file {source_path}: {e}")
+            raise Exception(f"Failed to create file version: {e}")

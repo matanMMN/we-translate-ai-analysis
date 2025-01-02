@@ -1,12 +1,54 @@
 services:
 
+  celery:
+    restart: unless-stopped
+    container_name: celery
+    stop_signal: SIGTERM
+    build:
+      context: ..
+      dockerfile: ./.docker/Dockerfile.celery
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PYTHONDONTWRITEBYTECODE=1
+      - RUN_IN_DOCKER=True
+      - DATABASE_URL=${DATABASE_URL}    # PostgreSQL
+      - CELERY_BACKEND_URL=${CELERY_BACKEND_URL}  # Redis
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL}  # RabbitMQ
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
+      - ENVIRONMENT=${ENVIRONMENT}
+      - APP_HOST=${APP_HOST}
+      - APP_PORT=${APP_PORT}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}  # Required for PDF processing
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}  # Required for file storage
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_ENDPOINT_URL=${AWS_ENDPOINT_URL}
+      - BUCKET_NAME=${BUCKET_NAME}
+      - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
+      - AWS_REGION_NAME=${AWS_REGION_NAME}
+      - REDIS_URL=${REDIS_URL}  # Required for Celery
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}  # Required for AI processing
+      - ANTHROPIC_MODEL_NAME=${ANTHROPIC_MODEL_NAME}
+      - CLAUDE_MAX_TOKENS=${CLAUDE_MAX_TOKENS}
+      - CLAUDE_TEMPERATURE=${CLAUDE_TEMPERATURE}
+      - CLAUDE_MAX_REPS=${CLAUDE_MAX_REPS}
+    command: ["./start-celery.sh"]
+    depends_on:
+      - backend
+      - redis
+      - rabbitmq
+      - localstack
+    networks:
+      - backend_network
+      - monitoring_network
+
   app:
     container_name: app
     build:
-      context: ../../frontend  # Adjust the context to your frontend directory
-      dockerfile: Dockerfile  # Specify the Dockerfile for the frontend if needed
+      context: ../../frontend 
+      dockerfile: Dockerfile 
     ports:
-      - "3000:3000"  # Expose the frontend port
+      - "3000:3000" 
     environment:
       - NEXTAUTH_SECRET=SUPER_SECRET
       - NODE_DEV=development

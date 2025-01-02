@@ -14,7 +14,7 @@ import { useAppSelector } from '@/hooks/useAppSelector'
 import { setTranslatedFile } from '@/store/slices/projectSlice'
 import { useRouter } from 'next/navigation'
 import { useSession } from "next-auth/react";
-import { selectSession } from "@/store/slices/sessionSlice";
+import { selectSession, setProjectTargetFileId } from "@/store/slices/sessionSlice";
 import { clearAllLocalStorage } from "@/store/slices/projectCacheSlice";
 
 const ACCEPTED_FILE_TYPES = {
@@ -89,6 +89,7 @@ export default function TranslateFile() {
                 }
 
                 setTranslationState('completed')
+                dispatch(setProjectTargetFileId(response.fileId))
                 dispatch(clearAllLocalStorage({ projectId }))
             } else {
                 throw new Error(response.error || 'Translation failed')
