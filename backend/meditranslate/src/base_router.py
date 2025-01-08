@@ -6,6 +6,7 @@ from meditranslate.src.translation_jobs.translation_job_router import translatio
 from meditranslate.src.translations.translation_router import translation_router
 from meditranslate.src.files.file_router import file_router
 from meditranslate.src.webhooks.webhook_router import webhook_router
+from meditranslate.src.requests.requests_router import requests_router
 
 
 base_router = APIRouter()
@@ -28,6 +29,11 @@ base_router.include_router(
 base_router.include_router(
     router=auth_router,
     prefix="/auth"
+)
+
+base_router.include_router(
+    router=requests_router,
+    prefix="/requests"
 )
 
 base_router.include_router(

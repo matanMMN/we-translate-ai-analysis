@@ -1,7 +1,8 @@
 import {NextAuthOptions} from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import {encode as defaultEncode, JWTEncodeParams} from "next-auth/jwt";
-import {serverUrl} from "@/lib/functions";
+import { serverUrl } from "@/lib/functions";
+import { UserRole } from "@/types/roles";
 
 
 export const authOptions: NextAuthOptions = {
@@ -20,17 +21,11 @@ export const authOptions: NextAuthOptions = {
                 password: {label: "Password", type: "password"}
             },
             async authorize(credentials: Record<"email" | "password", string> | undefined) {
+                if (!credentials || !credentials?.email || !credentials?.password) {
+                    throw new Error('Missing credentials');
+                }
                 try {
-                    if (!credentials)
-                        return null;
                     const {email, password} = credentials;
-
-                    if (!email || !password) {// || email !== "admin" || password !== "admin") {
-                        throw new Error('Invalid credentials');
-                    }
-
-                    // const res: User = await ApiClient.auth(email, password);
-                    console.log(email, password, serverUrl)
                     const data = await fetch(`${serverUrl}/auth/token`, {
                         method: 'POST',
                         headers: {
@@ -46,41 +41,38 @@ export const authOptions: NextAuthOptions = {
                             client_secret: 'string'
                         })
                     })
-                    console.log(serverUrl)
-                    console.log(data)
+
                     const res = await data.json()
-                    console.log(res)
-                    if (!res.access_token) {
+
+                    if (!res || !res.access_token) {
                         throw new Error('User not found');
                     }
-                    console.log("Res", res)
-                    const userRes = await fetch(`${serverUrl}/users/me/`, { // default user
+
+                    const userRes = await fetch(`${serverUrl}/users/me/`, { 
                         headers: {
                             'accept': 'application/json',
                             'Content-Type': 'application/json',
                             'Authorization': `Bearer ${res.access_token}`
                         }
                     })
+
                     const user = await userRes.json()
-                    console.log(user)
+
                     if (user.status_code !== 200)
                         throw new Error("User not found")
                     return {
-                        name: (user.data.first_name + " " + user.data.last_name) || "Null Null",
-                        email: user.data.email || "null@email.com",
+                        name: (user.data.first_name + " " + user.data.last_name) || user.data.email,
+                        email: user.data.email,
                         userId: user.data.id,
                         accessToken: res.access_token,
                         tokenType: res.token_type,
+                        role: user.data.role as UserRole
                     } as any
-                    // return {
-                    //     userId: res.id,
-                    //     name: res.first_name,
-                    //     email: res.email,
-                    // } as unknown as User;
 
+                    
                 } catch (e) {
                     console.error(e)
-                    throw new Error("Login failed");
+                    throw e
                 }
             }
         }),
@@ -95,16 +87,19 @@ export const authOptions: NextAuthOptions = {
                 session.accessToken = token.access_token as string;
                 session.tokenType = token.token_type as string;
                 session.userId = token.userId as string
+                session.user.role = token.role as UserRole;
+
             }
 
-            const userRes = await fetch(`${serverUrl}/users/me/`, { // default user
+            const userRes = await fetch(`${serverUrl}/users/me/`, {
                 headers: {
                     'accept': 'application/json',
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token.access_token}`
                 }
             });
-            const user: { status_code: number, data: { first_name: string, last_name: string } } = await userRes.json();
+
+            const user = await userRes.json();
 
             if (user.status_code !== 200) {
                 throw new Error("User not found");
@@ -124,6 +119,7 @@ export const authOptions: NextAuthOptions = {
                 token.access_token = user.accessToken;
                 token.token_type = user.tokenType;
                 token.userId = user.userId
+                token.role = user.role;
             }
 
             return token;
@@ -135,5 +131,3 @@ export const authOptions: NextAuthOptions = {
         }
     },
 }
-
-//'Authorization' = `Bearer ${accessToken}`

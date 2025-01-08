@@ -14,7 +14,7 @@ from meditranslate.src.files.file_schemas import (
     FilePointersResponseSchema,
 
 )
-
+from meditranslate.src.auth.permissions import Permission, requires_permissions
 from fastapi.responses import StreamingResponse
 
 file_router = APIRouter(tags=["files"],dependencies=[Depends(AuthenticationRequired)])
@@ -50,6 +50,7 @@ async def update_file(
     )
 
 @file_router.post("/upload/", response_model=FilePointerResponseSchema,status_code=201)
+@requires_permissions([Permission.FILE_UPLOAD])
 async def upload_file(
     current_user: CurrentUserDep,
     background_tasks: BackgroundTasks,

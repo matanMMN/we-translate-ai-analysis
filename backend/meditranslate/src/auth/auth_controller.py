@@ -1,6 +1,3 @@
-from typing import Any, List
-
-from fastapi import Request
 
 from meditranslate.app.db.transaction import Propagation, Transactional
 from meditranslate.app.shared.base_controller import BaseController

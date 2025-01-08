@@ -45,6 +45,7 @@ class UserService(BaseService[User]):
 
     async def get_user(self,user_id: str,raise_exception:bool=True,to_public:bool=True) -> Optional[User]:
         user = await self.user_repository.get_by(field="id",value=user_id,unique=True)
+        
         if user is None:
             if raise_exception:
                 raise AppError(
@@ -56,6 +57,7 @@ class UserService(BaseService[User]):
                 return None
         if to_public:
             public_user = self._to_public(user)
+            print(public_user)
             return public_user
         else:
             return user

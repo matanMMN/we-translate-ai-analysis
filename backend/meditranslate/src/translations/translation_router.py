@@ -98,17 +98,17 @@ async def translation_file(
     return FilePointerResponseSchema(data=file, status=ret_status)
 
 
-@translation_router.post(
-    path="/file/{file_id}/",
-    status_code=200
-)
-async def translation_file_with_worker(
-    current_user: CurrentUserDep,
-    file_id:str,
-    translation_file_schema: Annotated[TranslationFileSchema,Body()],
-    translation_controller: TranslationController = Depends(Factory.get_translation_controller)
-):
-    """
-    Create a new translation.
-    """
-    translation_file_task(current_user,file_id,translation_file_schema,translation_controller)
+# @translation_router.post(
+#     path="/file/{file_id}/",
+#     status_code=200
+# )
+# async def translation_file_with_worker(
+#     current_user: CurrentUserDep,
+#     file_id:str,
+#     translation_file_schema: Annotated[TranslationFileSchema,Body()],
+#     translation_controller: TranslationController = Depends(Factory.get_translation_controller)
+# ):
+#     """
+#     Create a new translation.
+#     """
+#     translation_file_task(current_user,file_id,translation_file_schema,translation_controller)

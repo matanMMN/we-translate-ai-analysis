@@ -1,12 +1,12 @@
 from fastapi import APIRouter
-from fastapi import APIRouter,Request,Query,Body
-
+from fastapi import APIRouter,Query,Body
+from meditranslate.src.auth.permissions import Permission, requires_permissions
 from meditranslate.app.dependancies.auth import AuthenticationRequired
 from meditranslate.app.dependancies.user import CurrentUserDep
 from meditranslate.app.shared.factory import Factory
 from meditranslate.app.shared.schemas import PaginationSchema,MetaSchema
 
-from typing import Any,List,Annotated,Optional
+from typing import Any,Annotated
 from meditranslate.src.translation_jobs.translation_job_schemas import (
     TranslationJobCreateSchema,
     TranslationJobUpdateSchema,
@@ -14,8 +14,6 @@ from meditranslate.src.translation_jobs.translation_job_schemas import (
     TranslationJobsResponseSchema,
     GetManySchema,
 )
-from fastapi.responses import JSONResponse
-import json
 from meditranslate.app.loggers import logger
 
 from fastapi import Depends
@@ -29,11 +27,8 @@ translation_job_router = APIRouter(
 
 
 
-@translation_job_router.post(
-    path="",
-    response_model=TranslationJobResponseSchema,
-    status_code=201,
-)
+@translation_job_router.post(path="",response_model=TranslationJobResponseSchema, status_code=201)
+@requires_permissions([Permission.PROJECT_CREATE])
 async def create_translation_job(
     current_user: CurrentUserDep,
     translation_job_create_schema: Annotated[TranslationJobCreateSchema,Body(example={
@@ -74,11 +69,8 @@ async def get_translation_job(
     )
 
 
-@translation_job_router.put(
-    "/{translation_job_id}",
-    response_model=TranslationJobResponseSchema,
-    status_code=200
-)
+@translation_job_router.put("/{translation_job_id}",response_model=TranslationJobResponseSchema,status_code=200)
+@requires_permissions([Permission.PROJECT_UPDATE])
 async def update_translation_job(
     current_user: CurrentUserDep,
     translation_job_id: str,
@@ -98,10 +90,8 @@ async def update_translation_job(
     )
 
 
-@translation_job_router.delete(
-    "/{translation_job_id}",
-    status_code=200,
-)
+@translation_job_router.delete("/{translation_job_id}",status_code=200)
+@requires_permissions([Permission.PROJECT_DELETE])
 async def delete_translation_job(
     current_user: CurrentUserDep,
     translation_job_id: str,

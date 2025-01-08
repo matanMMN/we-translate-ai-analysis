@@ -1,3 +1,4 @@
+from meditranslate.utils.user_role.user_role import UserRole
 from meditranslate.app.shared.schemas import BaseResponseSchema, BaseSchema,GetManySchema,ObjectIdSchema,UserFullNamesModificationSchema, UserIdentifiersModificationSchema,ModificationTimestampSchema,NameStr,UserNameStr,PassWordStr
 from typing import List,Optional,Dict,Any,Literal,Union
 from datetime import datetime,date
@@ -10,20 +11,21 @@ class PublicUserSchema(ObjectIdSchema,UserFullNamesModificationSchema,Modificati
     first_name: Optional[NameStr] = Field(None, title="First Name", description="User's first name")
     last_name : Optional[NameStr]= Field(None, title="Last Name", description="User's last name")
     last_login: Optional[date] = Field(None, title="last_login", description="Any additional user data")
-
+    role : Optional[str] = Field(UserRole.TRANSLATOR, title="role", description="")
 class UserSchema(ObjectIdSchema,UserFullNamesModificationSchema,ModificationTimestampSchema,UserIdentifiersModificationSchema):
     email : EmailStr = Field(None, title="Email", description="User email address")
     username : UserNameStr = Field(None, title="Username", description="User's username")
     first_name : Optional[NameStr] = Field(None, title="First Name", description="User's first name")
     last_name : Optional[NameStr] = Field(None, title="Last Name", description="User's last name")
     last_login: Optional[date] = Field(None, title="last_login", description="Any additional user data")
-
+    role : Optional[str] = Field(UserRole.TRANSLATOR, title="role", description="")
 class UserCreateSchema(BaseSchema):
     email :EmailStr = Field(..., title="Email", description="User email address")
     username : UserNameStr = Field(..., title="Username", description="User's username")
     password : PassWordStr = Field(..., title="Password", description="Password",repr=False)
     first_name : NameStr = Field(None, title="First Name", description="User's first name")
     last_name : NameStr = Field(None, title="LaBaseUserSchema,Creast Name", description="User's last name")
+    role : Optional[str] = Field(UserRole.TRANSLATOR, title="role", description="")
 
 class UserUpdateSchema(BaseSchema):
     email : Optional[EmailStr] = Field(None, title="Email", description="User email address")
@@ -31,6 +33,7 @@ class UserUpdateSchema(BaseSchema):
     password : Optional[PassWordStr] = Field(None, title="Password", description="Password",repr=False)
     first_name : Optional[NameStr] = Field(None, title="First Name", description="User's first name")
     last_name : Optional[NameStr] = Field(None, title="First Name", description="User's Last name")
+    role : Optional[str] = Field(UserRole.TRANSLATOR, title="role", description="")
 
 class UserResponseSchema(BaseResponseSchema):
     data: UserSchema

@@ -33,7 +33,8 @@ async def register_user(
             "username": "string",
             "password" : "string",
             "first_name":"example",
-            "last_name":"example"
+            "last_name":"example",
+            "role":"TRANSLATOR"
         })],
     auth_controller: AuthController = Depends(Factory.get_auth_controller)
 )-> UserResponseSchema:

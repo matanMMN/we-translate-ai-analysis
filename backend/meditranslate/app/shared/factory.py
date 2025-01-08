@@ -13,8 +13,11 @@ from meditranslate.src.webhooks.webhook_repository import WebhookRepository
 from meditranslate.src.webhooks.webhook_service import WebhookService
 from meditranslate.src.webhooks.webhook_controller import WebhookController
 from meditranslate.src.translation_jobs.translation_job_controller import TranslationJobController
+from meditranslate.src.requests.requests_controller import RequestsController
 from meditranslate.src.translation_jobs.translation_job_service import TranslationJobService
+from meditranslate.src.requests.requests_service import RequestsService
 from meditranslate.src.translation_jobs.translation_job_repository import TranslationJobRepository
+from meditranslate.src.requests.requests_repository import RequestRepository
 from meditranslate.app.storage import file_storage_service
 from meditranslate.translation import translation_engine
 from meditranslate.src.users.user_controller import UserController
@@ -47,6 +50,10 @@ class Factory:
     @staticmethod
     def get_translation_job_controller(db_session=Depends(get_session)) -> TranslationJobController:
         return TranslationJobController(TranslationJobService(TranslationJobRepository(db_session)))
+    
+    @staticmethod
+    def get_requests_controller(db_session=Depends(get_session)) -> RequestsController:
+        return RequestsController(RequestsService(RequestRepository(db_session),TranslationJobRepository(db_session)))
 
     @staticmethod
     def get_translation_controller(db_session=Depends(get_session)) -> TranslationController:

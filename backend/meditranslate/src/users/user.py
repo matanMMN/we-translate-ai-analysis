@@ -1,9 +1,11 @@
 from __future__ import annotations
 from meditranslate.app.db import Base
-from sqlalchemy import UUID, ForeignKey, String, Boolean, DateTime,LargeBinary,JSON,Enum,Float,Date,UniqueConstraint,Text
+from sqlalchemy import UUID, ForeignKey, String, Boolean,LargeBinary,JSON,Enum,Date
 from sqlalchemy.orm import Mapped, mapped_column,relationship
-from typing import Optional,List,Dict
-from datetime import date,datetime
+from typing import Optional,Dict
+from datetime import date
+from meditranslate.utils.user_role.user_role import UserRole
+
 
 class User(Base):
     __tablename__ = 'users'
@@ -12,6 +14,7 @@ class User(Base):
     username: Mapped[str] = mapped_column(String, unique=True, index=True)
     hashed_password: Mapped[bytes] = mapped_column(LargeBinary, nullable=False)
 
+    role: Mapped[Optional[UserRole]] = mapped_column(Enum(UserRole, native_enum=False), nullable=False, default=UserRole.TRANSLATOR)
     first_name: Mapped[Optional[str]] = mapped_column(String, nullable=True,default=None)
     last_name: Mapped[Optional[str]] = mapped_column(String, nullable=True,default=None)
 
