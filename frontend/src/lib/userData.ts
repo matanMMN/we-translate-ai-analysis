@@ -1,5 +1,6 @@
 import avatar1 from '@/assets/user1avatar.svg'
 import avatar2 from '@/assets/user2avatar.svg'
+import { UserRole } from '@/types/roles';
 
 //
 // const getPriority = () => {
@@ -30,6 +31,7 @@ export interface User {
     auth: boolean;
     accessToken: string;
     allProjects?: Array<Project>
+    role: UserRole
 }
 
 export interface ProjectMember {
